@@ -1,156 +1,106 @@
+# Redstone Pen
 
-## Redstone Pen
+A Minecraft Java Edition mod adding a pen to draw Redstone tracks more accurately.
+Inspired by Redstone Paste.
 
-----
-## Version history
+## Fork Status
 
-    - v1.11.42    [F] Redstone Remote compat issue fixed (issue #63, ty petio).
-                  [F] Fixed RLC custom label retention when breaking (#59, ty toastonrye).
-                  [F] Fixed RLC UI documentation hint contrast (issue #61).
-                  [F] Fixed Track source direction update (issue #58, ty tnoppeney).
+This fork continues development from the original archived project at
+`stfwi/redstonepen`.
 
-    - v1.11.41    [A] Redstone Remote can now enable/disable Redstone Logic Controls.
-                  [M] Adapted Pen bulk connector placement (no sneak required now).
+- Default branch: `main`
+- Supported loader: NeoForge
+- Current code base: derived from the original `neoforge-1.21` branch
 
-    - v1.11.40    [-] (Version skipped in Neoforge).
+## Project Links
 
-    - v1.11.39    [M] Updated lang zh_cn (ty special_tt).
+- Original archive: https://github.com/stfwi/redstonepen
+- Fork issues: https://github.com/whilestevego/redstonepen/issues
+- Fork repository: https://github.com/whilestevego/redstonepen
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
 
-    - v1.11.38    [F] Fixed loot table folder name (causing no drops on break).
-                  [F] In-block-multi-track update fix and performance cleanups.
-                  [M] Pen/Quill Track segment placement/removal now vanilla-like
-                      (right-click: place segment, left-click: remove segment).
-                  [M] Pen cannot break any blocks except Redstone wires/tracks.
-                  [A] Added Basic Redstone Gauge (*experimental* signal display).
-                  [A] Added Redstone Remote (*experimental* lever/button control).
+## Description
 
-    - v1.11.37    [F] Added TIVx() minimum interval documentation (issue #50, ty aerotactics).
-                  [F] In-block-multi-track update regression fixed (#51, ty aerotactics).
-                  [M] RLC parser edited to indicate an error for unknown signal processing
-                      identifiers (".CO", ".RE", ".FE"). (Issue #46, ty aerotactics).
-                  [F] Addressed incompatibility with FrozenLib (issue #47, ty GuineaPig)
-                  [M] Log file tagging improved, Pen debugging capabilities added in
-                      release mode.
-                  [M] Moved RCA (Redstone Client Adapter) memory map file
-                      root from the tmpdir to the game directory, @see
-                      https://github.com/stfwi/redstonepen/tree/redstone-client-adapter.
+Adds "one pen to draw them all" and helps with simpler Redstone handling.
 
-    - v1.11.33    [U] Updated to 1.21 neoforge.
+![](documentation/pentracks.png)
 
-    - v1.8.32     [A] Basic Lever, Button, and Pulse Button added.
-                  [M] TICKRATE=t now ignores signal interrupts (makes
-                      closed loop control simpler, issue #41).
-                  [M] Refactoring to improve loader compatibility.
+### Redstone Quill and Pen Items
 
-    - v1.8.31     [F] Fixed RLC UI initialization locking (issue #40, ty shinchai).
-                  [F] Bridge Relay to Track update fixed.
-                  [F] RCA init order fixed.
-                  [M] RLC editor cursor brightness increased.
+Craft and use them to draw or remove thin Redstone Tracks. Multiple independent
+tracks through one block space are possible. There are two versions:
 
-    - v1.8.30     [F] Fixed track segments adding/removing updates.
+- The Redstone Quill uses Redstone dust directly from your inventory.
+- The Redstone Pen stores Redstone in the item and can be refilled in the
+  crafting grid with Redstone Dust or Redstone Blocks.
+- Both allow you to inspect the current signal of a block, track, wire, or
+  device by sneaking while holding the pen or quill and looking at the block of
+  interest.
+- Both do not destroy blocks when left-clicking, except blocks with no
+  hardness, like grass, repeaters, or comparators.
 
-    - v1.8.29     [U] Initial port for Neoforge 1.20.4 (20.4.200).
-                  [M] Added RLC interval timer instance `TIV3`.
-                  [M] Added RLC TIVx enable signal (2nd argument).
-                  [M] Re-implemented/refactored Track optimizations.
-                  [M] Redstone Track colour brightness adapted.
-                  [M] Redstone Relay stone texture edited.
+### Block Signal Connectors
 
-    - v1.3.22     [F] Fixed connection update for Redstone Tracks (issue #28, ty fluppkin).
+Especially for compact wiring it is desirable to decide whether a Track shall
+power the block underneath or not. Therefore the Pen-Tracks do normally not
+connect to the block they are drawn on. To change this, add an explicit
+connector by clicking the centre of a Track with a Pen. Tracks intentionally do
+not pass indirect power through blocks to other Tracks, so you can power those
+blocks from independent routes without interference.
 
-    - v1.3.21     [U] Initial port to NeoForged 1.20.1.
+![](documentation/rspen-connector.png)
 
-    - v1.3.20     [U] Initial Forge port to 1.20.1.
+### Redstone Relays
 
-    - v1.2.20     [F] Fixed Optifine related preview-rendering issue (#26, thx wisquimas).
+Relays are like Redstone-powered solenoids that move built-in Redstone Torches
+back or forth so that they re-power Redstone signals to 15. They can be placed
+on solid faces in all directions. Output is only to the front, while inputs are
+at all sides except from above. The internal mechanics define what happens at
+the output side when the input signals change. Relays also detect indirect power
+from blocks they are placed on and can therefore be used to pass Track signals
+through blocks.
 
-    - v1.2.19     [M] RLC font size reduced, enabling to write 23 code lines.
+- **Redstone Relay:** Straight-forward input-on, output-on relay. Different
+  from a Repeater, it has no switch-on delay, but instead a switch-off delay of
+  one tick.
+- **Inverted Redstone Relay:** Input-on, output-off relay. Switch-on delay one
+  tick, no off delay.
+- **Bi-Stable Redstone Relay:** Flips when detecting an off-to-on transition at
+  the input.
+- **Pulse Redstone Relay:** Emits a short pulse at the output side when
+  detecting an off-to-on transition at the input.
 
-    - v1.2.18     [F] Fixed RLC tickrate=1 TON operation.
-                  [A] Added deadline based RLC tick adaption.
-                  [A] Added RLC TIV1/2 function blocks (Interval timed pulse
-                      every N ticks, two instances TIV1 and TIV2).
-                  [A] Added RLC comparator signal capture on redstone outputs.
+![](documentation/relays.png)
 
-    - v1.2.17     [F] Fixed RLC swapped port colors when placed on ceilings.
+- **Bridging Relay:** A Redstone Relay allowing tracks to cross. It forwards
+  power back to front like a normal Relay and has an additional independent wire
+  from left to right.
 
-    - v1.2.16     [U] Initial Forge port to 1.19.2.
+![](documentation/bridging-relay.png)
 
-    - v1.1.15     [U] Initial Forge port to 1.19.1.
-                  [A] Added translation zh_cn (PR#15, deluxghost).
+### Redstone Logic Control
 
-    - v1.0.14     [U] Forge updated to Forge 41.1.0.
+Simplified PLC-like, text-code-based signal controller. See the detailed
+documentation here:
 
-    - v1.0.13     [U] Forge updated to Forge 1.19-41.0.64.
+- [Redstone Logic Control documentation](documentation/redstone-logic-control/readme.md)
 
-    - v1.0.12     [F] Minor Track placement fixes.
-                  [M] Library/obsolete MC override cleanups.
+![](documentation/redstone-logic-control-1.png)
+![](documentation/redstone-logic-control-2.png)
 
-    - v1.0.11     [U] Initial 1.19 port.
+### Recipes
 
-    - v1.0.10     [R] Release build.
-                  [F] Fixed RLC GUI freeze on hot bar item quick move (issue #11, ty serifina).
+![](documentation/rspen-quill-recipe.png)
+![](documentation/rspen-penrecipe.png)
+![](documentation/relay-recipe1.png)
 
-    - v1.0.10-b3  [F] Fixed RCA indicator in the RLC GUI.
+## Community and References
 
-    - v1.0.10-b2  [A] Added basic mmap based approach for the Redstone
-                      Client Adapter (interfacing Arduino & Co).
+- Discord: the Redstone Pen has a channel on the
+  [Modded Redstone Discord server](https://discord.gg/6K958GsWq5)
+- Credits: the Redstone Remote item is heavily inspired by Lothazar's Cyclic
+  Remote Lever
 
-    - v1.0.10-b1  [U] Updated to 1.18.2.
+## License
 
-    - v1.0.9      [R] Release build.
-                  [A] Added RLC counter documentation.
-                  [A] Added RLC TICKRATE variable.
-                  [M] Pen recipe advancement edited.
-
-    - v1.0.9-b3   [A] Added Redstone Logic Control.
-                  [A] Added relay placement preview.
-                  [A] Added language support for Português (PR#2, faelBrunnoS).
-                  [A] Added Pen crafting advancement.
-                  [A] Added language es_es (PR#3, hacheraw).
-
-    - v1.0.9-b2   [R] Fixed regression issue related to #1.
-
-    - v1.0.9-b1   [F] Fixed diagonal placement RS notification (issue #1, ty iris-xii, rodg).
-                  [M] Creative mode pen handling edited.
-                  [F] Relay occlusion/shadow fixed.
-
-    - v1.0.8      [R] Release build.
-
-    - v1.0.8-b2   [M] Forge/gradle update, minor adaptions.
-
-    - v1.0.8-b1   [U] Initial 1.18.1 port.
-
-    - v1.0.7      [R] Initial 1.17.1 release.
-
-    - v1.0.7-b1   [U] Initial 1.17.1 port.
-
-    - v1.0.6      [F] Bridging Relay added to support wire crossings.
-
-    - v1.0.6-b1   [F] Fixed track net update power flags caching issue.
-
-    - v1.0.5      [A] Added Pulse Redstone Relay.
-
-    - v1.0.4      [A] Added Inverted Redstone Relay.
-                  [A] Added Bi-Stable Redstone Relay.
-                  [F] Fixed Pen/Quill model 3rd person view.
-
-    - v1.0.3      [A] Added Redstone Relay.
-
-    - v1.0.2      [A] Added Redstone Quill (uses Redstone directly from the inventory).
-                  [F] Wire update when removing diagonal/orthogonal tracks fixed.
-
-    - v1.0.2-b1   [F] Fixed placement net update of tracks around the corner.
-                  [I] Known issue: Power update around the corner when placing
-                      not yet always working.
-
-    - v1.0.1      [F] Fixed block removal bug (thx focsie).
-                  [F] Fixed vanilla Redstone connection bug.
-
-    - v1.0.0      [R] Initial release.
-                  [F] Internal mod logo image rescaled.
-                  [F] Fixed indirect non-wire bulk connector power reading.
-
-    - v1.0.0-b1   [A] Initial implementation.
-
------
+MIT. See `license`.
