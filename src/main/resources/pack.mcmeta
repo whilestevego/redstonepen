@@ -1,6 +1,10 @@
 {
   "pack": {
     "description": "redstonepen resources",
-    "pack_format": 22
+    "pack_format": 48,
+    "supported_formats": [
+      0,
+      2147483647
+    ]
   }
 }
