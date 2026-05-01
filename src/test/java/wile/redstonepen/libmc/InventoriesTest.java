@@ -65,4 +65,86 @@ class InventoriesTest
     assertEquals(1, copy.getItem(0).getCount());
     assertNotSame(source.getItem(0), copy.getItem(0));
   }
+
+  @Test
+  void areItemStacksIdenticalTrueForSameItemAndComponents()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE, 5);
+    final ItemStack b = new ItemStack(Items.REDSTONE, 5);
+
+    assertTrue(Inventories.areItemStacksIdentical(a, b));
+  }
+
+  @Test
+  void areItemStacksIdenticalFalseForDifferentItems()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE);
+    final ItemStack b = new ItemStack(Items.COAL);
+
+    assertFalse(Inventories.areItemStacksIdentical(a, b));
+  }
+
+  @Test
+  void areItemStacksDifferentIsTrueWhenItemsDiffer()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE);
+    final ItemStack b = new ItemStack(Items.COAL);
+
+    assertTrue(Inventories.areItemStacksDifferent(a, b));
+  }
+
+  @Test
+  void areItemStacksDifferentIsFalseForSameItem()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE, 3);
+    final ItemStack b = new ItemStack(Items.REDSTONE, 3);
+
+    assertFalse(Inventories.areItemStacksDifferent(a, b));
+  }
+
+  @Test
+  void isItemStackableOnFalseForEmptySourceStack()
+  {
+    final ItemStack b = new ItemStack(Items.REDSTONE);
+
+    assertFalse(Inventories.isItemStackableOn(ItemStack.EMPTY, b));
+  }
+
+  @Test
+  void isItemStackableOnFalseForUnstackableItem()
+  {
+    // IRON_PICKAXE has max stack size of 1 → not stackable
+    final ItemStack a = new ItemStack(Items.IRON_PICKAXE);
+    final ItemStack b = new ItemStack(Items.IRON_PICKAXE);
+
+    assertFalse(Inventories.isItemStackableOn(a, b));
+  }
+
+  @Test
+  void isItemStackableOnTrueForMatchingStackableItems()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE, 3);
+    final ItemStack b = new ItemStack(Items.REDSTONE, 10);
+
+    assertTrue(Inventories.isItemStackableOn(a, b));
+  }
+
+  @Test
+  void isItemStackableOnFalseForDifferentItems()
+  {
+    final ItemStack a = new ItemStack(Items.REDSTONE);
+    final ItemStack b = new ItemStack(Items.COAL);
+
+    assertFalse(Inventories.isItemStackableOn(a, b));
+  }
+
+  @Test
+  void copyOfPreservesContainerSize()
+  {
+    final SimpleContainer source = new SimpleContainer(5);
+
+    final SimpleContainer copy = (SimpleContainer)Inventories.copyOf(source);
+
+    assertEquals(5, copy.getContainerSize());
+  }
 }

@@ -1,6 +1,7 @@
 package wile.redstonepen.gametest;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
@@ -61,6 +62,64 @@ public final class RelayGameTests
 
     helper.succeedWhen(() -> assertRelayState(helper, Registries.getBlock("bistable_relay"), true, 1,
       "expected bistable relay to latch on after the first rising edge"));
+  }
+
+  // --- Facing / rotation ---
+
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
+  public static void relayDownFacingRotation0ActivatesFromEast(GameTestHelper helper)
+  {
+    // FACING=DOWN ROTATION=0: getFrontFacing=NORTH (output). EAST is an accepted input side.
+    Block relayBlock = Registries.getBlock("relay");
+    helper.setBlock(RELAY_POS.east(), Blocks.REDSTONE_BLOCK);
+    helper.setBlock(RELAY_POS, relayBlock.defaultBlockState()
+      .setValue(CircuitComponents.DirectedComponentBlock.FACING, Direction.DOWN)
+      .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+
+    helper.succeedWhen(() -> assertRelayState(helper, relayBlock, true, 0,
+      "relay with FACING=DOWN ROTATION=0 must activate when input is from east (non-output side)"));
+  }
+
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
+  public static void relayDownFacingRotation0DoesNotActivateFromNorth(GameTestHelper helper)
+  {
+    // FACING=DOWN ROTATION=0: getFrontFacing=NORTH (output). Input from NORTH must be ignored.
+    Block relayBlock = Registries.getBlock("relay");
+    helper.setBlock(RELAY_POS.north(), Blocks.REDSTONE_BLOCK);
+    helper.setBlock(RELAY_POS, relayBlock.defaultBlockState()
+      .setValue(CircuitComponents.DirectedComponentBlock.FACING, Direction.DOWN)
+      .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+
+    helper.succeedWhen(() -> assertRelayState(helper, relayBlock, false, 0,
+      "relay with FACING=DOWN ROTATION=0 must not activate when input is from north (output side)"));
+  }
+
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
+  public static void relayDownFacingRotation1ShiftsOutputToEast(GameTestHelper helper)
+  {
+    // FACING=DOWN ROTATION=1: getFrontFacing=EAST (output). Input from EAST must now be ignored.
+    Block relayBlock = Registries.getBlock("relay");
+    helper.setBlock(RELAY_POS.east(), Blocks.REDSTONE_BLOCK);
+    helper.setBlock(RELAY_POS, relayBlock.defaultBlockState()
+      .setValue(CircuitComponents.DirectedComponentBlock.FACING, Direction.DOWN)
+      .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 1));
+
+    helper.succeedWhen(() -> assertRelayState(helper, relayBlock, false, 0,
+      "relay with FACING=DOWN ROTATION=1 must not activate when input is from east (now the output side)"));
+  }
+
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
+  public static void relayDownFacingRotation1ActivatesFromNorth(GameTestHelper helper)
+  {
+    // FACING=DOWN ROTATION=1: getFrontFacing=EAST (output). NORTH is an accepted input side.
+    Block relayBlock = Registries.getBlock("relay");
+    helper.setBlock(RELAY_POS.north(), Blocks.REDSTONE_BLOCK);
+    helper.setBlock(RELAY_POS, relayBlock.defaultBlockState()
+      .setValue(CircuitComponents.DirectedComponentBlock.FACING, Direction.DOWN)
+      .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 1));
+
+    helper.succeedWhen(() -> assertRelayState(helper, relayBlock, true, 0,
+      "relay with FACING=DOWN ROTATION=1 must activate when input is from north (non-output side)"));
   }
 
   private static void placePoweredInput(GameTestHelper helper, Block relayBlock)
