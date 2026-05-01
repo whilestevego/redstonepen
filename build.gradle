@@ -29,14 +29,14 @@ runs {
     modSource project.sourceSets.main
   }
   client {
-    systemProperty 'forge.enabledGameTestNamespaces', project.meta_modid
+    systemProperty 'neoforge.enabledGameTestNamespaces', project.meta_modid + ',minecraft'
   }
   server {
-    systemProperty 'forge.enabledGameTestNamespaces', project.meta_modid
+    systemProperty 'neoforge.enabledGameTestNamespaces', project.meta_modid + ',minecraft'
     programArgument '--nogui'
   }
   gameTestServer {
-    systemProperty 'forge.enabledGameTestNamespaces', project.meta_modid
+    systemProperty 'neoforge.enabledGameTestNamespaces', project.meta_modid + ',minecraft'
   }
   data {
     programArguments.addAll '--mod', project.meta_modid, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
@@ -48,6 +48,24 @@ configurations { runtimeClasspath.extendsFrom localRuntime }
 
 dependencies {
   implementation "net.neoforged:neoforge:${version_neoforge}"
+  testImplementation platform('org.junit:junit-bom:5.10.2')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+tasks.register('prepareGameTestStructures', Copy) {
+  from 'gameteststructures'
+  into 'runs/gameTestServer/gameteststructures'
+}
+
+afterEvaluate {
+  tasks.named('runGameTestServer').configure {
+    dependsOn tasks.named('prepareGameTestStructures')
+  }
 }
 
 tasks.withType(ProcessResources).configureEach {
