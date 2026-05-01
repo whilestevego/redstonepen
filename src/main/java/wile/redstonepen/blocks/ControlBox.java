@@ -378,6 +378,49 @@ public class ControlBox
     public boolean trace_enabled()
     { return trace_; }
 
+    public static final class TestHooks
+    {
+      private final ControlBoxLogic.Logic logic_ = new ControlBoxLogic.Logic();
+
+      public boolean setCode(String text)
+      { return logic_.code(text); }
+
+      public boolean valid()
+      { return logic_.valid(); }
+
+      public Map<Integer, String> errors()
+      { return Map.copyOf(logic_.errors()); }
+
+      public int inputMask()
+      { return logic_.input_mask; }
+
+      public int outputMask()
+      { return logic_.output_mask; }
+
+      public void setInput(Direction side, int value)
+      {
+        final int shift = 4 * side.ordinal();
+        final int mask = 0xf << shift;
+        logic_.input_mask |= mask;
+        logic_.input_data = (logic_.input_data & ~mask) | ((value & 0xf) << shift);
+      }
+
+      public void setSymbol(String key, int value)
+      { logic_.symbol(key, value); }
+
+      public int getSymbol(String key)
+      { return logic_.symbol(key); }
+
+      public void tick()
+      { logic_.tick(); }
+
+      public int output(Direction side)
+      { return (logic_.output_data >> (4 * side.ordinal())) & 0xf; }
+
+      public int outputData()
+      { return logic_.output_data; }
+    }
+
   }
 
   //--------------------------------------------------------------------------------------------------------------------
