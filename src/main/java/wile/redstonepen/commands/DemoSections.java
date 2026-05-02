@@ -216,13 +216,17 @@ public final class DemoSections
     level.setBlock(cell.offset(4, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(4, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(4, 0, 1), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
-    // East-west signal: lever at west, lamp at east
-    level.setBlock(cell.offset(1, 0, 3),
+    // East-west cross-axis: lever placed directly adjacent to the bridge's WEST face
+    // so the bridge sees a true signal source (lever) on its cross-axis input. A wire
+    // chain on the input side would not work reliably because vanilla wire's
+    // `shouldSignal` flag suppresses inter-wire signal queries during a wire's own
+    // power-strength update — and the bridge's cross-axis read recurses through that
+    // path. With the lever directly adjacent, the bridge reads `lever.getSignal=15`
+    // through the non-wire branch of `getInputPower` and propagates cleanly.
+    level.setBlock(cell.offset(3, 0, 3),
       Blocks.LEVER.defaultBlockState()
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
         .setValue(LeverBlock.FACING, Direction.EAST), FLAGS);
-    level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    level.setBlock(cell.offset(3, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
     // Bridge relay sits at the intersection

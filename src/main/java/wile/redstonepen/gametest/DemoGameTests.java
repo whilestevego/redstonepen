@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import wile.redstonepen.ModConstants;
+import wile.redstonepen.blocks.CircuitComponents;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
 
@@ -134,7 +135,7 @@ public final class DemoGameTests
     helper.succeedWhen(() -> {
       assertModBlockAt(helper, CELL_LOCAL.offset(4, 0, 3), "bridge_relay");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 5), Blocks.LEVER);    // N-S input
-      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);    // E-W input
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), Blocks.LEVER);    // E-W input (adjacent to bridge)
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
     });
@@ -236,16 +237,72 @@ public final class DemoGameTests
       helper.assertBlockProperty(CELL_LOCAL.offset(4, 0, 1), BlockStateProperties.LIT, true));
   }
 
-  // Note: there is no E-W cross-axis behavioral test for bridge_relay. The bridge's
-  // front-axis (N-S in this contraption) drives via the POWERED state and propagates
-  // through its inherited update()/notifyOutputNeighbourOfStateChange() chain. The
-  // cross-axis (left/right) signal is read at query-time via getSignal(), but the
-  // bridge's inherited update() does not call updateNeighborsAt for cross-axis sides
-  // when an input changes — so wire downstream of the cross-axis output does not
-  // automatically recompute on input change. Behavioral coverage of the cross-axis
-  // therefore lives in manual / interactive testing, not in GameTests.
+  /** bridge_relay: pulling the E-W (cross-axis) lever powers the E-W lamp. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void bridgeRelayEastWestLineLights(GameTestHelper helper)
+  {
+    DemoSections.buildBridgeRelayCrossover(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> helper.pullLever(CELL_LOCAL.offset(3, 0, 3)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
 
-/** basic_gauge POWER property updates when an upstream lever is toggled on. */
+  /** pulse_relay: rising edge from a lever produces a STATE=1 pulse that clears within a few ticks. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 40)
+  public static void pulseRelayProducesObservablePulse(GameTestHelper helper)
+  {
+    DemoSections.buildPulseRelayMonostable(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    // pulse_relay's update() schedules a clearing tick on EVERY call — including
+    // placement — so an initial pulse-clear is queued at ~tick 2. Wait past that
+    // before pulling the lever so our rising edge isn't immediately overwritten.
+    helper.runAfterDelay(5, () -> helper.pullLever(CELL_LOCAL.offset(2, 0, 5)));
+    helper.runAtTickTime(6, () ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 3),
+        CircuitComponents.DirectedComponentBlock.STATE, 1));
+    // Pulse clears 2 ticks after the rising edge.
+    helper.runAtTickTime(15, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 3),
+        CircuitComponents.DirectedComponentBlock.STATE, 0);
+      helper.succeed();
+    });
+  }
+
+  /** bistable_relay: pressing the input button drives STATE from 0 to 1 (T flip-flop rising edge). */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void bistableRelayTogglesStateOnButtonPress(GameTestHelper helper)
+  {
+    DemoSections.buildBistableToggle(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> {
+      // Stone-button at (2,0,5). Force POWERED=true to simulate a press.
+      final BlockPos buttonAbs = helper.absolutePos(CELL_LOCAL.offset(2, 0, 5));
+      final BlockState buttonState = helper.getLevel().getBlockState(buttonAbs);
+      helper.getLevel().setBlock(buttonAbs,
+        buttonState.setValue(BlockStateProperties.POWERED, true), 3);
+      helper.getLevel().updateNeighborsAt(buttonAbs, buttonState.getBlock());
+    });
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 3),
+        CircuitComponents.DirectedComponentBlock.STATE, 1));
+  }
+
+  /** basic_button: pressing the button extends the adjacent sticky piston. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void buttonPressExtendsPiston(GameTestHelper helper)
+  {
+    DemoSections.buildButtonDrivesPiston(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> {
+      final BlockPos buttonAbs = helper.absolutePos(CELL_LOCAL.offset(2, 0, 4));
+      final BlockState buttonState = helper.getLevel().getBlockState(buttonAbs);
+      helper.getLevel().setBlock(buttonAbs,
+        buttonState.setValue(BlockStateProperties.POWERED, true), 3);
+      helper.getLevel().updateNeighborsAt(buttonAbs, buttonState.getBlock());
+    });
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 1),
+        BlockStateProperties.EXTENDED, true));
+  }
+
+  /** basic_gauge POWER property updates when an upstream lever is toggled on. */
   @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 40)
   public static void gaugeReadoutPowerRisesOnPull(GameTestHelper helper)
   {
