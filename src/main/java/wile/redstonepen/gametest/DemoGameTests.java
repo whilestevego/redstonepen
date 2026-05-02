@@ -16,6 +16,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import wile.redstonepen.ModConstants;
@@ -147,9 +148,10 @@ public final class DemoGameTests
   {
     DemoSections.buildControlBoxAndGate(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
     helper.succeedWhen(() -> {
-      assertModBlockAt(helper, CELL_LOCAL.offset(3, 1, 3), "control_box");
-      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 1, 4), Blocks.REDSTONE_BLOCK);
-      assertVanillaBlockAt(helper, CELL_LOCAL.offset(5, 1, 3), Blocks.REDSTONE_LAMP);
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.LEVER);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
     });
   }
 
@@ -187,9 +189,114 @@ public final class DemoGameTests
     });
   }
 
+  // ===========================================================================================
+  // Behavioral tests — trigger inputs and assert circuit output.
+  // ===========================================================================================
+
+  /** basic_lever pulled ON → vanilla redstone_lamp lights. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void leverDrivesLampLightsOnPull(GameTestHelper helper)
+  {
+    DemoSections.buildLeverDrivesLamp(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    // helper.pullLever requires vanilla Blocks.LEVER; basic_lever is a different block.
+    helper.runAfterDelay(2, () -> toggleLeverPowered(helper, CELL_LOCAL.offset(2, 0, 4), true));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 0), BlockStateProperties.LIT, true));
+  }
+
+  /** Plain relay buffers a vanilla-lever signal to a vanilla-lamp output. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void relayBufferLightsLampOnPull(GameTestHelper helper)
+  {
+    DemoSections.buildRelayBuffer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> helper.pullLever(CELL_LOCAL.offset(2, 0, 5)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 0), BlockStateProperties.LIT, true));
+  }
+
+  /** inverted_relay: pulling input lever ON drives lamp OFF (NOT-gate behavior). */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 40)
+  public static void invertedRelayLampDarkensOnPull(GameTestHelper helper)
+  {
+    DemoSections.buildInvertedRelayNotGate(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(4, () -> helper.pullLever(CELL_LOCAL.offset(2, 0, 5)));
+    helper.runAtTickTime(20, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 0), BlockStateProperties.LIT, false);
+      helper.succeed();
+    });
+  }
+
+  /** bridge_relay: pulling the N-S lever powers the N-S lamp. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 30)
+  public static void bridgeRelayNorthSouthLineLights(GameTestHelper helper)
+  {
+    DemoSections.buildBridgeRelayCrossover(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> helper.pullLever(CELL_LOCAL.offset(4, 0, 5)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(4, 0, 1), BlockStateProperties.LIT, true));
+  }
+
+  // Note: there is no E-W cross-axis behavioral test for bridge_relay. The bridge's
+  // front-axis (N-S in this contraption) drives via the POWERED state and propagates
+  // through its inherited update()/notifyOutputNeighbourOfStateChange() chain. The
+  // cross-axis (left/right) signal is read at query-time via getSignal(), but the
+  // bridge's inherited update() does not call updateNeighborsAt for cross-axis sides
+  // when an input changes — so wire downstream of the cross-axis output does not
+  // automatically recompute on input change. Behavioral coverage of the cross-axis
+  // therefore lives in manual / interactive testing, not in GameTests.
+
+/** basic_gauge POWER property updates when an upstream lever is toggled on. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 40)
+  public static void gaugeReadoutPowerRisesOnPull(GameTestHelper helper)
+  {
+    DemoSections.buildGaugeReadout(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> helper.pullLever(CELL_LOCAL.offset(2, 0, 5)));
+    helper.succeedWhen(() -> {
+      final BlockPos gaugePos = helper.absolutePos(CELL_LOCAL.offset(2, 0, 1));
+      final BlockState gauge = helper.getLevel().getBlockState(gaugePos);
+      final int power = gauge.getValue(BlockStateProperties.POWER);
+      if(power < 1) {
+        helper.fail("expected basic_gauge POWER >= 1 after lever pull, got " + power, CELL_LOCAL.offset(2, 0, 1));
+      }
+    });
+  }
+
+  /** control_box AND: only one lever pulled → output port b stays low → lamp stays dark. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 60)
+  public static void controlBoxAndOneInputKeepsLampDark(GameTestHelper helper)
+  {
+    DemoSections.buildControlBoxAndGate(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(4, () -> helper.pullLever(CELL_LOCAL.offset(3, 0, 5))); // south lever only
+    helper.runAtTickTime(50, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
+      helper.succeed();
+    });
+  }
+
+  /** control_box AND: both levers pulled → output port b → lamp lights. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 80)
+  public static void controlBoxAndBothInputsLightLamp(GameTestHelper helper)
+  {
+    DemoSections.buildControlBoxAndGate(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(4, () -> {
+      helper.pullLever(CELL_LOCAL.offset(3, 0, 5));   // south
+      helper.pullLever(CELL_LOCAL.offset(1, 0, 3));   // west
+    });
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
   // -------------------------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------------------------
+
+  private static void toggleLeverPowered(GameTestHelper helper, BlockPos localPos, boolean powered)
+  {
+    final BlockPos abs = helper.absolutePos(localPos);
+    final BlockState state = helper.getLevel().getBlockState(abs);
+    helper.getLevel().setBlock(abs, state.setValue(BlockStateProperties.POWERED, powered), 3);
+    helper.getLevel().updateNeighborsAt(abs, state.getBlock());
+  }
 
   private static void assertModBlockAt(GameTestHelper helper, BlockPos localPos, String modBlockName)
   {

@@ -21,7 +21,8 @@ public final class DemoBuilder
 {
   private DemoBuilder() {}
 
-  public static final int FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+  // UPDATE_NEIGHBORS so redstone propagates correctly after every placement.
+  public static final int FLAGS = Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS;
 
   public static BlockPos cellOrigin(BlockPos gridOrigin, int cellIndex, int columns, int spacing)
   {

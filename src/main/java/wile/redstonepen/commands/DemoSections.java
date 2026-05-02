@@ -222,6 +222,7 @@ public final class DemoSections
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
         .setValue(LeverBlock.FACING, Direction.EAST), FLAGS);
     level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(3, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
     // Bridge relay sits at the intersection
@@ -238,24 +239,34 @@ public final class DemoSections
     platform(level, cell);
     final Block controlBox = Registries.getBlock("control_box");
     if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 1, 3);
-    // Place control_box mounted on a stone block beneath it (FACING=DOWN, port d = below)
-    level.setBlock(cell.offset(3, 0, 3), Blocks.STONE.defaultBlockState(), FLAGS);
-    level.setBlock(cbPos,
+    // Control box mounted on the platform (FACING=DOWN ROTATION=0). Port mapping:
+    // d=DOWN, u=UP, r=NORTH, y=SOUTH, g=WEST, b=EAST.
+    final BlockPos cbPos = cell.offset(3, 0, 3);
+    DemoBuilder.placeAttached(level, cbPos,
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0), FLAGS);
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
     if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
       cbe.setCode(CONTROL_BOX_AND_PROGRAM);
+      cbe.setEnabled(true); // Without this, the program never executes.
       cbe.setChanged();
     }
-    // Place a redstone block adjacent to the south face (port y=south input on default rotation)
-    level.setBlock(cell.offset(3, 1, 4), Blocks.REDSTONE_BLOCK.defaultBlockState(), FLAGS);
-    // Two vanilla levers feeding control_box: one south, one west (ports y, g)
-    // Output port b = east → wire → lamp at east
-    level.setBlock(cell.offset(4, 1, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    level.setBlock(cell.offset(5, 0, 3), Blocks.STONE.defaultBlockState(), FLAGS);
-    level.setBlock(cell.offset(5, 1, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    // South-input lever feeds port y via a wire run.
+    level.setBlock(cell.offset(3, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(3, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // West-input lever feeds port g via a wire run.
+    level.setBlock(cell.offset(1, 0, 3),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.EAST), FLAGS);
+    level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // Output port b drives the east-side wire and lamp.
+    level.setBlock(cell.offset(4, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
     sign(level, cell.offset(7, 1, 6), "control_box", "AND program");
   }
 
