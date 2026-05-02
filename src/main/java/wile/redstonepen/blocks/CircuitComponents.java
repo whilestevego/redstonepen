@@ -377,28 +377,28 @@ public class CircuitComponents
     protected static Direction getOutputFacing(BlockState state)
     { return getFrontFacing(state); }
 
-    protected static Direction getFrontFacing(BlockState state)
+    public static Direction getFrontFacing(BlockState state)
     { return facing_mapping_.get((state.getValue(FACING).get3DDataValue()) * 4 + (((state.getValue(ROTATION)  )) & 0x3)); }
 
-    protected static Direction getRightFacing(BlockState state)
+    public static Direction getRightFacing(BlockState state)
     { return facing_mapping_.get((state.getValue(FACING).get3DDataValue()) * 4 + (((state.getValue(ROTATION)+1)) & 0x3)); }
 
-    protected static Direction getBackFacing(BlockState state)
+    public static Direction getBackFacing(BlockState state)
     { return facing_mapping_.get((state.getValue(FACING).get3DDataValue()) * 4 + (((state.getValue(ROTATION)+2)) & 0x3)); }
 
-    protected static Direction getLeftFacing(BlockState state)
+    public static Direction getLeftFacing(BlockState state)
     { return facing_mapping_.get((state.getValue(FACING).get3DDataValue()) * 4 + (((state.getValue(ROTATION)+3)) & 0x3)); }
 
-    protected static Direction getUpFacing(BlockState state)
+    public static Direction getUpFacing(BlockState state)
     { return state.getValue(FACING).getOpposite(); }
 
-    protected static Direction getDownFacing(BlockState state)
+    public static Direction getDownFacing(BlockState state)
     { return state.getValue(FACING); }
 
-    protected static Direction getForwardStateMappedFacing(BlockState state, Direction internal_side)
+    public static Direction getForwardStateMappedFacing(BlockState state, Direction internal_side)
     { return facing_fwd_state_mapping_[state.getValue(FACING).ordinal()][state.getValue(ROTATION)][internal_side.ordinal()]; }
 
-    protected static Direction getReverseStateMappedFacing(BlockState state, Direction world_side)
+    public static Direction getReverseStateMappedFacing(BlockState state, Direction world_side)
     { return facing_rev_state_mapping_[state.getValue(FACING).ordinal()][state.getValue(ROTATION)][world_side.ordinal()]; }
 
     protected void notifyOutputNeighbourOfStateChange(BlockState state, Level world, BlockPos pos)
