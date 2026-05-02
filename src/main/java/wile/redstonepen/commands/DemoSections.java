@@ -70,7 +70,7 @@ public final class DemoSections
   private interface Contraption { void build(Level level, BlockPos cell); }
 
   /** basic_lever drives a vanilla redstone lamp via redstone wire. */
-  private static void buildLeverDrivesLamp(Level level, BlockPos cell)
+  public static void buildLeverDrivesLamp(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block lever = Registries.getBlock("basic_lever");
@@ -89,7 +89,7 @@ public final class DemoSections
   }
 
   /** basic_button pulses a sticky piston that pushes a glowstone block. */
-  private static void buildButtonDrivesPiston(Level level, BlockPos cell)
+  public static void buildButtonDrivesPiston(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block button = Registries.getBlock("basic_button");
@@ -111,7 +111,7 @@ public final class DemoSections
   }
 
   /** Inverted relay: vanilla lever ON gives lamp OFF, lever OFF gives lamp ON. */
-  private static void buildInvertedRelayNotGate(Level level, BlockPos cell)
+  public static void buildInvertedRelayNotGate(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block relay = Registries.getBlock("inverted_relay");
@@ -137,7 +137,7 @@ public final class DemoSections
   }
 
   /** bistable_relay toggles state on each rising edge from a vanilla button. */
-  private static void buildBistableToggle(Level level, BlockPos cell)
+  public static void buildBistableToggle(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block relay = Registries.getBlock("bistable_relay");
@@ -159,7 +159,7 @@ public final class DemoSections
   }
 
   /** pulse_relay turns a held lever into a single brief lamp flash on rising edge. */
-  private static void buildPulseRelayMonostable(Level level, BlockPos cell)
+  public static void buildPulseRelayMonostable(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block relay = Registries.getBlock("pulse_relay");
@@ -181,7 +181,7 @@ public final class DemoSections
   }
 
   /** Plain relay: passes signal from input to output (buffer / signal direction). */
-  private static void buildRelayBuffer(Level level, BlockPos cell)
+  public static void buildRelayBuffer(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block relay = Registries.getBlock("relay");
@@ -203,7 +203,7 @@ public final class DemoSections
   }
 
   /** Bridge relay: two perpendicular signal lines crossing at a single block. */
-  private static void buildBridgeRelayCrossover(Level level, BlockPos cell)
+  public static void buildBridgeRelayCrossover(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block relay = Registries.getBlock("bridge_relay");
@@ -233,7 +233,7 @@ public final class DemoSections
   }
 
   /** ControlBox AND gate: two vanilla levers feeding ports d and u, output b drives lamp. */
-  private static void buildControlBoxAndGate(Level level, BlockPos cell)
+  public static void buildControlBoxAndGate(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block controlBox = Registries.getBlock("control_box");
@@ -260,7 +260,7 @@ public final class DemoSections
   }
 
   /** Vanilla lever drives a basic_gauge through a wire — gauge displays the signal level. */
-  private static void buildGaugeReadout(Level level, BlockPos cell)
+  public static void buildGaugeReadout(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block gauge = Registries.getBlock("basic_gauge");
