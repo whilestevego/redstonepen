@@ -2,7 +2,9 @@
  * @file DemoSections.java
  * @license MIT
  *
- * Implementations of each /redstonepen demo section.
+ * Working redstone contraptions that exercise mod blocks together with vanilla
+ * redstone components. Each contraption is a small, labeled circuit that can be
+ * triggered by the player and observed in-world.
  */
 package wile.redstonepen.commands;
 
@@ -11,145 +13,305 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.RepeaterBlock;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.blocks.CircuitComponents;
 import wile.redstonepen.blocks.ControlBox;
 import wile.redstonepen.libmc.Registries;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public final class DemoSections
 {
   private DemoSections() {}
 
-  // Block names that are DirectedComponentBlock instances.
-  public static final List<String> DIRECTED_BLOCKS = List.of(
-    "relay", "inverted_relay", "pulse_relay", "bistable_relay", "bridge_relay",
-    "control_box", "basic_lever", "basic_button", "basic_pulse_button"
-  );
-
-  public static final int CELL_SPACING = 3;        // 3 blocks between adjacent grid cells
-  public static final int BLOCK_GROUP_SPACING = 4; // gap between block sections (z axis)
-  public static final int GRID_COLUMNS = 4;        // ROTATION goes across columns
-  public static final int GRID_ROWS = 6;           // FACING goes down rows
+  private static final int FLAGS = DemoBuilder.FLAGS;
+  private static final int CELL_SIZE = 9;     // each contraption gets a 9x9 footprint
+  private static final int GRID_COLUMNS = 3;
 
   /**
-   * Returns the visual states of a directional block: every FACING × ROTATION combination,
-   * with POWERED=false and WATERLOGGED=false. 24 states total.
-   * Sorted by FACING.get3DDataValue() * 4 + ROTATION for stable layout.
+   * Builds the showcase: 9 working redstone contraptions in a 3x3 grid, each
+   * exercising a different mod block in interaction with vanilla redstone.
    */
-  public static List<BlockState> directionalStates(Block block)
+  public static void runCircuits(Level level, BlockPos origin)
   {
-    final List<BlockState> states = new ArrayList<>();
-    for(BlockState s : block.getStateDefinition().getPossibleStates()) {
-      if(!s.hasProperty(BlockStateProperties.FACING)) continue;
-      if(!s.hasProperty(CircuitComponents.DirectedComponentBlock.ROTATION)) continue;
-      if(s.hasProperty(BlockStateProperties.POWERED) && s.getValue(BlockStateProperties.POWERED)) continue;
-      if(s.hasProperty(BlockStateProperties.WATERLOGGED) && s.getValue(BlockStateProperties.WATERLOGGED)) continue;
-      if(s.hasProperty(CircuitComponents.DirectedComponentBlock.STATE)
-        && s.getValue(CircuitComponents.DirectedComponentBlock.STATE) != 0) continue;
-      states.add(s);
+    final Contraption[] contraptions = {
+      DemoSections::buildLeverDrivesLamp,
+      DemoSections::buildButtonDrivesPiston,
+      DemoSections::buildInvertedRelayNotGate,
+      DemoSections::buildBistableToggle,
+      DemoSections::buildPulseRelayMonostable,
+      DemoSections::buildRelayBuffer,
+      DemoSections::buildBridgeRelayCrossover,
+      DemoSections::buildControlBoxAndGate,
+      DemoSections::buildGaugeReadout
+    };
+    for(int i = 0; i < contraptions.length; ++i) {
+      final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, CELL_SIZE);
+      contraptions[i].build(level, cell);
     }
-    states.sort((a, b) -> {
-      int af = a.getValue(BlockStateProperties.FACING).get3DDataValue() * 4
-        + a.getValue(CircuitComponents.DirectedComponentBlock.ROTATION);
-      int bf = b.getValue(BlockStateProperties.FACING).get3DDataValue() * 4
-        + b.getValue(CircuitComponents.DirectedComponentBlock.ROTATION);
-      return Integer.compare(af, bf);
-    });
-    return states;
   }
 
-  /**
-   * Builds the full block gallery starting at {@code origin}. Each directional block gets
-   * a 6×4 grid (FACING × ROTATION). Returns the {@code z}-extent consumed so callers can
-   * lay out subsequent sections beyond it.
-   */
-  public static int runGallery(Level level, BlockPos origin)
-  {
-    int zCursor = 0;
-    for(String name : DIRECTED_BLOCKS) {
-      final Block block = Registries.getBlock(name);
-      if(block == null || block == Blocks.AIR) continue;
-      final List<BlockState> states = directionalStates(block);
-      final BlockPos sectionOrigin = origin.offset(0, 0, zCursor);
-      DemoBuilder.placeStandingSign(level, sectionOrigin.offset(-2, 1, 0), 0, name);
-      for(int i = 0; i < states.size(); ++i) {
-        final BlockPos cell = DemoBuilder.cellOrigin(sectionOrigin, i, GRID_COLUMNS, CELL_SPACING);
-        DemoBuilder.placeAttached(level, cell, states.get(i));
-      }
-      zCursor += GRID_ROWS * CELL_SPACING + BLOCK_GROUP_SPACING;
-    }
-    return zCursor;
-  }
-
-  /**
-   * Places a control_box pre-loaded with a demo program. The program reads inputs from
-   * adjacent levers/buttons (down, up, right, yellow=south, green=west, blue=east) and
-   * produces deterministic outputs on the same ports.
-   */
-  public static void runControlBox(Level level, BlockPos origin)
-  {
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null || controlBox == Blocks.AIR) return;
-    final BlockState state = controlBox.defaultBlockState()
-      .setValue(BlockStateProperties.FACING, Direction.DOWN)
-      .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0);
-    DemoBuilder.placeAttached(level, origin, state);
-    if(level.getBlockEntity(origin) instanceof ControlBox.ControlBoxBlockEntity cbe) {
-      cbe.setCode(CONTROL_BOX_DEMO_PROGRAM);
-      cbe.setChanged();
-    }
-    DemoBuilder.placeStandingSign(level, origin.offset(-2, 1, 0), 0, "ControlBox", "demo program");
-  }
-
-  /**
-   * Lays a small redstone-track wire pattern: a "+" of redstone tracks on a stone platform,
-   * with a redstone block at one end providing power.
-   */
-  public static void runTrack(Level level, BlockPos origin)
-  {
-    // 5×5 stone platform under the cross
-    for(int dx = -2; dx <= 2; ++dx) {
-      for(int dz = -2; dz <= 2; ++dz) {
-        level.setBlock(origin.offset(dx, -1, dz), Blocks.STONE.defaultBlockState(), DemoBuilder.FLAGS);
-      }
-    }
-    final Block track = Registries.getBlock("track");
-    if(track == null || track == Blocks.AIR) return;
-    // Place track segments: vanilla redstone wire is its own placement; the mod uses a
-    // pen-driven track. For demo, place vanilla redstone wire so the platform is visible
-    // and pen-applied tracks can be added by the user.
-    for(int d = -2; d <= 2; ++d) {
-      level.setBlock(origin.offset(d, 0, 0), Blocks.REDSTONE_WIRE.defaultBlockState(), DemoBuilder.FLAGS);
-      level.setBlock(origin.offset(0, 0, d), Blocks.REDSTONE_WIRE.defaultBlockState(), DemoBuilder.FLAGS);
-    }
-    level.setBlock(origin.offset(3, 0, 0), Blocks.REDSTONE_BLOCK.defaultBlockState(), DemoBuilder.FLAGS);
-    DemoBuilder.placeStandingSign(level, origin.offset(-2, 1, -3), 0, "Track demo", "stone + wire");
-  }
-
-  /**
-   * Runs every section in sequence, laid out along the z-axis from {@code origin}.
-   */
   public static void runAll(Level level, BlockPos origin)
   {
-    int z = 0;
-    z += runGallery(level, origin.offset(0, 0, z));
-    z += BLOCK_GROUP_SPACING;
-    runControlBox(level, origin.offset(0, 0, z));
-    z += BLOCK_GROUP_SPACING + 4;
-    runTrack(level, origin.offset(0, 0, z));
+    runCircuits(level, origin);
   }
 
-  // Demo program for the control box. Each output port mirrors the corresponding input
-  // through a different transformation, making the runtime behavior visible at a glance.
-  private static final String CONTROL_BOX_DEMO_PROGRAM = String.join("\n",
-    "# 6-input demo: each output reflects its input differently",
-    "b = max(d, u)",
-    "g = inv(d)",
-    "y = if(d, 15, 0)",
-    "r = lim(d + u, 0, 15)"
+  // -----------------------------------------------------------------------------------------------
+  // Contraptions — each occupies a CELL_SIZE × CELL_SIZE footprint with `cell` as the SW corner.
+  // Convention: stone platform at y-1, components at y0, signs at y+1. North-facing signs label
+  // the contraption from the south edge so the player reads them when approaching.
+  // -----------------------------------------------------------------------------------------------
+
+  @FunctionalInterface
+  private interface Contraption { void build(Level level, BlockPos cell); }
+
+  /** basic_lever drives a vanilla redstone lamp via redstone wire. */
+  private static void buildLeverDrivesLamp(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block lever = Registries.getBlock("basic_lever");
+    if(lever == null) return;
+    // Lever mounted on the floor at (2, 0, 4); output = NORTH (rotation 0)
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 4),
+      lever.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    // Wire NORTH to lamp
+    for(int dz = 3; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "basic_lever", "drives lamp");
+  }
+
+  /** basic_button pulses a sticky piston that pushes a glowstone block. */
+  private static void buildButtonDrivesPiston(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block button = Registries.getBlock("basic_button");
+    if(button == null) return;
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 4),
+      button.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    // Wire NORTH to piston
+    for(int dz = 3; dz >= 2; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    // Sticky piston facing NORTH at (2,0,1), pushable glowstone in front of it
+    level.setBlock(cell.offset(2, 0, 1),
+      Blocks.STICKY_PISTON.defaultBlockState().setValue(PistonBaseBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(2, 0, 0), Blocks.GLOWSTONE.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "basic_button", "pulses piston");
+  }
+
+  /** Inverted relay: vanilla lever ON gives lamp OFF, lever OFF gives lamp ON. */
+  private static void buildInvertedRelayNotGate(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block relay = Registries.getBlock("inverted_relay");
+    if(relay == null) return;
+    // Vanilla lever as input on the south end
+    level.setBlock(cell.offset(2, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    // Wire from lever NORTH into relay
+    level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // inverted_relay at (2,0,3): FACING=DOWN ROTATION=0 → input from south, output NORTH
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    // Wire from relay NORTH to lamp
+    for(int dz = 2; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "inverted_relay", "NOT gate");
+  }
+
+  /** bistable_relay toggles state on each rising edge from a vanilla button. */
+  private static void buildBistableToggle(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block relay = Registries.getBlock("bistable_relay");
+    if(relay == null) return;
+    level.setBlock(cell.offset(2, 0, 5),
+      Blocks.STONE_BUTTON.defaultBlockState()
+        .setValue(ButtonBlock.FACE, AttachFace.FLOOR)
+        .setValue(ButtonBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    for(int dz = 2; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "bistable_relay", "T flip-flop");
+  }
+
+  /** pulse_relay turns a held lever into a single brief lamp flash on rising edge. */
+  private static void buildPulseRelayMonostable(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block relay = Registries.getBlock("pulse_relay");
+    if(relay == null) return;
+    level.setBlock(cell.offset(2, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    for(int dz = 2; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "pulse_relay", "edge pulse");
+  }
+
+  /** Plain relay: passes signal from input to output (buffer / signal direction). */
+  private static void buildRelayBuffer(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block relay = Registries.getBlock("relay");
+    if(relay == null) return;
+    level.setBlock(cell.offset(2, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    for(int dz = 2; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "relay", "buffer / direction");
+  }
+
+  /** Bridge relay: two perpendicular signal lines crossing at a single block. */
+  private static void buildBridgeRelayCrossover(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block relay = Registries.getBlock("bridge_relay");
+    if(relay == null) return;
+    // North-south signal: lever at south, lamp at north
+    level.setBlock(cell.offset(4, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(4, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(4, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(4, 0, 1), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    // East-west signal: lever at west, lamp at east
+    level.setBlock(cell.offset(1, 0, 3),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.EAST), FLAGS);
+    level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    // Bridge relay sits at the intersection
+    DemoBuilder.placeAttached(level, cell.offset(4, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    sign(level, cell.offset(7, 1, 6), "bridge_relay", "crossover");
+  }
+
+  /** ControlBox AND gate: two vanilla levers feeding ports d and u, output b drives lamp. */
+  private static void buildControlBoxAndGate(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block controlBox = Registries.getBlock("control_box");
+    if(controlBox == null) return;
+    final BlockPos cbPos = cell.offset(3, 1, 3);
+    // Place control_box mounted on a stone block beneath it (FACING=DOWN, port d = below)
+    level.setBlock(cell.offset(3, 0, 3), Blocks.STONE.defaultBlockState(), FLAGS);
+    level.setBlock(cbPos,
+      controlBox.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0), FLAGS);
+    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+      cbe.setCode(CONTROL_BOX_AND_PROGRAM);
+      cbe.setChanged();
+    }
+    // Place a redstone block adjacent to the south face (port y=south input on default rotation)
+    level.setBlock(cell.offset(3, 1, 4), Blocks.REDSTONE_BLOCK.defaultBlockState(), FLAGS);
+    // Two vanilla levers feeding control_box: one south, one west (ports y, g)
+    // Output port b = east → wire → lamp at east
+    level.setBlock(cell.offset(4, 1, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(5, 0, 3), Blocks.STONE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(5, 1, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(7, 1, 6), "control_box", "AND program");
+  }
+
+  /** Vanilla lever drives a basic_gauge through a wire — gauge displays the signal level. */
+  private static void buildGaugeReadout(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block gauge = Registries.getBlock("basic_gauge");
+    if(gauge == null) return;
+    level.setBlock(cell.offset(2, 0, 5),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    // Wire NORTH; insert a repeater so the gauge sees a clean 15-level signal
+    level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(2, 0, 3),
+      Blocks.REPEATER.defaultBlockState().setValue(RepeaterBlock.FACING, Direction.SOUTH), FLAGS);
+    level.setBlock(cell.offset(2, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // Gauge mounted on the floor at (2,0,1)
+    if(gauge.defaultBlockState().hasProperty(BlockStateProperties.FACING)) {
+      DemoBuilder.placeAttached(level, cell.offset(2, 0, 1),
+        gauge.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN));
+    } else {
+      level.setBlock(cell.offset(2, 0, 0), Blocks.STONE.defaultBlockState(), FLAGS);
+      level.setBlock(cell.offset(2, 0, 1), gauge.defaultBlockState(), FLAGS);
+    }
+    sign(level, cell.offset(4, 1, 6), "basic_gauge", "signal readout");
+  }
+
+  // -----------------------------------------------------------------------------------------------
+  // Helpers
+  // -----------------------------------------------------------------------------------------------
+
+  private static void platform(Level level, BlockPos cell)
+  {
+    final BlockState stone = Blocks.STONE.defaultBlockState();
+    final BlockState air = Blocks.AIR.defaultBlockState();
+    for(int dx = 0; dx < CELL_SIZE; ++dx) {
+      for(int dz = 0; dz < CELL_SIZE; ++dz) {
+        level.setBlock(cell.offset(dx, -1, dz), stone, FLAGS);
+        for(int dy = 0; dy < 4; ++dy) {
+          level.setBlock(cell.offset(dx, dy, dz), air, FLAGS);
+        }
+      }
+    }
+  }
+
+  private static void sign(Level level, BlockPos pos, String line1, String line2)
+  {
+    DemoBuilder.placeStandingSign(level, pos, 8, line1, line2);
+  }
+
+  // ControlBox AND program. Port mapping: d=DOWN, u=UP, r=NORTH, y=SOUTH, g=WEST, b=EAST.
+  // Output b = high only when both south and west inputs are high. `if` chosen over `*` to
+  // produce a clean 0/15 output regardless of partial input levels.
+  private static final String CONTROL_BOX_AND_PROGRAM = String.join("\n",
+    "# AND of south and west inputs",
+    "b = if(y, if(g, 15, 0), 0)"
   );
 }

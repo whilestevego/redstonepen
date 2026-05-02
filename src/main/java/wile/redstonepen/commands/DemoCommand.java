@@ -30,16 +30,14 @@ public final class DemoCommand
     final LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("redstonepen")
       .requires(s -> s.hasPermission(2))
       .then(Commands.literal("demo")
-        .executes(ctx -> runSection(ctx.getSource(), Section.ALL))
-        .then(Commands.literal("gallery").executes(ctx -> runSection(ctx.getSource(), Section.GALLERY)))
-        .then(Commands.literal("controlbox").executes(ctx -> runSection(ctx.getSource(), Section.CONTROL_BOX)))
-        .then(Commands.literal("track").executes(ctx -> runSection(ctx.getSource(), Section.TRACK)))
+        .executes(ctx -> runSection(ctx.getSource(), Section.CIRCUITS))
+        .then(Commands.literal("circuits").executes(ctx -> runSection(ctx.getSource(), Section.CIRCUITS)))
         .then(Commands.literal("all").executes(ctx -> runSection(ctx.getSource(), Section.ALL)))
       );
     dispatcher.register(root);
   }
 
-  private enum Section { GALLERY, CONTROL_BOX, TRACK, ALL }
+  private enum Section { CIRCUITS, ALL }
 
   private static int runSection(CommandSourceStack source, Section section)
   {
@@ -51,9 +49,7 @@ public final class DemoCommand
     final Level level = player.level();
     final BlockPos origin = player.blockPosition().offset(2, 0, 0);
     switch(section) {
-      case GALLERY -> DemoSections.runGallery(level, origin);
-      case CONTROL_BOX -> DemoSections.runControlBox(level, origin);
-      case TRACK -> DemoSections.runTrack(level, origin);
+      case CIRCUITS -> DemoSections.runCircuits(level, origin);
       case ALL -> DemoSections.runAll(level, origin);
     }
     source.sendSuccess(() -> Component.literal("redstonepen demo: " + section.name().toLowerCase() + " built at " + origin), true);
