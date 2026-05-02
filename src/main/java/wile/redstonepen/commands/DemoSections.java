@@ -75,11 +75,11 @@ public final class DemoSections
     platform(level, cell);
     final Block lever = Registries.getBlock("basic_lever");
     if(lever == null) return;
-    // Lever mounted on the floor at (2, 0, 4); output = NORTH (rotation 0)
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 4),
+    // basic_lever extends vanilla LeverBlock: ATTACH_FACE + HORIZONTAL_FACING + POWERED.
+    level.setBlock(cell.offset(2, 0, 4),
       lever.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+        .setValue(BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR)
+        .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), FLAGS);
     // Wire NORTH to lamp
     for(int dz = 3; dz >= 1; --dz) {
       level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
@@ -94,10 +94,11 @@ public final class DemoSections
     platform(level, cell);
     final Block button = Registries.getBlock("basic_button");
     if(button == null) return;
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 4),
+    // basic_button extends vanilla ButtonBlock: same property set as a lever.
+    level.setBlock(cell.offset(2, 0, 4),
       button.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+        .setValue(BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR)
+        .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), FLAGS);
     // Wire NORTH to piston
     for(int dz = 3; dz >= 2; --dz) {
       level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
@@ -273,14 +274,8 @@ public final class DemoSections
     level.setBlock(cell.offset(2, 0, 3),
       Blocks.REPEATER.defaultBlockState().setValue(RepeaterBlock.FACING, Direction.SOUTH), FLAGS);
     level.setBlock(cell.offset(2, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    // Gauge mounted on the floor at (2,0,1)
-    if(gauge.defaultBlockState().hasProperty(BlockStateProperties.FACING)) {
-      DemoBuilder.placeAttached(level, cell.offset(2, 0, 1),
-        gauge.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN));
-    } else {
-      level.setBlock(cell.offset(2, 0, 0), Blocks.STONE.defaultBlockState(), FLAGS);
-      level.setBlock(cell.offset(2, 0, 1), gauge.defaultBlockState(), FLAGS);
-    }
+    // Gauge has no facing — just place on top of stone at (2,0,1).
+    level.setBlock(cell.offset(2, 0, 1), gauge.defaultBlockState(), FLAGS);
     sign(level, cell.offset(4, 1, 6), "basic_gauge", "signal readout");
   }
 
