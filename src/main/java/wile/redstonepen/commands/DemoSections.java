@@ -292,37 +292,68 @@ public final class DemoSections
   }
 
   /**
-   * Pen-track 3D route: wire climbs over a 1-block step using multi-face track segments.
-   * A vanilla redstone wire cannot route up a vertical face — this contraption shows the
-   * unique pen-track capability of carrying a single signal across the floor, around an
-   * edge, and onto a raised surface, all on flat block faces (no staircase of full blocks).
+   * Pen-track 3D route: a single signal climbs a 3-block tower on its south face,
+   * crosses the tower top horizontally for 3 blocks, and drops south-side onto the
+   * input face of a relay; the relay then drives a vanilla redstone lamp. The route
+   * uses pen-track multi-face segments at every corner — a vanilla redstone wire
+   * could not span this path without a staircase of full blocks per vertical step.
    */
   public static void buildPenTrackWallClimb(Level level, BlockPos cell)
   {
     platform(level, cell);
     final Block track = Registries.getBlock("track");
-    if(track == null) return;
-    // 1-block step the wire has to climb over.
-    level.setBlock(cell.offset(4, 0, 4), Blocks.STONE.defaultBlockState(), FLAGS);
-    // Lever (vanilla, on the platform) drives the wire from south.
+    final Block relay = Registries.getBlock("relay");
+    if(track == null || relay == null) return;
+
+    // Tower: 3-tall pillar at z=4 plus a horizontal top extension at y=2 going north.
+    final BlockState stone = Blocks.STONE.defaultBlockState();
+    level.setBlock(cell.offset(4, 0, 4), stone, FLAGS);
+    level.setBlock(cell.offset(4, 1, 4), stone, FLAGS);
+    level.setBlock(cell.offset(4, 2, 4), stone, FLAGS);
+    level.setBlock(cell.offset(4, 2, 3), stone, FLAGS);
+    level.setBlock(cell.offset(4, 2, 2), stone, FLAGS);
+    level.setBlock(cell.offset(4, 2, 1), stone, FLAGS); // support for terminal relay
+
+    // Lever drives the wire from south on the platform.
     level.setBlock(cell.offset(4, 0, 6),
       Blocks.LEVER.defaultBlockState()
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
         .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
-    // South-of-step track: full N-S line on the platform top, plus a vertical line on the
-    // track's NORTH face (which is the step's south face) climbing the step.
+
+    // 1) Floor track + start of climb on south face of tower base.
     placePenTrack(level, cell.offset(4, 0, 5),
       wireBit(Direction.DOWN, Direction.NORTH)
         | wireBit(Direction.DOWN, Direction.SOUTH)
         | wireBit(Direction.NORTH, Direction.DOWN)
         | wireBit(Direction.NORTH, Direction.UP));
-    // Top-of-step track: N-S line on the step's top face, carrying the climbed signal north.
-    placePenTrack(level, cell.offset(4, 1, 4),
-      wireBit(Direction.DOWN, Direction.NORTH)
-        | wireBit(Direction.DOWN, Direction.SOUTH));
-    // Lamp at the elevated north end.
-    level.setBlock(cell.offset(4, 1, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
-    sign(level, cell.offset(4, 1, 7), "pen_track", "wall climb");
+    // 2) Vertical climb segment on south face of tower middle.
+    placePenTrack(level, cell.offset(4, 1, 5),
+      wireBit(Direction.NORTH, Direction.DOWN)
+        | wireBit(Direction.NORTH, Direction.UP));
+    // 3) Top of climb on south face of tower top.
+    placePenTrack(level, cell.offset(4, 2, 5),
+      wireBit(Direction.NORTH, Direction.DOWN)
+        | wireBit(Direction.NORTH, Direction.UP));
+    // 4-6) Horizontal run across the tower top (north of tower).
+    placePenTrack(level, cell.offset(4, 3, 4),
+      wireBit(Direction.DOWN, Direction.SOUTH)
+        | wireBit(Direction.DOWN, Direction.NORTH));
+    placePenTrack(level, cell.offset(4, 3, 3),
+      wireBit(Direction.DOWN, Direction.SOUTH)
+        | wireBit(Direction.DOWN, Direction.NORTH));
+    placePenTrack(level, cell.offset(4, 3, 2),
+      wireBit(Direction.DOWN, Direction.SOUTH)
+        | wireBit(Direction.DOWN, Direction.NORTH));
+
+    // Terminal: relay reads input from south (the wire arriving from the tracks above)
+    // and drives a vanilla redstone lamp on its north output side.
+    DemoBuilder.placeAttached(level, cell.offset(4, 3, 1),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    level.setBlock(cell.offset(4, 3, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+
+    sign(level, cell.offset(4, 1, 8), "pen_track 3D", "lever to relay");
   }
 
   private static long wireBit(Direction face, Direction wireDirection)

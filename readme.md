@@ -114,7 +114,7 @@ mod block to vanilla Redstone:
 | `bridge_relay`   | Crossover of two perpendicular signal lines                |
 | `control_box`    | AND program driven by two levers                           |
 | `basic_gauge`    | Signal-level readout from a lever + repeater               |
-| Pen tracks       | 3D wire route climbing a 1-block step (multi-face segments) |
+| Pen tracks       | 3D wire route up a 3-block tower, across the top, into a Relay driving a Lamp |
 
 Requires permission level 2 (cheats / `/op`); not gamemode-specific.
 

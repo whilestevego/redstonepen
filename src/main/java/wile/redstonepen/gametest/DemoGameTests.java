@@ -190,17 +190,32 @@ public final class DemoGameTests
     });
   }
 
-  /** Pen-track 3D route over a 1-block step: lever, two pen-tracks, step, elevated lamp. */
+  /**
+   * Pen-track 3D route: lever, floor track, 3-tall tower with vertical pen-track climb on
+   * its south face, horizontal pen-track run across the tower top, terminal relay driving
+   * a vanilla redstone lamp.
+   */
   @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 20)
   public static void penTrackWallClimb(GameTestHelper helper)
   {
     DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
     helper.succeedWhen(() -> {
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 6), Blocks.LEVER);
+      // Tower
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 4), Blocks.STONE);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 1, 4), Blocks.STONE);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 2, 4), Blocks.STONE);
+      // Tracks: floor + climb
       assertModBlockAt(helper, CELL_LOCAL.offset(4, 0, 5), "track");
-      assertModBlockAt(helper, CELL_LOCAL.offset(4, 1, 4), "track");
-      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 1, 3), Blocks.REDSTONE_LAMP);
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 1, 5), "track");
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 2, 5), "track");
+      // Tracks: horizontal across tower top
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 3, 4), "track");
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 3, 3), "track");
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 3, 2), "track");
+      // Terminal contraption
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 3, 1), "relay");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 3, 0), Blocks.REDSTONE_LAMP);
     });
   }
 
@@ -316,14 +331,14 @@ public final class DemoGameTests
         BlockStateProperties.EXTENDED, true));
   }
 
-  /** Pen-track wall climb: lever on → wire travels 3D path → elevated lamp lights. */
+  /** Pen-track 3D route: lever on → wire climbs tower → relay output → lamp lights. */
   @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 60)
   public static void penTrackWallClimbLightsLamp(GameTestHelper helper)
   {
     DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
     helper.runAfterDelay(4, () -> helper.pullLever(CELL_LOCAL.offset(4, 0, 6)));
     helper.succeedWhen(() ->
-      helper.assertBlockProperty(CELL_LOCAL.offset(4, 1, 3), BlockStateProperties.LIT, true));
+      helper.assertBlockProperty(CELL_LOCAL.offset(4, 3, 0), BlockStateProperties.LIT, true));
   }
 
   /** basic_gauge POWER property updates when an upstream lever is toggled on. */
