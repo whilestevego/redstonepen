@@ -4,6 +4,7 @@ plugins {
   id 'eclipse'
   id 'idea'
   id 'maven-publish'
+  id 'jacoco'
   id 'net.neoforged.gradle.userdev' version '7.0.145'
 }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -53,8 +54,15 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+jacoco {
+  toolVersion = '0.8.12'
+}
+
 test {
   useJUnitPlatform()
+  jacoco {
+    destinationFile = layout.buildDirectory.file('jacoco/test.exec').get().asFile
+  }
 }
 
 tasks.register('prepareGameTestStructures', Copy) {
@@ -63,9 +71,60 @@ tasks.register('prepareGameTestStructures', Copy) {
 }
 
 afterEvaluate {
-  tasks.named('runGameTestServer').configure {
+  tasks.named('runGameTestServer').configure { task ->
     dependsOn tasks.named('prepareGameTestStructures')
+    jacoco.applyTo(task)
+    task.extensions.configure(JacocoTaskExtension) {
+      destinationFile = layout.buildDirectory.file('jacoco/gameTestServer.exec').get().asFile
+      includes = ['wile.redstonepen.*']
+    }
   }
+}
+
+jacocoTestReport {
+  executionData.setFrom(
+    fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
+  )
+  reports {
+    html.required = true
+    xml.required  = true
+    csv.required  = false
+  }
+  classDirectories.setFrom(
+    files(classDirectories.files.collect {
+      fileTree(dir: it, exclude: [
+        '**/generated/**',
+        '**/*$$Lambda*.class'
+      ])
+    })
+  )
+}
+
+jacocoTestCoverageVerification {
+  executionData.setFrom(
+    fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
+  )
+  classDirectories.setFrom(
+    files(classDirectories.files.collect {
+      fileTree(dir: it, exclude: [
+        '**/generated/**',
+        '**/*$$Lambda*.class'
+      ])
+    })
+  )
+  violationRules {
+    rule {
+      limit { counter = 'LINE';   minimum = 0.00 }
+      limit { counter = 'BRANCH'; minimum = 0.00 }
+    }
+  }
+}
+
+tasks.register('coverage') {
+  group = 'verification'
+  description = 'Runs unit tests + GameTests and produces merged JaCoCo report.'
+  dependsOn tasks.named('test'), tasks.named('runGameTestServer')
+  finalizedBy tasks.named('jacocoTestReport')
 }
 
 tasks.withType(ProcessResources).configureEach {
