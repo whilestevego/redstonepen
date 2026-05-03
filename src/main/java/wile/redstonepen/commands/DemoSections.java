@@ -55,12 +55,7 @@ public final class DemoSections
     }
   }
 
-  public static void runAll(Level level, BlockPos origin)
-  {
-    runCircuits(level, origin);
-  }
-
-  // -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
   // Contraptions — each occupies a CELL_SIZE × CELL_SIZE footprint with `cell` as the SW corner.
   // Convention: stone platform at y-1, components at y0, signs at y+1. North-facing signs label
   // the contraption from the south edge so the player reads them when approaching.

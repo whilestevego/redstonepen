@@ -7,7 +7,6 @@
 package wile.redstonepen.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -27,19 +26,13 @@ public final class DemoCommand
 
   public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
   {
-    final LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("redstonepen")
+    dispatcher.register(Commands.literal("redstonepen")
       .requires(s -> s.hasPermission(2))
-      .then(Commands.literal("demo")
-        .executes(ctx -> runSection(ctx.getSource(), Section.CIRCUITS))
-        .then(Commands.literal("circuits").executes(ctx -> runSection(ctx.getSource(), Section.CIRCUITS)))
-        .then(Commands.literal("all").executes(ctx -> runSection(ctx.getSource(), Section.ALL)))
-      );
-    dispatcher.register(root);
+      .then(Commands.literal("demo").executes(ctx -> runDemo(ctx.getSource())))
+    );
   }
 
-  private enum Section { CIRCUITS, ALL }
-
-  private static int runSection(CommandSourceStack source, Section section)
+  private static int runDemo(CommandSourceStack source)
   {
     final ServerPlayer player = source.getPlayer();
     if(player == null) {
@@ -48,11 +41,8 @@ public final class DemoCommand
     }
     final Level level = player.level();
     final BlockPos origin = player.blockPosition().offset(2, 0, 0);
-    switch(section) {
-      case CIRCUITS -> DemoSections.runCircuits(level, origin);
-      case ALL -> DemoSections.runAll(level, origin);
-    }
-    source.sendSuccess(() -> Component.literal("redstonepen demo: " + section.name().toLowerCase() + " built at " + origin), true);
+    DemoSections.runCircuits(level, origin);
+    source.sendSuccess(() -> Component.literal("redstonepen demo built at " + origin), true);
     return 1;
   }
 }
