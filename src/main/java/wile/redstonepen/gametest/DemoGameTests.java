@@ -190,6 +190,20 @@ public final class DemoGameTests
     });
   }
 
+  /** Pen-track 3D route over a 1-block step: lever, two pen-tracks, step, elevated lamp. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 20)
+  public static void penTrackWallClimb(GameTestHelper helper)
+  {
+    DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 6), Blocks.LEVER);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 4), Blocks.STONE);
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 0, 5), "track");
+      assertModBlockAt(helper, CELL_LOCAL.offset(4, 1, 4), "track");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 1, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
   // ===========================================================================================
   // Behavioral tests — trigger inputs and assert circuit output.
   // ===========================================================================================
@@ -300,6 +314,16 @@ public final class DemoGameTests
     helper.succeedWhen(() ->
       helper.assertBlockProperty(CELL_LOCAL.offset(2, 0, 1),
         BlockStateProperties.EXTENDED, true));
+  }
+
+  /** Pen-track wall climb: lever on → wire travels 3D path → elevated lamp lights. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 60)
+  public static void penTrackWallClimbLightsLamp(GameTestHelper helper)
+  {
+    DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(4, () -> helper.pullLever(CELL_LOCAL.offset(4, 0, 6)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(4, 1, 3), BlockStateProperties.LIT, true));
   }
 
   /** basic_gauge POWER property updates when an upstream lever is toggled on. */

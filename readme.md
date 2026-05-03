@@ -100,8 +100,8 @@ documentation here:
 /redstonepen demo
 ```
 
-Builds 9 working contraptions in a 3x3 grid in front of the player,
-each wiring a mod block to vanilla Redstone:
+Builds 10 working contraptions in front of the player, each wiring a
+mod block to vanilla Redstone:
 
 | Mod block        | What it shows                                              |
 |------------------|------------------------------------------------------------|
@@ -114,6 +114,7 @@ each wiring a mod block to vanilla Redstone:
 | `bridge_relay`   | Crossover of two perpendicular signal lines                |
 | `control_box`    | AND program driven by two levers                           |
 | `basic_gauge`    | Signal-level readout from a lever + repeater               |
+| Pen tracks       | 3D wire route climbing a 1-block step (multi-face segments) |
 
 Requires permission level 2 (cheats / `/op`); not gamemode-specific.
 

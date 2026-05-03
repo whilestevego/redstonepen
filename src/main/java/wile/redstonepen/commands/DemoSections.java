@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.blocks.CircuitComponents;
 import wile.redstonepen.blocks.ControlBox;
+import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Registries;
 
 public final class DemoSections
@@ -30,7 +31,7 @@ public final class DemoSections
 
   private static final int FLAGS = DemoBuilder.FLAGS;
   private static final int CELL_SIZE = 9;     // each contraption gets a 9x9 footprint
-  private static final int GRID_COLUMNS = 3;
+  private static final int GRID_COLUMNS = 4;  // 10 contraptions in a 4x3 grid (last row has 2)
 
   /**
    * Builds the showcase: 9 working redstone contraptions in a 3x3 grid, each
@@ -47,7 +48,8 @@ public final class DemoSections
       DemoSections::buildRelayBuffer,
       DemoSections::buildBridgeRelayCrossover,
       DemoSections::buildControlBoxAndGate,
-      DemoSections::buildGaugeReadout
+      DemoSections::buildGaugeReadout,
+      DemoSections::buildPenTrackWallClimb
     };
     for(int i = 0; i < contraptions.length; ++i) {
       final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, CELL_SIZE);
@@ -287,6 +289,54 @@ public final class DemoSections
     // Gauge has no facing — just place on top of stone at (2,0,1).
     level.setBlock(cell.offset(2, 0, 1), gauge.defaultBlockState(), FLAGS);
     sign(level, cell.offset(4, 1, 6), "basic_gauge", "signal readout");
+  }
+
+  /**
+   * Pen-track 3D route: wire climbs over a 1-block step using multi-face track segments.
+   * A vanilla redstone wire cannot route up a vertical face — this contraption shows the
+   * unique pen-track capability of carrying a single signal across the floor, around an
+   * edge, and onto a raised surface, all on flat block faces (no staircase of full blocks).
+   */
+  public static void buildPenTrackWallClimb(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block track = Registries.getBlock("track");
+    if(track == null) return;
+    // 1-block step the wire has to climb over.
+    level.setBlock(cell.offset(4, 0, 4), Blocks.STONE.defaultBlockState(), FLAGS);
+    // Lever (vanilla, on the platform) drives the wire from south.
+    level.setBlock(cell.offset(4, 0, 6),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+    // South-of-step track: full N-S line on the platform top, plus a vertical line on the
+    // track's NORTH face (which is the step's south face) climbing the step.
+    placePenTrack(level, cell.offset(4, 0, 5),
+      wireBit(Direction.DOWN, Direction.NORTH)
+        | wireBit(Direction.DOWN, Direction.SOUTH)
+        | wireBit(Direction.NORTH, Direction.DOWN)
+        | wireBit(Direction.NORTH, Direction.UP));
+    // Top-of-step track: N-S line on the step's top face, carrying the climbed signal north.
+    placePenTrack(level, cell.offset(4, 1, 4),
+      wireBit(Direction.DOWN, Direction.NORTH)
+        | wireBit(Direction.DOWN, Direction.SOUTH));
+    // Lamp at the elevated north end.
+    level.setBlock(cell.offset(4, 1, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 7), "pen_track", "wall climb");
+  }
+
+  private static long wireBit(Direction face, Direction wireDirection)
+  {
+    return RedstoneTrack.defs.connections.getWireBit(face, wireDirection);
+  }
+
+  private static void placePenTrack(Level level, BlockPos pos, long wireFlags)
+  {
+    level.setBlock(pos, Registries.getBlock("track").defaultBlockState(), FLAGS);
+    if(level.getBlockEntity(pos) instanceof RedstoneTrack.TrackBlockEntity te) {
+      te.addWireFlags(wireFlags);
+      te.sync(true);
+    }
   }
 
   // -----------------------------------------------------------------------------------------------
