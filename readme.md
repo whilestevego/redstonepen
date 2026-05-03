@@ -94,6 +94,30 @@ documentation here:
 ![](documentation/rspen-penrecipe.png)
 ![](documentation/relay-recipe1.png)
 
+## Demo Command
+
+```
+/redstonepen demo
+```
+
+Builds 10 working contraptions in front of the player, each wiring a
+mod block to vanilla Redstone:
+
+| Mod block        | What it shows                                              |
+|------------------|------------------------------------------------------------|
+| `basic_lever`    | Drives a vanilla Redstone Lamp                             |
+| `basic_button`   | Pulses a Sticky Piston pushing a Glowstone block           |
+| `relay`          | Buffer                                                     |
+| `inverted_relay` | NOT gate                                                   |
+| `pulse_relay`    | Edge-pulse from a held lever                               |
+| `bistable_relay` | T flip-flop toggled by a Stone Button                      |
+| `bridge_relay`   | Crossover of two perpendicular signal lines                |
+| `control_box`    | AND program driven by two levers                           |
+| `basic_gauge`    | Signal-level readout from a lever + repeater               |
+| Pen tracks       | 3D wire route up a 3-block tower, across the top, into a Relay driving a Lamp |
+
+Requires permission level 2 (cheats / `/op`); not gamemode-specific.
+
 ## Community and References
 
 - Discord: the Redstone Pen has a channel on the

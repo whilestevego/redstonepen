@@ -37,6 +37,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import wile.redstonepen.blocks.ControlBox;
 import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.commands.DemoCommand;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Networking;
 import wile.redstonepen.libmc.Overlay;
@@ -54,6 +55,7 @@ public class ModRedstonePen
     bus.addListener(LiveCycleEvents::onConstruct);
     bus.addListener(LiveCycleEvents::onRegister);
     bus.addListener(LiveCycleEvents::onRegisterNetwork);
+    NeoForge.EVENT_BUS.addListener(DemoCommand::onRegisterCommands);
     CREATIVE_MODE_TABS.register(bus);
   }
 
