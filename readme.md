@@ -94,6 +94,54 @@ documentation here:
 ![](documentation/rspen-penrecipe.png)
 ![](documentation/relay-recipe1.png)
 
+## Demo Command
+
+Builds an in-world showcase of every mod block wired up to vanilla
+Redstone. Useful for visual QA, screenshots, regression checks against
+block-model changes, and onboarding.
+
+```
+/redstonepen demo
+```
+
+Lays out 9 small working contraptions in a 3x3 grid in front of the
+player:
+
+| # | Mod block         | What it shows                                              |
+|---|-------------------|------------------------------------------------------------|
+| 1 | `basic_lever`     | Drives a vanilla Redstone Lamp via wire                    |
+| 2 | `basic_button`    | Pulses a Sticky Piston pushing a Glowstone block           |
+| 3 | `inverted_relay`  | NOT gate (lever -> relay -> lamp)                          |
+| 4 | `bistable_relay`  | T flip-flop toggled by a Stone Button                      |
+| 5 | `pulse_relay`     | Edge-pulse from a held lever                               |
+| 6 | `relay`           | Buffer / signal-direction                                  |
+| 7 | `bridge_relay`    | Crossover of two perpendicular signal lines                |
+| 8 | `control_box`     | AND program (`b = if(y, if(g, 15, 0), 0)`) driven by levers|
+| 9 | `basic_gauge`     | Displays signal level from a lever + repeater              |
+
+Each contraption sits on its own stone platform with a labeled sign.
+Toggle the levers and press the buttons to watch the contraption
+respond.
+
+### Subcommands
+
+- `/redstonepen demo` (default) - all 9 contraptions
+- `/redstonepen demo circuits` - same as default
+- `/redstonepen demo all` - same as default
+
+### Requirements
+
+The command requires permission level 2 (operator / cheats). Works in
+any gamemode if cheats are enabled. In single-player, enable cheats
+when creating the world; in multiplayer, run as an operator
+(`/op <player>`).
+
+### Producing a downloadable demo world
+
+1. Create a flat world with cheats enabled.
+2. Run `/redstonepen demo`.
+3. Save and zip the world folder for distribution.
+
 ## Community and References
 
 - Discord: the Redstone Pen has a channel on the
