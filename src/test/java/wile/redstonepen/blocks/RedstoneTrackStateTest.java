@@ -154,13 +154,11 @@ class RedstoneTrackStateTest
 
   // --- Side power nibbles ---
 
-  @Test
-  void getSidePowerZeroStateReturnsZeroForAllDirections()
+  @ParameterizedTest
+  @EnumSource(Direction.class)
+  void getSidePowerZeroStateReturnsZero(Direction dir)
   {
-    final TestHooks th = h();
-    for(Direction dir : Direction.values()) {
-      assertEquals(0, th.getSidePower(dir), "getSidePower(" + dir + ") must be 0 on zero state");
-    }
+    assertEquals(0, h().getSidePower(dir));
   }
 
   @ParameterizedTest
@@ -232,14 +230,15 @@ class RedstoneTrackStateTest
     assertEquals(6, th.getRedstoneDustCount());
   }
 
-  @Test
-  void redstoneDustCountKWireBitsSetReturnsK()
+  static IntStream dustCountIndices() { return IntStream.rangeClosed(0, 24); }
+
+  @ParameterizedTest
+  @MethodSource("dustCountIndices")
+  void redstoneDustCountEqualsSetBitCount(int k)
   {
-    for(int k = 0; k <= 24; ++k) {
-      final TestHooks th = h();
-      th.setState((1L << k) - 1); // lowest k bits set
-      assertEquals(k, th.getRedstoneDustCount(), "k=" + k);
-    }
+    final TestHooks th = h();
+    th.setState((1L << k) - 1);
+    assertEquals(k, th.getRedstoneDustCount());
   }
 
   // --- defs.connections static mappings ---
