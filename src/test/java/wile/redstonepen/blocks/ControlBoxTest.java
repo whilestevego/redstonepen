@@ -753,7 +753,7 @@ class ControlBoxTest
   }
 
   @Test
-  void duplicateAssignmentToSamePortLatestWins()
+  void duplicateAssignmentUsesLastValue()
   {
     final TestHooks hooks = new TestHooks();
     assertTrue(hooks.setCode("b=3\nb=7"));
