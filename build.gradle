@@ -38,6 +38,10 @@ runs {
   }
   gameTestServer {
     systemProperty 'neoforge.enabledGameTestNamespaces', project.meta_modid + ',minecraft'
+    // JaCoCo offline-instrumentation runtime: writes exec on JVM shutdown.
+    systemProperty 'jacoco-agent.destfile', file("${layout.buildDirectory.get().asFile}/jacoco/gameTestServer.exec").absolutePath
+    systemProperty 'jacoco-agent.output',   'file'
+    systemProperty 'jacoco-agent.append',   'false'
   }
   data {
     programArguments.addAll '--mod', project.meta_modid, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
@@ -45,13 +49,21 @@ runs {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-configurations { runtimeClasspath.extendsFrom localRuntime }
+configurations {
+  runtimeClasspath.extendsFrom localRuntime
+  jacocoOfflineRuntime
+}
 
 dependencies {
   implementation "net.neoforged:neoforge:${version_neoforge}"
   testImplementation platform('org.junit:junit-bom:5.10.2')
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+  // JaCoCo offline-instrumentation runtime, resolved into its own config so
+  // we can locate the jar and append it to the bootstrap classpath of the
+  // GameTest JVM (NeoForge's transforming mod classloader otherwise can't
+  // resolve org.jacoco.agent.rt.internal_*.Offline).
+  jacocoOfflineRuntime "org.jacoco:org.jacoco.agent:0.8.12:runtime"
 }
 
 jacoco {
@@ -70,13 +82,67 @@ tasks.register('prepareGameTestStructures', Copy) {
   into 'runs/gameTestServer/gameteststructures'
 }
 
+// --- JaCoCo offline instrumentation for NeoForge GameTest server -----------
+// NeoForge's transforming classloader rewrites bytecode at load, so JaCoCo's
+// online javaagent sees post-transform classes that don't match the on-disk
+// originals and the report rejects them. Workaround: instrument main classes
+// offline before the run, swap the instrumented copies in over
+// build/classes/java/main, run runGameTestServer, then restore originals.
+def jacocoMainClassesDir = layout.buildDirectory.dir('classes/java/main')
+def jacocoOrigBackupDir  = layout.buildDirectory.dir('classes-java-main-original')
+def jacocoInstrDir       = layout.buildDirectory.dir('classes-instrumented/java/main')
+
+tasks.register('instrumentClassesForCoverage') {
+  group = 'verification'
+  description = 'Offline-instruments main classes for JaCoCo coverage in NeoForge runs.'
+  dependsOn tasks.named('classes')
+  inputs.dir jacocoMainClassesDir
+  outputs.dir jacocoInstrDir
+  doLast {
+    def dst = jacocoInstrDir.get().asFile
+    delete dst
+    dst.mkdirs()
+    ant.taskdef(name: 'jacocoinstrument',
+                classname: 'org.jacoco.ant.InstrumentTask',
+                classpath: configurations.jacocoAnt.asPath)
+    ant.jacocoinstrument(destdir: dst) {
+      fileset(dir: jacocoMainClassesDir.get().asFile)
+    }
+  }
+}
+
+tasks.register('swapInInstrumentedClasses') {
+  dependsOn tasks.named('instrumentClassesForCoverage')
+  doLast {
+    def main   = jacocoMainClassesDir.get().asFile
+    def backup = jacocoOrigBackupDir.get().asFile
+    def instr  = jacocoInstrDir.get().asFile
+    delete backup
+    copy { from main; into backup }
+    delete main
+    copy { from instr; into main }
+  }
+}
+
+tasks.register('restoreOriginalClasses') {
+  doLast {
+    def main   = jacocoMainClassesDir.get().asFile
+    def backup = jacocoOrigBackupDir.get().asFile
+    if (backup.exists()) {
+      delete main
+      copy { from backup; into main }
+      delete backup
+    }
+  }
+}
+
 afterEvaluate {
   tasks.named('runGameTestServer').configure { task ->
     dependsOn tasks.named('prepareGameTestStructures')
-    project.jacoco.applyTo(task)
-    def jacocoExt = task.extensions.getByType(JacocoTaskExtension)
-    jacocoExt.destinationFile = layout.buildDirectory.file('jacoco/gameTestServer.exec').get().asFile
-    jacocoExt.includes = ['wile.redstonepen.*']
+    dependsOn tasks.named('swapInInstrumentedClasses')
+    finalizedBy tasks.named('restoreOriginalClasses')
+    def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
+    task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
   }
 }
 
