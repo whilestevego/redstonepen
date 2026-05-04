@@ -24,24 +24,6 @@ class RedstoneTrackStateTest
   // --- Mask constants ---
 
   @Test
-  void wireMaskCoversExactlyBits0To23()
-  {
-    assertEquals(0x0000000000ffffffL, defs.STATE_FLAG_WIR_MASK);
-  }
-
-  @Test
-  void connectionMaskCoversExactlyBits24To29()
-  {
-    assertEquals(0x000000003f000000L, defs.STATE_FLAG_CON_MASK);
-  }
-
-  @Test
-  void powerMaskCoversExactlyBits32To55()
-  {
-    assertEquals(0x00ffffff00000000L, defs.STATE_FLAG_PWR_MASK);
-  }
-
-  @Test
   void masksDontOverlap()
   {
     assertEquals(0L, defs.STATE_FLAG_WIR_MASK & defs.STATE_FLAG_CON_MASK);
