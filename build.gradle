@@ -73,11 +73,10 @@ tasks.register('prepareGameTestStructures', Copy) {
 afterEvaluate {
   tasks.named('runGameTestServer').configure { task ->
     dependsOn tasks.named('prepareGameTestStructures')
-    jacoco.applyTo(task)
-    task.extensions.configure(JacocoTaskExtension) {
-      destinationFile = layout.buildDirectory.file('jacoco/gameTestServer.exec').get().asFile
-      includes = ['wile.redstonepen.*']
-    }
+    project.jacoco.applyTo(task)
+    def jacocoExt = task.extensions.getByType(JacocoTaskExtension)
+    jacocoExt.destinationFile = layout.buildDirectory.file('jacoco/gameTestServer.exec').get().asFile
+    jacocoExt.includes = ['wile.redstonepen.*']
   }
 }
 
