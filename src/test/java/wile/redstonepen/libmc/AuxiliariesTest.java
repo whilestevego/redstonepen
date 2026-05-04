@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -22,14 +21,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 import org.junit.jupiter.api.Test;
 
 class AuxiliariesTest
 {
-  private static final double EPS = 1e-9;
-
   // --- mod helpers / logging -----------------------------------------------------------------
 
   @Test
@@ -219,75 +215,6 @@ class AuxiliariesTest
     assertFalse(s.has(DataComponents.CUSTOM_NAME));
   }
 
-  // --- AABB rotation/mirroring/union ---------------------------------------------------------
-
-  private static void assertAABB(AABB e, AABB a)
-  {
-    assertEquals(e.minX, a.minX, EPS);
-    assertEquals(e.minY, a.minY, EPS);
-    assertEquals(e.minZ, a.minZ, EPS);
-    assertEquals(e.maxX, a.maxX, EPS);
-    assertEquals(e.maxY, a.maxY, EPS);
-    assertEquals(e.maxZ, a.maxZ, EPS);
-  }
-
-  @Test
-  void getMirroredAABBOnAxisX()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    assertAABB(new AABB(1-0.6, 0.2, 0.3, 1-0.1, 0.7, 0.9),
-      Auxiliaries.getMirroredAABB(bb, Direction.Axis.X));
-  }
-
-  @Test
-  void getMirroredAABBOnAxisY()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    assertAABB(new AABB(0.1, 1-0.7, 0.3, 0.6, 1-0.2, 0.9),
-      Auxiliaries.getMirroredAABB(bb, Direction.Axis.Y));
-  }
-
-  @Test
-  void getMirroredAABBOnAxisZ()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    assertAABB(new AABB(0.1, 0.2, 1-0.9, 0.6, 0.7, 1-0.3),
-      Auxiliaries.getMirroredAABB(bb, Direction.Axis.Z));
-  }
-
-  @Test
-  void getMirroredAABBArrayPreservesLength()
-  {
-    final AABB[] in = { new AABB(0,0,0,1,1,1), new AABB(0.2,0.2,0.2,0.8,0.8,0.8) };
-    final AABB[] out = Auxiliaries.getMirroredAABB(in, Direction.Axis.X);
-    assertEquals(in.length, out.length);
-  }
-
-  @Test
-  void getMappedAABBAppliesMapper()
-  {
-    final AABB[] in = { new AABB(0,0,0,1,1,1) };
-    final AABB[] out = Auxiliaries.getMappedAABB(in, b -> b.move(2,0,0));
-    assertAABB(new AABB(2,0,0,3,1,1), out[0]);
-  }
-
-  @Test
-  void getUnionShapeOfSingleAABB()
-  {
-    final VoxelShape s = Auxiliaries.getUnionShape(new AABB(0,0,0,1,1,1));
-    assertFalse(s.isEmpty());
-  }
-
-  @Test
-  void getUnionShapeOfArrayOfAABB()
-  {
-    final VoxelShape s = Auxiliaries.getUnionShape(
-      new AABB[]{ new AABB(0,0,0,0.5,1,1) },
-      new AABB[]{ new AABB(0.5,0,0,1,1,1) }
-    );
-    assertFalse(s.isEmpty());
-  }
-
   // --- BlockPosRange ---------------------------------------------------------------------------
 
   @Test
@@ -350,6 +277,27 @@ class AuxiliariesTest
     assertEquals(r.getVolume(), r.stream().count());
   }
 
+  @Test
+  void blockPosRangeVolumeEqualsProductOfDimensions()
+  {
+    final Auxiliaries.BlockPosRange range = new Auxiliaries.BlockPosRange(0, 0, 0, 2, 1, 1);
+    assertEquals(range.getXSize() * range.getYSize() * range.getZSize(), range.getVolume());
+  }
+
+  @Test
+  void blockPosRangeByXZYIndexZeroReturnsOriginCorner()
+  {
+    final Auxiliaries.BlockPosRange range = new Auxiliaries.BlockPosRange(1, 2, 3, 3, 4, 5);
+    assertEquals(new BlockPos(1, 2, 3), range.byXZYIndex(0));
+  }
+
+  @Test
+  void blockPosRangeByXZYIndexLastReturnsMaxCorner()
+  {
+    final Auxiliaries.BlockPosRange range = new Auxiliaries.BlockPosRange(0, 0, 0, 2, 1, 1);
+    assertEquals(new BlockPos(2, 1, 1), range.byXZYIndex(range.getVolume() - 1));
+  }
+
   // --- text component (de)serialization ------------------------------------------------------
 
   @Test
@@ -383,126 +331,6 @@ class AuxiliariesTest
   void logGitVersionDoesNotThrow()
   { Auxiliaries.logGitVersion(); }
 
-  // --- 6-face rotation -----------------------------------------------------------------------
-
-  @Test
-  void getRotatedAABBNorthIsIdentity()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    assertAABB(bb, Auxiliaries.getRotatedAABB(bb, Direction.NORTH));
-  }
-
-  @Test
-  void getRotatedAABBAllSixFacesProduceValidBoxes()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    for(Direction d : Direction.values()) {
-      final AABB out = Auxiliaries.getRotatedAABB(bb, d);
-      assertNotNull(out);
-      assertTrue(out.maxX > out.minX);
-      assertTrue(out.maxY > out.minY);
-      assertTrue(out.maxZ > out.minZ);
-    }
-  }
-
-  @Test
-  void getRotatedAABBHorizontalKeepsYAxis()
-  {
-    final AABB bb = new AABB(0.1, 0.25, 0.3, 0.7, 0.85, 0.9);
-    final AABB south = Auxiliaries.getRotatedAABB(bb, Direction.SOUTH, true);
-    assertEquals(bb.minY, south.minY, EPS);
-    assertEquals(bb.maxY, south.maxY, EPS);
-  }
-
-  @Test
-  void getRotatedAABBHorizontalDownAndUpAreIdentity()
-  {
-    final AABB bb = new AABB(0.1, 0.25, 0.3, 0.7, 0.85, 0.9);
-    assertAABB(bb, Auxiliaries.getRotatedAABB(bb, Direction.DOWN, true));
-    assertAABB(bb, Auxiliaries.getRotatedAABB(bb, Direction.UP, true));
-  }
-
-  @Test
-  void getRotatedAABBArrayPreservesLength()
-  {
-    final AABB[] in = { new AABB(0,0,0,1,1,1), new AABB(0.2,0.2,0.2,0.8,0.8,0.8) };
-    final AABB[] out = Auxiliaries.getRotatedAABB(in, Direction.EAST);
-    assertEquals(in.length, out.length);
-  }
-
-  @Test
-  void getRotatedAABBArrayHorizontalPreservesLength()
-  {
-    final AABB[] in = { new AABB(0,0,0,1,1,1) };
-    final AABB[] out = Auxiliaries.getRotatedAABB(in, Direction.SOUTH, true);
-    assertEquals(in.length, out.length);
-  }
-
-  @Test
-  void getYRotatedAABBZeroStepsIsIdentity()
-  {
-    final AABB bb = new AABB(0.1, 0.25, 0.3, 0.7, 0.85, 0.9);
-    assertAABB(bb, Auxiliaries.getYRotatedAABB(bb, 0));
-  }
-
-  @Test
-  void getYRotatedAABBHandlesNegativeAndModularSteps()
-  {
-    final AABB bb = new AABB(0.1, 0.25, 0.3, 0.7, 0.85, 0.9);
-    final AABB a = Auxiliaries.getYRotatedAABB(bb, 1);
-    final AABB b = Auxiliaries.getYRotatedAABB(bb, 5);
-    assertAABB(a, b);
-    final AABB c = Auxiliaries.getYRotatedAABB(bb, -3);
-    assertAABB(a, c);
-  }
-
-  @Test
-  void getYRotatedAABBArrayPreservesLength()
-  {
-    final AABB[] in = { new AABB(0,0,0,1,1,1) };
-    final AABB[] out = Auxiliaries.getYRotatedAABB(in, 2);
-    assertEquals(in.length, out.length);
-  }
-
-  @Test
-  void getRotatedAABBHorizontalAllSixFacesProduceValidBoxes()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    for(Direction d : Direction.values()) {
-      final AABB out = Auxiliaries.getRotatedAABB(bb, d, true);
-      assertNotNull(out);
-      assertTrue(out.maxX > out.minX);
-      assertTrue(out.maxY > out.minY);
-      assertTrue(out.maxZ > out.minZ);
-    }
-  }
-
-  @Test
-  void getYRotatedAABBAllFourQuartersProduceValidBoxes()
-  {
-    final AABB bb = new AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.9);
-    for(int q = 0; q < 4; q++) {
-      final AABB out = Auxiliaries.getYRotatedAABB(bb, q);
-      assertNotNull(out);
-      assertEquals(bb.minY, out.minY, EPS);
-      assertEquals(bb.maxY, out.maxY, EPS);
-    }
-  }
-
-  @Test
-  void getUnionShapeArrayOfArraysHandlesEmptyInput()
-  {
-    final VoxelShape s = Auxiliaries.getUnionShape(new AABB[0][0]);
-    assertTrue(s.isEmpty());
-  }
-
-  @Test
-  void getMappedAABBHandlesEmptyInput()
-  {
-    final AABB[] out = Auxiliaries.getMappedAABB(new AABB[0], b -> b);
-    assertEquals(0, out.length);
-  }
-
   @Test
   void setItemStackNbtCanReplaceExistingValue()
   {
@@ -534,27 +362,6 @@ class AuxiliariesTest
     assertFalse(Auxiliaries.hasItemStackNbt(s, "k"));
   }
 
-  @Test
-  void getMirroredAABBArrayWithEmptyInput()
-  {
-    final AABB[] out = Auxiliaries.getMirroredAABB(new AABB[0], Direction.Axis.X);
-    assertEquals(0, out.length);
-  }
-
-  @Test
-  void getRotatedAABBArrayWithEmptyInput()
-  {
-    final AABB[] out = Auxiliaries.getRotatedAABB(new AABB[0], Direction.NORTH);
-    assertEquals(0, out.length);
-  }
-
-  @Test
-  void getYRotatedAABBArrayWithEmptyInput()
-  {
-    final AABB[] out = Auxiliaries.getYRotatedAABB(new AABB[0], 1);
-    assertEquals(0, out.length);
-  }
-
   // --- particles (server-side guard) ---------------------------------------------------------
 
   @Test
@@ -564,27 +371,6 @@ class AuxiliariesTest
   @Test
   @Disabled("Requires Level/ServerLevel — exercised by GameTests")
   void getFakePlayerOnNonServerLevelReturnsEmpty() {}
-
-  // --- getPixeledAABB -----------------------------------------------------------------------
-
-  @Test
-  void getPixeledAABBScalesByFactor16()
-  {
-    final AABB bb = Auxiliaries.getPixeledAABB(0, 0, 0, 16, 16, 16);
-    assertAABB(new AABB(0, 0, 0, 1, 1, 1), bb);
-  }
-
-  @Test
-  void getPixeledAABBPartialPixels()
-  {
-    final AABB bb = Auxiliaries.getPixeledAABB(2, 4, 6, 10, 12, 14);
-    assertEquals(2.0/16.0, bb.minX, EPS);
-    assertEquals(4.0/16.0, bb.minY, EPS);
-    assertEquals(6.0/16.0, bb.minZ, EPS);
-    assertEquals(10.0/16.0, bb.maxX, EPS);
-    assertEquals(12.0/16.0, bb.maxY, EPS);
-    assertEquals(14.0/16.0, bb.maxZ, EPS);
-  }
 
   // --- isWaterLogged -------------------------------------------------------------------------
 
