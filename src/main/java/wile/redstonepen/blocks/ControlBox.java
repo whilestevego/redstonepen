@@ -419,6 +419,20 @@ public class ControlBox
 
       public int outputData()
       { return logic_.output_data; }
+
+      public void setRcaInput(int channel, int value)
+      {
+        final long mask = 0xfL << (channel * 4);
+        logic_.rca_input_mask |= mask;
+        logic_.rca_input_data = (logic_.rca_input_data & ~mask) | (((long)(value & 0xf)) << (channel * 4));
+      }
+
+      public int getRcaOutput(int channel)
+      { return (int)((logic_.rca_output_data >> (channel * 4)) & 0xfL); }
+
+      public long rcaOutputData()
+      { return logic_.rca_output_data; }
+
     }
 
   }

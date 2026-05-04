@@ -92,7 +92,8 @@ public class RemoteItem extends StandardItems.BaseItem
   public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
   {
     if(!(world instanceof ServerLevel sworld)) return InteractionResultHolder.success(player.getItemInHand(hand));
-    onTriggerRemoteLink(sworld, (ServerPlayer)player, player.getItemInHand(hand));
+    if(!(player instanceof ServerPlayer splayer)) return InteractionResultHolder.fail(player.getItemInHand(hand));
+    onTriggerRemoteLink(sworld, splayer, player.getItemInHand(hand));
     return InteractionResultHolder.fail(player.getItemInHand(hand));
   }
 
@@ -100,7 +101,8 @@ public class RemoteItem extends StandardItems.BaseItem
   public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
   {
     if(!(context.getLevel() instanceof ServerLevel sworld)) return InteractionResult.SUCCESS;
-    onTriggerRemoteLink(sworld, (ServerPlayer)context.getPlayer(), stack);
+    if(!(context.getPlayer() instanceof ServerPlayer splayer)) return InteractionResult.CONSUME;
+    onTriggerRemoteLink(sworld, splayer, stack);
     return InteractionResult.CONSUME;
   }
 

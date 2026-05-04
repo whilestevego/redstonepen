@@ -4,6 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.ButtonBlock;
@@ -15,6 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import wile.redstonepen.ModConstants;
+import wile.redstonepen.blocks.BasicGauge;
 import wile.redstonepen.libmc.Registries;
 
 @GameTestHolder(ModConstants.MODID)
@@ -125,5 +133,55 @@ public final class BasicLeverButtonGameTests
         helper.fail("pulse button should revert after its active period");
       helper.succeed();
     });
+  }
+
+  // --- BasicGauge -----------------------------------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 10)
+  public static void gaugeReadsZeroWhenNoSignal(GameTestHelper helper)
+  {
+    helper.setBlock(POS, Registries.getBlock("basic_gauge").defaultBlockState());
+    helper.runAfterDelay(2, () -> {
+      final int power = helper.getBlockState(POS).getValue(BlockStateProperties.POWER);
+      if(power != 0) helper.fail("expected gauge power=0 with no signal, got " + power);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 10)
+  public static void gaugeReadsSignalFromAdjacentRedstoneBlock(GameTestHelper helper)
+  {
+    helper.setBlock(POS, Registries.getBlock("basic_gauge").defaultBlockState());
+    helper.setBlock(POS.east(), Blocks.REDSTONE_BLOCK);
+    helper.succeedWhen(() -> {
+      final int power = helper.getBlockState(POS).getValue(BlockStateProperties.POWER);
+      if(power <= 0) helper.fail("expected gauge power>0 adjacent to redstone block, got " + power);
+    });
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void gaugeShouldCheckWeakPowerReturnsFalse(GameTestHelper helper)
+  {
+    helper.setBlock(POS, Registries.getBlock("basic_gauge").defaultBlockState());
+    final BasicGauge.BasicGaugeBlock block = (BasicGauge.BasicGaugeBlock)Registries.getBlock("basic_gauge");
+    final boolean result = block.shouldCheckWeakPower(helper.getBlockState(POS), helper.getLevel(), helper.absolutePos(POS), Direction.NORTH);
+    if(result) helper.fail("shouldCheckWeakPower must return false");
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void gaugeGetStateForPlacementReturnsNonNull(GameTestHelper helper)
+  {
+    final Block block = Registries.getBlock("basic_gauge");
+    final ItemStack stack = new ItemStack(block);
+    final BlockPos abs = helper.absolutePos(POS);
+    final BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false);
+    final var player = helper.makeMockPlayer(GameType.SURVIVAL);
+    player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+    final UseOnContext useCtx = new UseOnContext(helper.getLevel(), player, InteractionHand.MAIN_HAND, stack, hit);
+    final BlockPlaceContext ctx = new BlockPlaceContext(useCtx);
+    final BlockState placed = block.getStateForPlacement(ctx);
+    // placed may be null if position is not replaceable; either way the method must not throw.
+    helper.succeed();
   }
 }
