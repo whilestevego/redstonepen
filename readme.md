@@ -118,6 +118,72 @@ mod block to vanilla Redstone:
 
 Requires permission level 2 (cheats / `/op`); not gamemode-specific.
 
+## Development
+
+### Test Coverage
+
+The project measures coverage with [JaCoCo](https://www.jacoco.org/) across
+both test paths:
+
+- **Unit tests** (`src/test/java/...`) — JUnit 5, run in a plain JVM with
+  online instrumentation.
+- **NeoForge GameTests** (`@GameTest` methods, run via the
+  `runGameTestServer` task) — run inside a real Minecraft server JVM with
+  **offline** instrumentation, because NeoForge's transforming mod
+  classloader rewrites bytecode at load time and breaks online
+  instrumentation matching.
+
+#### Run
+
+```
+./gradlew coverage
+```
+
+This runs the unit-test suite and the GameTest server, then merges both
+execution datasets into a single report.
+
+#### Output
+
+| Path                                              | Contents                          |
+|---------------------------------------------------|-----------------------------------|
+| `build/reports/jacoco/test/html/index.html`       | HTML report (open in a browser)   |
+| `build/reports/jacoco/test/jacocoTestReport.xml`  | XML report (for CI / Codecov)     |
+| `build/jacoco/test.exec`                          | Unit-test execution data          |
+| `build/jacoco/gameTestServer.exec`                | GameTest execution data           |
+
+#### Individual tasks
+
+- `./gradlew test jacocoTestReport` — unit tests only.
+- `./gradlew runGameTestServer jacocoTestReport` — GameTests only. Triggers
+  offline instrumentation: main classes are temporarily replaced with
+  instrumented copies for the run, then restored by the
+  `restoreOriginalClasses` finalizer (runs even if the GameTest server
+  fails). If a build is killed mid-run and originals are not restored, run
+  `./gradlew clean classes` to regenerate them.
+- `./gradlew jacocoTestCoverageVerification` — enforce minimum coverage.
+  Thresholds start at `0.00` (baseline) and are intended to ratchet up
+  toward `1.00` over time.
+
+#### How offline instrumentation works
+
+1. `instrumentClassesForCoverage` runs the JaCoCo Ant `InstrumentTask`
+   against `build/classes/java/main`, writing instrumented bytecode to
+   `build/classes-instrumented/java/main`.
+2. `swapInInstrumentedClasses` backs up the originals to
+   `build/classes-java-main-original` and copies the instrumented classes
+   into place.
+3. `runGameTestServer` launches with the JaCoCo runtime jar appended to
+   the JVM bootstrap classpath (`-Xbootclasspath/a:`) so the transforming
+   mod classloader can resolve `org.jacoco.agent.rt.internal_*.Offline`,
+   and with `jacoco-agent.destfile` pointing at
+   `build/jacoco/gameTestServer.exec`. The runtime writes the exec file on
+   JVM shutdown.
+4. `restoreOriginalClasses` (configured as `finalizedBy`) puts the
+   uninstrumented classes back, even if the run failed.
+
+The instrumented classes are scratch artefacts under `build/` and are
+never included in the published jar.
+
 ## Community and References
 
 - Discord: the Redstone Pen has a channel on the
