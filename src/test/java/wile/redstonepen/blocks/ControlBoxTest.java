@@ -691,19 +691,23 @@ class ControlBoxTest
   // --- Constants & misc functions ---
 
   @Test
-  void clockFunctionParses()
+  void clockFunctionReturnsCurrentClockSymbolValue()
   {
     final TestHooks hooks = new TestHooks();
     assertTrue(hooks.setCode("b=clock()"));
+    hooks.setSymbol(".clock", 7);
     hooks.tick();
+    assertEquals(7, hooks.output(Direction.EAST));
   }
 
   @Test
-  void timeFunctionParses()
+  void timeFunctionReturnsCurrentTimeSymbolValue()
   {
     final TestHooks hooks = new TestHooks();
     assertTrue(hooks.setCode("b=time()"));
+    hooks.setSymbol(".time", 5);
     hooks.tick();
+    assertEquals(5, hooks.output(Direction.EAST));
   }
 
   @Test
