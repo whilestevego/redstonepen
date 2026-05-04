@@ -41,7 +41,7 @@ class RsSignalsTest
   }
 
   @Test
-  void fromContainerReturnsOneForSingleItemAcrossManySlots()
+  void fromContainerAppliesNonemptyBonusWhenFillRoundsToZero()
   {
     final SimpleContainer container = new SimpleContainer(27);
     container.setItem(0, new ItemStack(Items.REDSTONE, 1));
