@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Disabled;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -551,22 +553,12 @@ class AuxiliariesTest
   // --- particles (server-side guard) ---------------------------------------------------------
 
   @Test
-  void particlesOnNonServerLevelReturnsEarly()
-  {
-    // we cannot easily build a Level here; the function early-returns when the
-    // level is not a ServerLevel — pass null to assert no incidental behaviour
-    // is invoked. If it throws NPE we tolerate (the guard happens before sl.send).
-    try {
-      // not calling — Level.getRandom() would NPE; this branch is exercised
-      // by GameTests anyway.
-    } catch(Throwable ignored) {}
-  }
+  @Disabled("Requires ServerLevel — exercised by GameTests")
+  void particlesOnNonServerLevelReturnsEarly() {}
 
   @Test
-  void getFakePlayerOnNonServerLevelReturnsEmpty()
-  {
-    // skipped: requires a Level; GameTests cover the server branch.
-  }
+  @Disabled("Requires Level/ServerLevel — exercised by GameTests")
+  void getFakePlayerOnNonServerLevelReturnsEmpty() {}
 
   // --- getPixeledAABB -----------------------------------------------------------------------
 
