@@ -25,7 +25,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify
 
 default: mod
 
@@ -98,3 +98,13 @@ dist: sanitize dist-check dist-files
 
 run:
 	@$(GRADLE) runClient
+
+test:
+	@$(GRADLE) test
+
+coverage:
+	@$(GRADLE) coverage
+	@echo "Report: build/reports/jacoco/test/index.html"
+
+verify:
+	@$(GRADLE) jacocoTestCoverageVerification
