@@ -5,8 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.IntStream;
+
 import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import wile.redstonepen.blocks.RedstoneTrack.TrackBlockEntity.TestHooks;
 import wile.redstonepen.blocks.RedstoneTrack.defs;
 import wile.redstonepen.blocks.RedstoneTrack.defs.connections;
@@ -95,14 +101,13 @@ class RedstoneTrackStateTest
     assertEquals(0, th.addWireFlags(1L));
   }
 
-  @Test
-  void addWireFlagsAll24FlagsIndividuallyReturnsOne()
+  static IntStream wireBitIndices() { return IntStream.range(0, 24); }
+
+  @ParameterizedTest
+  @MethodSource("wireBitIndices")
+  void addWireFlagEachBitIndividuallyReturnsOne(int i)
   {
-    for(int i = 0; i < 24; ++i) {
-      final TestHooks th = h();
-      assertEquals(1, th.addWireFlags(1L << i),
-        "addWireFlags bit " + i + " on empty state must return 1");
-    }
+    assertEquals(1, h().addWireFlags(1L << i));
   }
 
   @Test
@@ -129,16 +134,15 @@ class RedstoneTrackStateTest
     assertEquals(1, th.getConnectionFlags());
   }
 
-  @Test
-  void getConnectionFlagEachBitIndependently()
+  @ParameterizedTest
+  @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+  void getConnectionFlagEachBitIndependently(int i)
   {
-    for(int i = 0; i < 6; ++i) {
-      final TestHooks th = h();
-      th.setState(1L << (24 + i));
-      assertTrue(th.getConnectionFlag(i), "connection flag " + i + " must be true");
-      for(int j = 0; j < 6; ++j) {
-        if(j != i) assertFalse(th.getConnectionFlag(j), "connection flag " + j + " must be false");
-      }
+    final TestHooks th = h();
+    th.setState(1L << (24 + i));
+    assertTrue(th.getConnectionFlag(i));
+    for(int j = 0; j < 6; ++j) {
+      if(j != i) assertFalse(th.getConnectionFlag(j), "flag " + j + " must be clear when only " + i + " is set");
     }
   }
 
@@ -159,25 +163,23 @@ class RedstoneTrackStateTest
     }
   }
 
-  @Test
-  void setSidePowerRoundTripsAllDirectionsAtMax()
+  @ParameterizedTest
+  @EnumSource(Direction.class)
+  void setSidePowerRoundTripsAtMax(Direction dir)
   {
-    for(Direction dir : Direction.values()) {
-      final TestHooks th = h();
-      th.setSidePower(dir, 15);
-      assertEquals(15, th.getSidePower(dir), "round-trip getSidePower after setSidePower(15) for " + dir);
-    }
+    final TestHooks th = h();
+    th.setSidePower(dir, 15);
+    assertEquals(15, th.getSidePower(dir));
   }
 
-  @Test
-  void setSidePowerRoundTripsAllDirectionsAtZero()
+  @ParameterizedTest
+  @EnumSource(Direction.class)
+  void setSidePowerRoundTripsAtZero(Direction dir)
   {
-    for(Direction dir : Direction.values()) {
-      final TestHooks th = h();
-      th.setSidePower(dir, 15); // set first to confirm clearing works
-      th.setSidePower(dir, 0);
-      assertEquals(0, th.getSidePower(dir), "getSidePower(" + dir + ") after setSidePower(0) must be 0");
-    }
+    final TestHooks th = h();
+    th.setSidePower(dir, 15);
+    th.setSidePower(dir, 0);
+    assertEquals(0, th.getSidePower(dir));
   }
 
   @Test
