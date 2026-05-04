@@ -432,6 +432,7 @@ public class ControlBox
 
       public long rcaOutputData()
       { return logic_.rca_output_data; }
+
     }
 
   }

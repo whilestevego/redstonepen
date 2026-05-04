@@ -17,21 +17,21 @@ import wile.redstonepen.libmc.Auxiliaries;
 public final class AuxiliariesGameTests
 {
   private static final String NS = "minecraft";
-  private static final String EMPTY = "relay_activates_from_redstone";
+  private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
 
   private AuxiliariesGameTests() {}
 
   // --- particles -----------------------------------------------------------------------------------
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void particlesOnServerLevelDoesNotThrow(GameTestHelper helper)
   {
     Auxiliaries.particles(helper.getLevel(), helper.absolutePos(POS), ParticleTypes.SMOKE);
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void particlesVec3OnServerLevelDoesNotThrow(GameTestHelper helper)
   {
     final net.minecraft.world.phys.Vec3 pos = net.minecraft.world.phys.Vec3.atCenterOf(helper.absolutePos(POS));
@@ -41,7 +41,7 @@ public final class AuxiliariesGameTests
 
   // --- getFakePlayer -------------------------------------------------------------------------------
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void getFakePlayerOnServerLevelReturnsPresent(GameTestHelper helper)
   {
     final var result = Auxiliaries.getFakePlayer(helper.getLevel());
@@ -51,7 +51,7 @@ public final class AuxiliariesGameTests
 
   // --- playerChatMessage ---------------------------------------------------------------------------
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void playerChatMessageWithMockPlayerDoesNotThrow(GameTestHelper helper)
   {
     final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -61,7 +61,7 @@ public final class AuxiliariesGameTests
 
   // --- text component helpers ----------------------------------------------------------------------
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void serializeNonNullComponentReturnsNonEmpty(GameTestHelper helper)
   {
     final String serialized = Auxiliaries.serializeTextComponent(
@@ -70,7 +70,7 @@ public final class AuxiliariesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void unserializeSimpleTextComponentReturnsComponent(GameTestHelper helper)
   {
     final String json = Auxiliaries.serializeTextComponent(

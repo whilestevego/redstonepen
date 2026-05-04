@@ -15,13 +15,13 @@ import wile.redstonepen.libmc.Inventories;
 public final class InventoriesGameTests
 {
   private static final String NS = "minecraft";
-  private static final String EMPTY = "relay_activates_from_redstone";
+  private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
   private InventoriesGameTests() {}
 
   // --- InventoryRange.insert complex second-iteration paths --------------------------------
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeInsertBetweenMatchedSlots(GameTestHelper helper)
   {
     // "between" path: matches at slots 1 and 3 (full), empty slot 2 between them.
@@ -37,7 +37,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeInsertBeforeAfterMatchedSlot(GameTestHelper helper)
   {
     // "before/after" path: matches at slots 1 and 3, but slot 2 is occupied by a DIFFERENT
@@ -54,7 +54,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeInsertSimulateWithPartialStack(GameTestHelper helper)
   {
     // simulate=true path in insert(ItemStack, boolean): partially-filled slot.
@@ -68,7 +68,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeInsertSimulateNoRoomReturnsInput(GameTestHelper helper)
   {
     // simulate=true when all stacks are full → input returned as-is.
@@ -82,7 +82,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeExtractMultipleMatchingSlots(GameTestHelper helper)
   {
     // extract() multi-slot path: stackable items spread across two slots.
@@ -96,7 +96,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeExtractWithSimulateTrue(GameTestHelper helper)
   {
     // extract(amount, random=false, simulate=true) must not modify container.
@@ -111,7 +111,7 @@ public final class InventoriesGameTests
     helper.succeed();
   }
 
-  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  @GameTest(templateNamespace = NS, template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void inventoryRangeInsertFillupOnlyStopsAtOnlyFillup(GameTestHelper helper)
   {
     // only_fillup=true path via 5-arg insert: if no match to fill up, returns input.

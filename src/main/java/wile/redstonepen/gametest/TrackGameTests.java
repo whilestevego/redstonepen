@@ -494,8 +494,8 @@ public final class TrackGameTests
     block.modifySegments(helper.getBlockState(TRACK_POS), helper.getLevel(), absPos, player,
       pen, net.minecraft.world.InteractionHand.MAIN_HAND, rtr, false, true);
     final RedstoneTrack.TrackBlockEntity te = getTrack(helper);
-    if(te == null) { helper.succeed(); return; }
-    if(te.getWireFlags() == 0) { helper.succeed(); return; }
+    if(te == null) { helper.fail("expected TrackBlockEntity after placeTrack"); return; }
+    if(te.getWireFlags() == 0) { helper.fail("expected non-zero wire flags after ADD pass"); return; }
 
     // REMOVE all wires: call remove with empty stack (no pen) on each face/direction combo.
     // We remove the same bit we just added.
@@ -616,7 +616,7 @@ public final class TrackGameTests
   {
     final RedstoneTrack.RedstoneTrackBlock block = placeTrack(helper);
     final boolean signalSource = block.isSignalSource(helper.getBlockState(TRACK_POS));
-    // Just call it without asserting a specific value — verifies line coverage.
+    if(!signalSource) helper.fail("track must be a signal source");
     helper.succeed();
   }
 

@@ -490,11 +490,35 @@ public final class ControlBoxGameTests
   public static void controlBoxBuiltinFunctionsExercised(GameTestHelper helper)
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
-    // Exercise several built-in functions to cover their lambda bodies.
-    // Each tick call drives the expression evaluator.
-    te.setCode("b = max(3,5)\nb = min(3,5)\nb = inv(3)\nb = if(1,15,0)\nb = mean(4,8)\nb = lim(3,0,15)");
+    final ControlBox.ControlBoxBlock block = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    final BlockPos absPos = helper.absolutePos(CONTROL_BOX_POS);
     te.setEnabled(true);
-    te.tick();
+    int sig;
+
+    te.setCode("b=max(3,5)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 5) helper.fail("max(3,5) expected 5, got " + sig);
+
+    te.setCode("b=min(3,5)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 3) helper.fail("min(3,5) expected 3, got " + sig);
+
+    te.setCode("b=inv(3)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 12) helper.fail("inv(3) expected 12, got " + sig);
+
+    te.setCode("b=if(1,15,0)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 15) helper.fail("if(1,15,0) expected 15, got " + sig);
+
+    te.setCode("b=mean(4,8)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 6) helper.fail("mean(4,8) expected 6, got " + sig);
+
+    te.setCode("b=lim(3,0,15)"); te.tick();
+    sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(), absPos, Direction.WEST);
+    if(sig != 3) helper.fail("lim(3,0,15) expected 3, got " + sig);
+
     helper.succeed();
   }
 
@@ -502,10 +526,16 @@ public final class ControlBoxGameTests
   public static void controlBoxCounterFunctionsExercised(GameTestHelper helper)
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
+    // cnt1/cnt2/cnt3 each increment from 0; last assignment (cnt3) wins for port b.
+    // After 2 ticks with input=1 and max=10, cnt3 should have reached 2.
     te.setCode("b=cnt1(1,10)\nb=cnt2(1,10)\nb=cnt3(1,10)");
     te.setEnabled(true);
     te.tick();
     te.tick();
+    final ControlBox.ControlBoxBlock block = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    final int sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(),
+      helper.absolutePos(CONTROL_BOX_POS), Direction.WEST);
+    if(sig != 2) helper.fail("cnt3(1,10) after 2 ticks expected 2, got " + sig);
     helper.succeed();
   }
 
@@ -513,10 +543,16 @@ public final class ControlBoxGameTests
   public static void controlBoxTimerFunctionsExercised(GameTestHelper helper)
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
+    // Last assignment (tiv1) wins for port b. tiv1(5) is an interval timer with period=5;
+    // after 2 ticks elapsed=2 < period, so output=0.
     te.setCode("b=ton1(1,5)\nb=tof1(1,5)\nb=tp1(1,5)\nb=tiv1(5)");
     te.setEnabled(true);
     te.tick();
     te.tick();
+    final ControlBox.ControlBoxBlock block = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    final int sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(),
+      helper.absolutePos(CONTROL_BOX_POS), Direction.WEST);
+    if(sig != 0) helper.fail("tiv1(5) after 2 ticks expected 0, got " + sig);
     helper.succeed();
   }
 
@@ -525,6 +561,7 @@ public final class ControlBoxGameTests
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
     // Cover lambda bodies for cnt4/cnt5, tiv2/tiv3, ton2-5, tof2-5, tp2-5, rnd, clock, time.
+    // Last assignment is b=time(); assert output is in valid redstone range [0,15].
     te.setCode("b=cnt4(1,10)\nb=cnt5(1,10)\nb=tiv2(10)\nb=tiv3(10)"
       + "\nb=ton2(1,5)\nb=ton3(1,5)\nb=ton4(1,5)\nb=ton5(1,5)"
       + "\nb=tof2(1,5)\nb=tof3(1,5)\nb=tof4(1,5)\nb=tof5(1,5)"
@@ -533,6 +570,10 @@ public final class ControlBoxGameTests
     te.setEnabled(true);
     te.tick();
     te.tick();
+    final ControlBox.ControlBoxBlock block = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    final int sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(),
+      helper.absolutePos(CONTROL_BOX_POS), Direction.WEST);
+    if(sig < 0 || sig > 15) helper.fail("time() output must be in [0,15], got " + sig);
     helper.succeed();
   }
 
@@ -540,11 +581,15 @@ public final class ControlBoxGameTests
   public static void controlBoxTimerEdgeCasesDoNotThrow(GameTestHelper helper)
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
-    // tof(0,0): pt=0 branch in timer_off_function (returns bool_true immediately).
-    // tp(0,5): in=0, et=0 branch in timer_pulse_function (signal not started, returns bool_false).
+    // tof(0,0): pt=0 branch → returns bool_true immediately (b=15).
+    // tp(0,5): in=0, pulse never started → returns bool_false (b=0). Last assignment wins.
     te.setCode("b=tof1(0,0)\nb=tp1(0,5)");
     te.setEnabled(true);
     te.tick();
+    final ControlBox.ControlBoxBlock block = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    final int sig = block.getSignal(helper.getBlockState(CONTROL_BOX_POS), helper.getLevel(),
+      helper.absolutePos(CONTROL_BOX_POS), Direction.WEST);
+    if(sig != 0) helper.fail("tp1(0,5) with no input expected 0, got " + sig);
     helper.succeed();
   }
 
