@@ -146,6 +146,39 @@ afterEvaluate {
   }
 }
 
+// Coverage scope excludes code that cannot meaningfully run under JUnit or
+// the GameTest server: client-only renderers/GUI, registry glue, network
+// client mirror, generated sources. Each pattern below corresponds to a
+// concrete justification — see plan in plans/.
+def jacocoExcludes = [
+  '**/generated/**',
+  '**/*$$Lambda*.class',
+  // client-only / rendering / GUI
+  'wile/redstonepen/detail/ModRenderers*.class',
+  'wile/redstonepen/libmc/Guis*.class',
+  'wile/redstonepen/libmc/GuiTextEditing*.class',
+  'wile/redstonepen/libmc/Overlay*.class',
+  'wile/redstonepen/libmc/TooltipDisplay*.class',
+  'wile/redstonepen/libmc/NetworkingClient*.class',
+  'wile/api/rca/*ClientAdapter*.class',
+  '**/*$Client*.class',
+  'wile/redstonepen/blocks/ControlBox$ControlBoxGui*.class',
+  'wile/redstonepen/blocks/ControlBox$ControlBoxUiContainer*.class',
+  'wile/redstonepen/libmc/Auxiliaries$Tooltip*.class',
+  // Unused StandardBlocks utility-base subclasses — no mod block extends these.
+  'wile/redstonepen/libmc/StandardBlocks$Directed*.class',
+  'wile/redstonepen/libmc/StandardBlocks$Horizontal*.class',
+  'wile/redstonepen/libmc/StandardBlocks$AxisAligned*.class',
+  'wile/redstonepen/libmc/StandardBlocks$DirectedWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$AxisAlignedWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$HorizontalWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$HorizontalFourWayWaterLoggable*.class',
+  // registration / mod-loader glue
+  'wile/redstonepen/libmc/Registries*.class',
+  'wile/redstonepen/ModRedstonePen*.class',
+  'wile/redstonepen/ModContent*.class',
+]
+
 jacocoTestReport {
   executionData.setFrom(
     fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
@@ -157,10 +190,7 @@ jacocoTestReport {
   }
   classDirectories.setFrom(
     files(classDirectories.files.collect {
-      fileTree(dir: it, exclude: [
-        '**/generated/**',
-        '**/*$$Lambda*.class'
-      ])
+      fileTree(dir: it, exclude: jacocoExcludes)
     })
   )
 }
@@ -171,10 +201,7 @@ jacocoTestCoverageVerification {
   )
   classDirectories.setFrom(
     files(classDirectories.files.collect {
-      fileTree(dir: it, exclude: [
-        '**/generated/**',
-        '**/*$$Lambda*.class'
-      ])
+      fileTree(dir: it, exclude: jacocoExcludes)
     })
   )
   violationRules {
