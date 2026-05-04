@@ -10,6 +10,12 @@ import wile.redstonepen.blocks.ControlBox.ControlBoxBlockEntity.TestHooks;
 
 class ControlBoxTest
 {
+  private static boolean isInputUsed(TestHooks h, Direction d)
+  { return (h.inputMask() & (0xf << (4 * d.ordinal()))) != 0; }
+
+  private static boolean isOutputUsed(TestHooks h, Direction d)
+  { return (h.outputMask() & (0xf << (4 * d.ordinal()))) != 0; }
+
   @Test
   void rejectsUnknownSignalSuffixes()
   {
@@ -26,9 +32,9 @@ class ControlBoxTest
 
     assertTrue(hooks.setCode("b=d\nu=15"));
     assertTrue(hooks.valid());
-    assertTrue((hooks.inputMask() & 0xf) != 0, "expected input mask for d");
-    assertTrue((hooks.outputMask() & (0xf << (4 * Direction.EAST.ordinal()))) != 0, "expected output mask for b");
-    assertTrue((hooks.outputMask() & (0xf << (4 * Direction.UP.ordinal()))) != 0, "expected output mask for u");
+    assertTrue(isInputUsed(hooks, Direction.DOWN),  "expected input mask for d");
+    assertTrue(isOutputUsed(hooks, Direction.EAST), "expected output mask for b");
+    assertTrue(isOutputUsed(hooks, Direction.UP),   "expected output mask for u");
   }
 
   @Test
@@ -446,16 +452,15 @@ class ControlBoxTest
     final TestHooks hooks = new TestHooks();
     assertTrue(hooks.setCode("b=d"));
 
-    // d (DOWN, ordinal 0) should be in input mask
-    assertTrue((hooks.inputMask() & (0xf << (4 * Direction.DOWN.ordinal()))) != 0, "expected input mask for d");
-    // b (EAST, ordinal 5) should be in output mask
-    assertTrue((hooks.outputMask() & (0xf << (4 * Direction.EAST.ordinal()))) != 0, "expected output mask for b");
+    // d (DOWN) should be in input mask; b (EAST) should be in output mask
+    assertTrue(isInputUsed(hooks, Direction.DOWN),  "expected input mask for d");
+    assertTrue(isOutputUsed(hooks, Direction.EAST), "expected output mask for b");
 
     // All other directions must have zero mask
-    assertEquals(0, hooks.inputMask()  & (0xf << (4 * Direction.UP.ordinal())),    "unexpected input mask for u");
-    assertEquals(0, hooks.inputMask()  & (0xf << (4 * Direction.NORTH.ordinal())), "unexpected input mask for r");
-    assertEquals(0, hooks.outputMask() & (0xf << (4 * Direction.DOWN.ordinal())),  "unexpected output mask for d");
-    assertEquals(0, hooks.outputMask() & (0xf << (4 * Direction.UP.ordinal())),    "unexpected output mask for u");
+    assertFalse(isInputUsed(hooks,  Direction.UP),    "unexpected input mask for u");
+    assertFalse(isInputUsed(hooks,  Direction.NORTH), "unexpected input mask for r");
+    assertFalse(isOutputUsed(hooks, Direction.DOWN),  "unexpected output mask for d");
+    assertFalse(isOutputUsed(hooks, Direction.UP),    "unexpected output mask for u");
   }
 
   // --- Symbol persistence ---
