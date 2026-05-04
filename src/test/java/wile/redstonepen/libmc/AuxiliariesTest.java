@@ -568,4 +568,40 @@ class AuxiliariesTest
     // skipped: requires a Level; GameTests cover the server branch.
   }
 
+  // --- getPixeledAABB -----------------------------------------------------------------------
+
+  @Test
+  void getPixeledAABBScalesByFactor16()
+  {
+    final AABB bb = Auxiliaries.getPixeledAABB(0, 0, 0, 16, 16, 16);
+    assertAABB(new AABB(0, 0, 0, 1, 1, 1), bb);
+  }
+
+  @Test
+  void getPixeledAABBPartialPixels()
+  {
+    final AABB bb = Auxiliaries.getPixeledAABB(2, 4, 6, 10, 12, 14);
+    assertEquals(2.0/16.0, bb.minX, EPS);
+    assertEquals(4.0/16.0, bb.minY, EPS);
+    assertEquals(6.0/16.0, bb.minZ, EPS);
+    assertEquals(10.0/16.0, bb.maxX, EPS);
+    assertEquals(12.0/16.0, bb.maxY, EPS);
+    assertEquals(14.0/16.0, bb.maxZ, EPS);
+  }
+
+  // --- isWaterLogged -------------------------------------------------------------------------
+
+  @Test
+  void isWaterLoggedFalseForNonWaterLoggableBlock()
+  {
+    assertFalse(Auxiliaries.isWaterLogged(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState()));
+  }
+
+  @Test
+  void isWaterLoggedFalseForDryWaterLoggableBlock()
+  {
+    // Oak slab is water-loggable; default state is not waterlogged.
+    assertFalse(Auxiliaries.isWaterLogged(net.minecraft.world.level.block.Blocks.OAK_SLAB.defaultBlockState()));
+  }
+
 }

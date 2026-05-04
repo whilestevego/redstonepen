@@ -987,4 +987,92 @@ class ControlBoxTest
     h.tick();
     assertEquals(7, h.output(Direction.EAST));
   }
+
+  // --- ton: already-complete path (et >= pt on entry) ---
+
+  @Test
+  void tonStaysHighAfterPeriodWithInputStillHigh()
+  {
+    // After the timer has completed (et==pt), ticking again with input still high
+    // must exercise the top-of-else `if(et >= pt) return bool_true()` branch.
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("b=ton1(d, 3)"));
+    h.setInput(Direction.DOWN, 1);
+    tickAt(h, 0);           // starts timer, et=1
+    tickAt(h, 4);           // et=min(4-0,3)=3 >= pt → timer completes, returns true
+    assertTrue(h.output(Direction.EAST) > 0);
+    tickAt(h, 5);           // et=3 still in map, >= pt → already-complete branch
+    assertTrue(h.output(Direction.EAST) > 0);
+  }
+
+  // --- tof: already-complete path (et >= pt on entry) ---
+
+  @Test
+  void tofStaysLowAfterPeriodWithInputStillLow()
+  {
+    // After the off-timer has completed (et==pt), ticking again with input still low
+    // must exercise the top-of-else `if(et >= pt) return bool_false()` branch.
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("b=tof1(d, 3)"));
+    h.setInput(Direction.DOWN, 1);
+    tickAt(h, 0);           // in=1 → true immediately
+    h.setInput(Direction.DOWN, 0);
+    tickAt(h, 1);           // in=0 → starts off-timer, et=1 → true
+    tickAt(h, 5);           // et=min(5-1,3)=3 >= pt → completes → false
+    assertEquals(0, h.output(Direction.EAST));
+    tickAt(h, 6);           // et=3 still in map, >= pt → already-complete branch → false
+    assertEquals(0, h.output(Direction.EAST));
+  }
+
+  // --- counter: 3-arg form (explicit max, no explicit min) ---
+
+  @Test
+  void counterThreeArgsClampsBetweenZeroAndMax()
+  {
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("b=cnt1(d, u, 5)"));
+    // Increment several times; should clamp at 5.
+    h.setInput(Direction.DOWN, 1);
+    h.setInput(Direction.UP, 0);
+    for(int i = 0; i < 10; ++i) h.tick();
+    assertEquals(5, h.output(Direction.EAST));
+  }
+
+  // --- RCA input/output paths in tick() ---
+
+  @Test
+  void rcaInputChannelFlowsThroughTick()
+  {
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("do0=di0+di1"));
+    h.setRcaInput(0, 3);
+    h.setRcaInput(1, 5);
+    h.tick();
+    assertEquals(8, h.getRcaOutput(0));
+  }
+
+  @Test
+  void rcaOutputMaskLimitsOutOfRangeValue()
+  {
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("do0=di0"));
+    h.setRcaInput(0, 15);
+    h.tick();
+    assertEquals(15, h.getRcaOutput(0));
+    // Setting input to 0 should propagate.
+    h.setRcaInput(0, 0);
+    h.tick();
+    assertEquals(0, h.getRcaOutput(0));
+  }
+
+  @Test
+  void rcaOutputDataIsZeroWhenNotAssigned()
+  {
+    final TestHooks h = new TestHooks();
+    assertTrue(h.setCode("b=di0"));  // reads rca in, assigns to redstone out only
+    h.setRcaInput(0, 7);
+    h.tick();
+    // rca_output_mask==0, so rca_output_data stays 0
+    assertEquals(0, h.rcaOutputData());
+  }
 }

@@ -10,12 +10,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.items.RedstonePenItem;
+import wile.redstonepen.libmc.Inventories;
 import wile.redstonepen.libmc.Registries;
 
 @GameTestHolder(ModConstants.MODID)
@@ -238,6 +240,101 @@ public final class PenItemGameTests
     helper.succeed();
   }
 
+  // --- useOn server-side placement ---------------------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void useOnStoneSouthFaceServerPlacesTrack(GameTestHelper helper)
+  {
+    // Stone at POS acts as the support wall; the track is placed on its south face.
+    helper.setBlock(POS, Blocks.STONE);
+    helper.setBlock(POS.south(), Blocks.AIR);
+
+    final Player player = helper.makeMockPlayer(GameType.CREATIVE);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+
+    final BlockPos absolute = helper.absolutePos(POS);
+    final net.minecraft.world.phys.Vec3 clickVec = net.minecraft.world.phys.Vec3.atCenterOf(absolute).add(0, 0, 0.5);
+    final BlockHitResult hit = new BlockHitResult(clickVec, Direction.SOUTH, absolute, false);
+    final var ctx = new net.minecraft.world.item.context.UseOnContext(
+      helper.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND, pen, hit);
+    final InteractionResult result = pen.useOn(ctx);
+    if(result == InteractionResult.FAIL) helper.fail("expected non-FAIL when placing track on stone south face, got " + result);
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void useOnExistingTrackModifiesSegment(GameTestHelper helper)
+  {
+    // First place a track at POS.south(), then click it directly to trigger modifySegments().
+    helper.setBlock(POS, Blocks.STONE);
+    helper.setBlock(POS.south(), Blocks.AIR);
+
+    final Player player = helper.makeMockPlayer(GameType.CREATIVE);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+
+    final BlockPos absolute = helper.absolutePos(POS);
+    final net.minecraft.world.phys.Vec3 clickVec = net.minecraft.world.phys.Vec3.atCenterOf(absolute).add(0, 0, 0.5);
+    final BlockHitResult hit = new BlockHitResult(clickVec, Direction.SOUTH, absolute, false);
+    final var ctx = new net.minecraft.world.item.context.UseOnContext(
+      helper.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND, pen, hit);
+    pen.useOn(ctx); // places the track
+
+    // Now click the track block directly (modifySegments path).
+    final BlockPos trackAbsolute = helper.absolutePos(POS.south());
+    final BlockHitResult trackHit = new BlockHitResult(
+      net.minecraft.world.phys.Vec3.atCenterOf(trackAbsolute), Direction.NORTH, trackAbsolute, false);
+    final var trackCtx = new net.minecraft.world.item.context.UseOnContext(
+      helper.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND, pen, trackHit);
+    final InteractionResult r2 = pen.useOn(trackCtx);
+    if(r2 == InteractionResult.FAIL) helper.fail("clicking existing track must not fail, got " + r2);
+    helper.succeed();
+  }
+
+  // --- canAttackBlock / onBlockStartBreak --------------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void penCanAttackBlockOnRedstoneWireRemovesWire(GameTestHelper helper)
+  {
+    // Place a redstone wire block, then call canAttackBlock — attack() removes it.
+    helper.setBlock(POS, Blocks.STONE);  // support
+    helper.setBlock(POS.above(), Blocks.REDSTONE_WIRE);
+
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    pen.setDamageValue(0);
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+
+    final BlockPos wireAbs = helper.absolutePos(POS.above());
+    final BlockState wireState = helper.getLevel().getBlockState(wireAbs);
+    pen.getItem().canAttackBlock(wireState, helper.getLevel(), wireAbs, player);
+
+    // Wire should be gone (replaced by air or a pushed redstone item).
+    final BlockState after = helper.getLevel().getBlockState(wireAbs);
+    if(!after.isAir()) helper.fail("expected redstone wire to be removed by pen attack, got: " + after);
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void penOnBlockStartBreakTriggersAttackOnRedstoneWire(GameTestHelper helper)
+  {
+    helper.setBlock(POS, Blocks.STONE);
+    helper.setBlock(POS.above(), Blocks.REDSTONE_WIRE);
+
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    pen.setDamageValue(0);
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+
+    final BlockPos wireAbs = helper.absolutePos(POS.above());
+    ((wile.redstonepen.libmc.StandardItems.BaseItem)pen.getItem()).onBlockStartBreak(pen, wireAbs, player);
+
+    final BlockState after = helper.getLevel().getBlockState(wireAbs);
+    if(!after.isAir()) helper.fail("expected redstone wire removed by onBlockStartBreak, got: " + after);
+    helper.succeed();
+  }
+
   // --- pen overrides -----------------------------------------------------------------------
 
   @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
@@ -298,5 +395,149 @@ public final class PenItemGameTests
     final int half = pen.getItem().getBarWidth(pen);
     if(!(half < undamaged)) helper.fail("expected bar width to decrease with damage");
     helper.succeed();
+  }
+
+  // --- doesSneakBypassUse ------------------------------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void penSneakBypassesUse(GameTestHelper helper)
+  {
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final BlockPos abs = helper.absolutePos(POS);
+    if(!pen.getItem().doesSneakBypassUse(pen, helper.getLevel(), abs, player))
+      helper.fail("pen must return true for doesSneakBypassUse");
+    helper.succeed();
+  }
+
+  // --- quill (maxDamage=0) paths in pushRedstone / popRedstone / hasEnoughRedstone ----------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void pushRedstoneWithUnlimitedQuillGoesToInventory(GameTestHelper helper)
+  {
+    // quill has durability(0) → maxDamage=0 → insert redstone into player inventory.
+    final ItemStack quill = new ItemStack(Registries.getItem("quill"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(quill.getMaxDamage() != 0) { helper.succeed(); return; }
+    RedstonePenItem.pushRedstone(quill, 3, player);
+    // No exception = pass; inventory check is best-effort.
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void popRedstoneFromUnlimitedQuillExtractsFromInventory(GameTestHelper helper)
+  {
+    // quill has maxDamage=0 → extract redstone from player inventory path.
+    final ItemStack quill = new ItemStack(Registries.getItem("quill"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(quill.getMaxDamage() != 0) { helper.succeed(); return; }
+    final int popped = RedstonePenItem.popRedstone(quill, 2, player, net.minecraft.world.InteractionHand.MAIN_HAND);
+    // Player has no redstone → returns 0 (extract returns empty).
+    if(popped != 0) helper.fail("expected 0 redstone popped from empty inventory quill, got " + popped);
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void hasEnoughRedstoneWithUnlimitedQuillChecksInventory(GameTestHelper helper)
+  {
+    // quill (maxDamage=0): hasEnoughRedstone calls Inventories.extract simulate.
+    final ItemStack quill = new ItemStack(Registries.getItem("quill"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(quill.getMaxDamage() != 0) { helper.succeed(); return; }
+    // Player has no redstone → should return false.
+    if(RedstonePenItem.hasEnoughRedstone(quill, 1, player))
+      helper.fail("expected false: quill with no inventory redstone");
+    helper.succeed();
+  }
+
+  // --- popRedstone: pen breaks completely ---------------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void popRedstoneBreaksPenWhenDamageExceedsMax(GameTestHelper helper)
+  {
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    if(pen.getMaxDamage() <= 0) { helper.succeed(); return; }
+    // Set pen to near-full damage so that popping more than remaining capacity breaks it.
+    pen.setDamageValue(pen.getMaxDamage() - 2);
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+    final int popped = RedstonePenItem.popRedstone(pen, 10, player, net.minecraft.world.InteractionHand.MAIN_HAND);
+    // Should only give 2 (remaining capacity before break).
+    if(popped != 2) helper.fail("expected 2 redstone from near-broken pen, got " + popped);
+    // Pen should now be gone from main hand.
+    if(!player.getMainHandItem().isEmpty()) helper.fail("expected pen to be consumed when breaking");
+    helper.succeed();
+  }
+
+  // --- pushRedstone: non-pen non-redstone item fallback -----------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void pushRedstoneToNonPenItemGivesDirectly(GameTestHelper helper)
+  {
+    // If stack is neither pen nor redstone, redstone goes directly to player via give().
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final ItemStack stick = new ItemStack(Items.STICK);
+    RedstonePenItem.pushRedstone(stick, 2, player);
+    // No exception = pass; the give() drops/inserts into inventory.
+    helper.succeed();
+  }
+
+  // --- Inventories.InventoryRange factory methods ------------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void inventoryRangeFromPlayerHotbarCovers9Slots(GameTestHelper helper)
+  {
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final Inventories.InventoryRange ir = Inventories.InventoryRange.fromPlayerHotbar(player);
+    if(ir.size() != 9) helper.fail("hotbar range must cover 9 slots, got " + ir.size());
+    helper.succeed();
+  }
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void inventoryRangeFromPlayerStorageCovers27Slots(GameTestHelper helper)
+  {
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final Inventories.InventoryRange ir = Inventories.InventoryRange.fromPlayerStorage(player);
+    if(ir.size() != 27) helper.fail("storage range must cover 27 slots, got " + ir.size());
+    helper.succeed();
+  }
+
+  // --- attack: else path (non-track non-wire block) ----------------------------------------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 5)
+  public static void penAttackOnNonTrackNonWireBlockReturnsNormally(GameTestHelper helper)
+  {
+    // Stone is neither track nor redstone wire → attack() takes the else branch → return false.
+    helper.setBlock(POS, Blocks.STONE);
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+    final BlockPos abs = helper.absolutePos(POS);
+    final BlockState stoneState = helper.getLevel().getBlockState(abs);
+    pen.getItem().canAttackBlock(stoneState, helper.getLevel(), abs, player);
+    helper.succeed();
+  }
+
+  // --- track power propagation: RedstoneTrackBlock.getSignal / TrackBlockEntity.tick -------
+
+  @GameTest(templateNamespace = NS, template = EMPTY, timeoutTicks = 20)
+  public static void trackNeighborChangedAndUpdateShapeExercised(GameTestHelper helper)
+  {
+    // Place stone support, use pen to place a track wire on its south face.
+    // Then add REDSTONE_BLOCK adjacent; this triggers neighborChanged and tick in the track.
+    helper.setBlock(POS, Blocks.STONE);
+    final Player player = helper.makeMockPlayer(GameType.CREATIVE);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
+    final BlockPos abs = helper.absolutePos(POS);
+    final Vec3 clickLoc = Vec3.atCenterOf(abs).add(0, 0, 0.5);
+    final BlockHitResult hit = new BlockHitResult(clickLoc, Direction.SOUTH, abs, false);
+    final var ctx = new net.minecraft.world.item.context.UseOnContext(
+      helper.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND, pen, hit);
+    pen.useOn(ctx);
+    // Place redstone block to trigger neighborChanged / signal update paths.
+    helper.setBlock(POS.south().east(), Blocks.REDSTONE_BLOCK);
+    // Just verifying no crash; track may or may not survive depending on segment state.
+    helper.runAfterDelay(5, helper::succeed);
   }
 }

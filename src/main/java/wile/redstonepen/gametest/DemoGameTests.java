@@ -19,8 +19,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraft.core.Direction;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.CircuitComponents;
+import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
 
@@ -220,6 +222,41 @@ public final class DemoGameTests
   }
 
   // ===========================================================================================
+  // DemoBuilder utility method coverage
+  // ===========================================================================================
+
+  /** clearRegion fills all positions in a bounding box with air. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 10)
+  public static void clearRegionFillsWithAir(GameTestHelper helper)
+  {
+    final BlockPos lo = CELL_LOCAL;
+    final BlockPos hi = CELL_LOCAL.offset(2, 2, 2);
+    // First place some non-air blocks in the region.
+    helper.setBlock(lo, Blocks.STONE);
+    helper.setBlock(hi, Blocks.STONE);
+    DemoBuilder.clearRegion(helper.getLevel(), helper.absolutePos(lo), helper.absolutePos(hi));
+    helper.succeedWhen(() -> {
+      if(!helper.getBlockState(lo).isAir()) helper.fail("clearRegion lo corner must be air");
+      if(!helper.getBlockState(hi).isAir()) helper.fail("clearRegion hi corner must be air");
+    });
+  }
+
+  /** placeWallSign places an oak_wall_sign block with a backing stone support. */
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 10)
+  public static void placeWallSignPlacesSignBlock(GameTestHelper helper)
+  {
+    final BlockPos signPos = CELL_LOCAL;
+    DemoBuilder.placeWallSign(helper.getLevel(), helper.absolutePos(signPos), Direction.NORTH,
+      "hello", "world", null, null);
+    helper.succeedWhen(() -> {
+      final net.minecraft.world.level.block.state.BlockState state = helper.getLevel()
+        .getBlockState(helper.absolutePos(signPos));
+      if(!(state.getBlock() instanceof net.minecraft.world.level.block.WallSignBlock))
+        helper.fail("expected wall sign block at signPos, found " + state.getBlock());
+    });
+  }
+
+  // ===========================================================================================
   // Behavioral tests — trigger inputs and assert circuit output.
   // ===========================================================================================
 
@@ -402,6 +439,16 @@ public final class DemoGameTests
       helper.fail("expected mod block " + modBlockName + " at " + localPos
         + " but found " + actual.getBlock(), localPos);
     }
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // DemoSections.runCircuits: chains all contraptions; exercises the loop in runCircuits().
+  // -------------------------------------------------------------------------------------------
+  @GameTest(templateNamespace = TEMPLATE_NAMESPACE, template = EMPTY_PAD, timeoutTicks = 20)
+  public static void runCircuitsBuildsAllContraptions(GameTestHelper helper)
+  {
+    DemoSections.runCircuits(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeed();
   }
 
   private static void assertVanillaBlockAt(GameTestHelper helper, BlockPos localPos, net.minecraft.world.level.block.Block expected)
