@@ -96,6 +96,11 @@ class AuxiliariesTest
   {
     final MutableComponent c = Auxiliaries.localizable("foo", net.minecraft.ChatFormatting.RED);
     assertNotNull(c);
+    assertEquals(
+      net.minecraft.network.chat.TextColor.fromLegacyFormat(net.minecraft.ChatFormatting.RED),
+      c.getStyle().getColor(),
+      "RED color should be applied to component style"
+    );
   }
 
   @Test
