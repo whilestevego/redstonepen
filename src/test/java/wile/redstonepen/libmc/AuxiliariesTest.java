@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
@@ -60,13 +61,11 @@ class AuxiliariesTest
   }
 
   @Test
-  void isModLoadedDoesNotThrowAndDefaultsFalseForUnknown()
+  void isModLoadedReturnsFalseForUnknownMod()
   {
-    try {
-      assertFalse(Auxiliaries.isModLoaded("definitely-not-a-real-mod-xyz"));
-    } catch(Throwable t) {
-      // ModList may not be initialised in unit tests; tolerate either outcome.
-    }
+    Assumptions.assumeDoesNotThrow(() -> net.neoforged.fml.ModList.get(),
+      "ModList not initialised in this test environment");
+    assertFalse(Auxiliaries.isModLoaded("definitely-not-a-real-mod-xyz"));
   }
 
   // --- localization / text helpers -----------------------------------------------------------
