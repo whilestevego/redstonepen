@@ -527,8 +527,9 @@ public final class ControlBoxGameTests
   {
     final ControlBox.ControlBoxBlockEntity te = placeControlBox(helper);
     // cnt1/cnt2/cnt3 each increment from 0; last assignment (cnt3) wins for port b.
-    // After 2 ticks with input=1 and max=10, cnt3 should have reached 2.
-    te.setCode("b=cnt1(1,10)\nb=cnt2(1,10)\nb=cnt3(1,10)");
+    // 3-arg form cnt(up,down,max): up=1>0 increments, down=0<=0 does not decrement, max=10.
+    // After 2 ticks cnt3 should have reached 2.
+    te.setCode("b=cnt1(1,0,10)\nb=cnt2(1,0,10)\nb=cnt3(1,0,10)");
     te.setEnabled(true);
     te.tick();
     te.tick();

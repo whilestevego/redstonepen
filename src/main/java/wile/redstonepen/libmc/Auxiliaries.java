@@ -161,7 +161,7 @@ public class Auxiliaries
   public static MutableComponent localizable(String modtrkey, @Nullable ChatFormatting color, Object... args)
   {
     final MutableComponent tr = Component.translatable(modid()+"."+modtrkey, args);
-    if(color!=null) tr.getStyle().applyFormat(color);
+    if(color!=null) tr.withStyle(color);
     return tr;
   }
 
@@ -174,9 +174,7 @@ public class Auxiliaries
   @OnlyIn(Dist.CLIENT)
   public static String localize(String translationKey, Object... args)
   {
-    final Component tr = Component.translatable(translationKey, args);
-    tr.getStyle().applyFormat(ChatFormatting.RESET);
-    return tr.getString().trim();
+    return Component.translatable(translationKey, args).getString().trim();
   }
 
   @OnlyIn(Dist.CLIENT)
