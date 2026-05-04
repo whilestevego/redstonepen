@@ -174,9 +174,7 @@ public class Auxiliaries
   @OnlyIn(Dist.CLIENT)
   public static String localize(String translationKey, Object... args)
   {
-    final Component tr = Component.translatable(translationKey, args);
-    tr.withStyle(ChatFormatting.RESET);
-    return tr.getString().trim();
+    return Component.translatable(translationKey, args).getString().trim();
   }
 
   @OnlyIn(Dist.CLIENT)

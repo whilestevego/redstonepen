@@ -63,8 +63,9 @@ class AuxiliariesTest
   @Test
   void isModLoadedReturnsFalseForUnknownMod()
   {
-    Assumptions.assumeDoesNotThrow(() -> net.neoforged.fml.ModList.get(),
-      "ModList not initialised in this test environment");
+    boolean modListAvailable = true;
+    try { net.neoforged.fml.ModList.get(); } catch(Throwable ignored) { modListAvailable = false; }
+    Assumptions.assumeTrue(modListAvailable, "ModList not initialised in this test environment");
     assertFalse(Auxiliaries.isModLoaded("definitely-not-a-real-mod-xyz"));
   }
 
