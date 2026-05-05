@@ -56,10 +56,7 @@ configurations {
 
 dependencies {
   minecraft "com.mojang:minecraft:${project.version_minecraft}"
-  mappings loom.layered {
-    officialMojangMappings()
-    parchment("org.parchmentmc.data:parchment-${project.parchment_mc_version}:${project.parchment_mappings_version}@zip")
-  }
+  mappings loom.officialMojangMappings()
   neoForge "net.neoforged:neoforge:${project.version_neoforge}"
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
