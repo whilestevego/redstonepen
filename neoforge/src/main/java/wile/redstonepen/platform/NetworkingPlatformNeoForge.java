@@ -1,4 +1,6 @@
-package wile.redstonepen.libmc;
+package wile.redstonepen.platform;
+
+import wile.redstonepen.libmc.*;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

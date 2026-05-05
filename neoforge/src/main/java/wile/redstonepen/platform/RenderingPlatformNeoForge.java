@@ -1,4 +1,6 @@
-package wile.redstonepen.libmc;
+package wile.redstonepen.platform;
+
+import wile.redstonepen.libmc.*;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;

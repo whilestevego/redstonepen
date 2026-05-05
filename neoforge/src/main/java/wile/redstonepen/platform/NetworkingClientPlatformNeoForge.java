@@ -1,4 +1,6 @@
-package wile.redstonepen.libmc;
+package wile.redstonepen.platform;
+
+import wile.redstonepen.libmc.*;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;

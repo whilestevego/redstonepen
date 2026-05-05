@@ -1,5 +1,6 @@
-package wile.redstonepen;
+package wile.redstonepen.neoforge;
 
+import wile.redstonepen.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
@@ -31,8 +32,8 @@ import wile.redstonepen.blocks.ControlBox;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.NetworkingClientPlatformNeoForge;
-import wile.redstonepen.libmc.NetworkingPlatformNeoForge;
+import wile.redstonepen.platform.NetworkingClientPlatformNeoForge;
+import wile.redstonepen.platform.NetworkingPlatformNeoForge;
 import wile.redstonepen.libmc.Overlay;
 import wile.redstonepen.libmc.Registries;
 
