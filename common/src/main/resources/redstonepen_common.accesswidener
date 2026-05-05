@@ -1,0 +1,9 @@
+accessWidener   v2   named
+
+# Inner functional interfaces that Loom marks as private in the common module classpath
+accessible  class   net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible  class   net/minecraft/world/inventory/MenuType$MenuSupplier
+accessible  method  net/minecraft/world/inventory/MenuType  <init>  (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+
+# UseOnContext(Level,Player,InteractionHand,ItemStack,BlockHitResult) is protected in vanilla
+accessible  method  net/minecraft/world/item/context/UseOnContext  <init>  (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
