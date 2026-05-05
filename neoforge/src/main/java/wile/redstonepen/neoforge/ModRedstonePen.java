@@ -32,7 +32,6 @@ import wile.redstonepen.blocks.ControlBox;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.platform.NetworkingClientPlatformNeoForge;
 import wile.redstonepen.platform.NetworkingPlatformNeoForge;
 import wile.redstonepen.libmc.Overlay;
 import wile.redstonepen.libmc.Registries;
@@ -84,8 +83,6 @@ public class ModRedstonePen
       final PayloadRegistrar registrar = event.registrar("v1");
       NetworkingPlatformNeoForge.setRegistrar(registrar);
       Networking.init();
-      NetworkingClientPlatformNeoForge clientPlatform = new NetworkingClientPlatformNeoForge();
-      clientPlatform.registerClientReceiver();
     }
   }
 
