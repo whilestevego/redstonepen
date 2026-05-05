@@ -24,7 +24,7 @@ import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
 
-public final class DemoGameTests
+public class DemoGameTests
 {
   private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_PAD = "empty_demo_pad";
@@ -33,7 +33,7 @@ public final class DemoGameTests
   // so the 9x9 footprint fits inside the 16x6x16 pad with room to spare on every side.
   private static final BlockPos CELL_LOCAL = new BlockPos(1, 1, 1);
 
-  private DemoGameTests()
+  public DemoGameTests()
   {}
 
   // -------------------------------------------------------------------------------------------

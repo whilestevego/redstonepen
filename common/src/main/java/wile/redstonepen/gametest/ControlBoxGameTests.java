@@ -19,13 +19,13 @@ import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Registries;
 import java.util.List;
 
-public final class ControlBoxGameTests
+public class ControlBoxGameTests
 {
   private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_RELAY_TEMPLATE = "relay_activates_from_redstone";
   private static final BlockPos CONTROL_BOX_POS = new BlockPos(1, 1, 1);
 
-  private ControlBoxGameTests()
+  public ControlBoxGameTests()
   {}
 
   @GameTest(template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)

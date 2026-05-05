@@ -8,12 +8,12 @@ import net.minecraft.world.item.Items;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.Inventories;
 
-public final class InventoriesGameTests
+public class InventoriesGameTests
 {
   private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
-  private InventoriesGameTests() {}
+  public InventoriesGameTests() {}
 
   // --- InventoryRange.insert complex second-iteration paths --------------------------------
 

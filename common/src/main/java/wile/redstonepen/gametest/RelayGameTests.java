@@ -22,14 +22,14 @@ import wile.redstonepen.libmc.Registries;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class RelayGameTests
+public class RelayGameTests
 {
   private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_RELAY_TEMPLATE = "relay_activates_from_redstone";
   private static final BlockPos RELAY_POS = new BlockPos(1, 1, 1);
   private static final BlockPos INPUT_POS = RELAY_POS.east();
 
-  private RelayGameTests()
+  public RelayGameTests()
   {}
 
   @GameTest(template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)

@@ -23,14 +23,14 @@ import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.BasicGauge;
 import wile.redstonepen.libmc.Registries;
 
-public final class BasicLeverButtonGameTests
+public class BasicLeverButtonGameTests
 {
   private static final String NS = "minecraft";
   private static final String EMPTY = "relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
   private static final BlockPos SUPPORT = POS.below();
 
-  private BasicLeverButtonGameTests() {}
+  public BasicLeverButtonGameTests() {}
 
   // --- BasicLever -----------------------------------------------------------------------
 

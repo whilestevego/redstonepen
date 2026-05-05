@@ -17,13 +17,13 @@ import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.Registries;
 
-public final class RemoteItemGameTests
+public class RemoteItemGameTests
 {
   private static final String NS = "minecraft";
   private static final String EMPTY = "relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
 
-  private RemoteItemGameTests() {}
+  public RemoteItemGameTests() {}
 
   @GameTest(template = EMPTY, timeoutTicks = 5)
   public static void remoteBarNotVisible(GameTestHelper helper)

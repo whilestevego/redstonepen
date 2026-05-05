@@ -15,6 +15,7 @@ version = project.version_mod
 base { archivesName = "${project.meta_modid}-${project.version_minecraft}-neoforge" }
 
 loom {
+  accessWidenerPath = project(':common').file("src/main/resources/redstonepen_common.accesswidener")
   neoForge {}
 
   runs {

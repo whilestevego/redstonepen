@@ -13,12 +13,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.ExtendedShapelessRecipe;
 
-public final class RecipeGameTests
+public class RecipeGameTests
 {
   private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
-  private RecipeGameTests() {}
+  public RecipeGameTests() {}
 
   @GameTest(template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void extendedShapelessRecipeSerializerRoundTrip(GameTestHelper helper)

@@ -24,13 +24,13 @@ import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Registries;
 import java.util.List;
 
-public final class TrackGameTests
+public class TrackGameTests
 {
   private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_TEMPLATE = "relay_activates_from_redstone";
   private static final BlockPos TRACK_POS = new BlockPos(1, 1, 1);
 
-  private TrackGameTests()
+  public TrackGameTests()
   {}
 
   @GameTest(template = EMPTY_TEMPLATE, timeoutTicks = 20)
