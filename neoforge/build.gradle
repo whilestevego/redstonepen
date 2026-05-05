@@ -120,8 +120,9 @@ tasks.register('instrumentClassesForCoverage') {
   group = 'verification'
   description = 'Offline-instruments main classes for JaCoCo coverage in NeoForge runs.'
   dependsOn tasks.named('classes')
-  inputs.dir jacocoMainClassesDir
+  inputs.dir(jacocoMainClassesDir).optional(true)
   outputs.dir jacocoInstrDir
+  onlyIf { jacocoMainClassesDir.get().asFile.exists() }
   doLast {
     def dst = jacocoInstrDir.get().asFile
     delete dst
