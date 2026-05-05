@@ -1,0 +1,66 @@
+// fabric/build.gradle
+plugins {
+  id 'dev.architectury.loom'
+  id 'com.github.johnrengelman.shadow'
+}
+
+architectury {
+  platformSetupLoomIde()
+  fabric()
+}
+
+group   = project.meta_modgroup
+version = project.version_mod
+base { archivesName = "${project.meta_modid}-${project.version_minecraft_fabric}-fabric" }
+
+configurations {
+  common
+  shadowCommon
+  compileClasspath.extendsFrom common
+  runtimeClasspath.extendsFrom common
+  developmentFabric.extendsFrom common
+}
+
+dependencies {
+  minecraft "com.mojang:minecraft:${project.version_minecraft_fabric}"
+  mappings loom.officialMojangMappings()
+  modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+  modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+  common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+  shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
+}
+
+// --- GameTest structures ----------------------------------------------------
+// Run configuration and structure copying wired in Phase 6 when Fabric
+// GameTest sources and entry points are in place.
+tasks.register('prepareGameTestStructures', Copy) {
+  from rootProject.file('common/gameteststructures')
+  into 'runs/gameTestServer/gameteststructures'
+}
+
+// --- Shadow + Remap: produces a fat JAR embedding common classes -----------
+shadowJar {
+  exclude 'architectury.common.json'
+  configurations = [project.configurations.shadowCommon]
+  archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+  inputFile.set shadowJar.archiveFile
+  dependsOn shadowJar
+  archiveClassifier = ''
+}
+
+jar { archiveClassifier = 'dev' }
+
+// --- Resource processing ----------------------------------------------------
+tasks.withType(ProcessResources).configureEach {
+  inputs.property 'version', project.version
+  filesMatching('fabric.mod.json') { expand version: project.version }
+  outputs.upToDateWhen { false }
+  doLast {
+    file("${sourceSets.main.output.resourcesDir}/.gitversion-${meta_modid}").text =
+      'git log "-1" "--format=%h"'.execute().in.text.trim()
+  }
+}

@@ -25,10 +25,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run unit tests
-        run: ./gradlew test
+        run: ./gradlew :common:test
 
       - name: Run build
         run: ./gradlew build
 
-      - name: Run GameTests
-        run: ./gradlew runGameTestServer
+      # GameTest steps restored in Phase 5/6 once sources exist in the modules.
+      # Running runGameTestServer with empty modules boots a full Minecraft
+      # server with nothing registered and hangs indefinitely.

@@ -1,0 +1,36 @@
+// common/build.gradle
+plugins {
+  id 'dev.architectury.loom'
+  id 'jacoco'
+}
+
+architectury { common('neoforge', 'fabric') }
+
+group   = project.meta_modgroup
+version = project.version_mod
+base { archivesName = "${project.meta_modid}-${project.version_minecraft}-common" }
+
+dependencies {
+  minecraft "com.mojang:minecraft:${project.version_minecraft}"
+  mappings loom.officialMojangMappings()
+  // fabric-loader on the compile classpath only: provides @Environment / EnvType
+  // so common code can annotate client-only methods without a fabric runtime dep.
+  modCompileOnly "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+  testImplementation platform('org.junit:junit-bom:5.10.2')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+jacoco { toolVersion = '0.8.12' }
+
+test {
+  useJUnitPlatform()
+  jacoco {
+    destinationFile = layout.buildDirectory.file('jacoco/test.exec').get().asFile
+  }
+}
+
+tasks.withType(ProcessResources).configureEach {
+  outputs.upToDateWhen { false }
+}
