@@ -19,6 +19,16 @@ loom {
   neoForge {}
 
   runs {
+    // Include neoforge classes in the mod's SecureJar so NeoForge scans them for
+    // @GameTestHolder, @Mod, etc. Without this Loom only provides the resources dir.
+    configureEach {
+      mods {
+        "${project.meta_modid}" {
+          sourceSet sourceSets.main
+        }
+      }
+    }
+
     client {
       client()
       property 'neoforge.enabledGameTestNamespaces', "${project.meta_modid},minecraft"
