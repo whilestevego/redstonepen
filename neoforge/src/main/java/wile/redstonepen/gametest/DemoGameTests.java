@@ -513,7 +513,9 @@ public class DemoGameTests
     helper.succeedWhen(() -> {
       assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
     });
   }
 
@@ -571,19 +573,44 @@ public class DemoGameTests
     });
   }
 
-  /** Pulse counter: pressing the button once lights the output lamp (count goes from 0 to 1). */
+  /** Pulse counter: first press lights the north lamp (count=1, r=15). */
   @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
-  public static void pulseCounterLightsLampOnFirstPress(GameTestHelper helper)
+  public static void pulseCounterFirstPressLightsNorthLamp(GameTestHelper helper)
   {
     DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
-    helper.runAfterDelay(2, () -> {
-      final BlockPos btnAbs = helper.absolutePos(CELL_LOCAL.offset(3, 0, 5));
-      final BlockState btnState = helper.getLevel().getBlockState(btnAbs);
-      helper.getLevel().setBlock(btnAbs, btnState.setValue(BlockStateProperties.POWERED, true), 3);
-      helper.getLevel().updateNeighborsAt(btnAbs, btnState.getBlock());
-    });
+    helper.runAfterDelay(2, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
     helper.succeedWhen(() ->
-      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+      helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true));
+  }
+
+  /** Pulse counter: second press also lights the east lamp (count=2, r+b=15). */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 80)
+  public static void pulseCounterSecondPressFillsEastLamp(GameTestHelper helper)
+  {
+    DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(15, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.succeedWhen(() -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true);
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true);
+    });
+  }
+
+  /** Pulse counter: fourth press wraps to zero — all lamps dark. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 120)
+  public static void pulseCounterFourthPressWrapsToZero(GameTestHelper helper)
+  {
+    DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2,   () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(15,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(30,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(45,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(70, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, false);
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
+      helper.assertBlockProperty(CELL_LOCAL.offset(1, 0, 3), BlockStateProperties.LIT, false);
+      helper.succeed();
+    });
   }
 
   /** SR latch: pressing the set button latches state — lamp stays lit after button release. */
@@ -614,7 +641,7 @@ public class DemoGameTests
   public static void pwmZeroDutyLampStaysDark(GameTestHelper helper)
   {
     DemoSections.buildPwmDemo(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
-    // Lever starts off (g=0); b = if(clock%16 < 0, 15, 0) = always 0.
+    // Lever starts off (g=0); b = if(clock%32 < 0, 15, 0) = always 0.
     helper.runAfterDelay(20, () -> {
       helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
       helper.succeed();
@@ -663,6 +690,34 @@ public class DemoGameTests
     helper.runAfterDelay(30, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
     helper.succeedWhen(() ->
       helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true));
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // Hold timer: button south triggers countdown; lever west sets duration; lamp east output.
+  // -------------------------------------------------------------------------------------------
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void holdTimerPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildHoldTimer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  /** Hold timer: pressing the button lights the lamp, which stays on for the timer duration. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 120)
+  public static void holdTimerLightsLampAfterPress(GameTestHelper helper)
+  {
+    DemoSections.buildHoldTimer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    // Pull lever to max position (g=15) so timer = 62 ticks.
+    helper.runAfterDelay(2,  () -> helper.pullLever(CELL_LOCAL.offset(1, 0, 3)));
+    helper.runAfterDelay(5,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    // Lamp should be on immediately after press.
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
   }
 
   private static void pressButton(GameTestHelper helper, BlockPos localPos)

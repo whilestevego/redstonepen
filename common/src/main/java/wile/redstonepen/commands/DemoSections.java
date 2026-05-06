@@ -54,7 +54,8 @@ public final class DemoSections
       DemoSections::buildPulseCounter,
       DemoSections::buildSrLatch,
       DemoSections::buildPwmDemo,
-      DemoSections::buildStepSequencer
+      DemoSections::buildStepSequencer,
+      DemoSections::buildHoldTimer
     };
     for(int i = 0; i < contraptions.length; ++i) {
       final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, CELL_SIZE);
@@ -432,8 +433,9 @@ public final class DemoSections
   }
 
   /**
-   * Pulse counter: each button press increments a CNT; lamp lights after the first press.
-   * Port y (SOUTH) = button input, b (EAST) = lamp output.
+   * Pulse counter: each button press fills one more lamp out of three — press 1→north,
+   * press 2→north+east, press 3→all three, press 4→wraps back to zero.
+   * Port y (SOUTH) = button, r (NORTH) = lamp 1, b (EAST) = lamp 2, g (WEST) = lamp 3.
    */
   public static void buildPulseCounter(Level level, BlockPos cell)
   {
@@ -456,11 +458,17 @@ public final class DemoSections
         .setValue(BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR)
         .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), FLAGS);
     level.setBlock(cell.offset(3, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    // Lamp — east output (port b); signal strength shows the count
+    // Lamp 1 — north output (port r)
+    level.setBlock(cell.offset(3, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(3, 0, 1), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    // Lamp 2 — east output (port b)
     level.setBlock(cell.offset(4, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
-    sign(level, cell.offset(4, 1, 6), "pulse_counter", "CNT + .re demo");
+    // Lamp 3 — west output (port g)
+    level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(1, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "pulse_counter", "3-lamp fill");
   }
 
   /**
@@ -571,6 +579,45 @@ public final class DemoSections
     sign(level, cell.offset(4, 1, 6), "step_sequencer", "CNT state machine");
   }
 
+  /**
+   * Hold timer: pressing the button triggers a timed output; the lever sets the duration
+   * (g=0 → ~2 ticks, g=15 → ~62 ticks). Port y (SOUTH) = trigger button, g (WEST) = duration
+   * lever, b (EAST) = lamp output.
+   */
+  public static void buildHoldTimer(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    final Block controlBox = Registries.getBlock("control_box");
+    if(controlBox == null) return;
+    final BlockPos cbPos = cell.offset(3, 0, 3);
+    DemoBuilder.placeAttached(level, cbPos,
+      controlBox.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+      cbe.setCode(HOLD_TIMER_PROGRAM);
+      cbe.setEnabled(true);
+      cbe.setChanged();
+    }
+    // Trigger button — south input (port y)
+    level.setBlock(cell.offset(3, 0, 5),
+      Blocks.STONE_BUTTON.defaultBlockState()
+        .setValue(BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR)
+        .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), FLAGS);
+    level.setBlock(cell.offset(3, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // Duration lever — west input (port g)
+    level.setBlock(cell.offset(1, 0, 3),
+      Blocks.LEVER.defaultBlockState()
+        .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+        .setValue(LeverBlock.FACING, Direction.EAST), FLAGS);
+    level.setBlock(cell.offset(2, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    // Lamp — east output (port b)
+    level.setBlock(cell.offset(4, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(5, 0, 3), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    level.setBlock(cell.offset(6, 0, 3), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    sign(level, cell.offset(4, 1, 6), "hold_timer", "TON demo");
+  }
+
   // ControlBox AND program. Port mapping: d=DOWN, u=UP, r=NORTH, y=SOUTH, g=WEST, b=EAST.
   // Output b = high only when both south and west inputs are high. `if` chosen over `*` to
   // produce a clean 0/15 output regardless of partial input levels.
@@ -588,12 +635,14 @@ public final class DemoSections
     "g = if(phase >= 40, if(phase < 80, 15, 0), 0)"
   );
 
-  // Pulse counter: rising edges on port y increment a counter; lamp on when any press has occurred.
-  // Output b uses a full 15 signal so it travels through the 2-wire run to the lamp.
+  // Pulse counter: each press (y.re) fills one more of three lamps before wrapping.
+  // count % 4 cycles 0→1→2→3→0; r lights at count>=1, b at count>=2, g at count>=3.
   private static final String PULSE_COUNTER_PROGRAM = String.join("\n",
-    "# Counts button presses; lamp lights after first press",
-    "count = cnt1(y.re)",
-    "b = if(count, 15, 0)"
+    "# Each press fills one more lamp; wraps every 4 presses",
+    "count = cnt1(y.re) % 4",
+    "r = if(count > 0, 15, 0)",
+    "b = if(count > 1, 15, 0)",
+    "g = if(count > 2, 15, 0)"
   );
 
   // SR latch: r.re sets state to 15, y.re clears it; state persists between ticks.
@@ -603,11 +652,11 @@ public final class DemoSections
     "b = state"
   );
 
-  // PWM: output b is on for the first g ticks of every 16-tick clock period.
-  // At g=0 always off, g=8 half duty, g=15 on 15/16 ticks.
+  // PWM: output b is on for the first g*2 ticks of every 32-tick clock period.
+  // At g=0 always off, g=8 ~50% duty, g=15 on 30/32 ticks.
   private static final String PWM_PROGRAM = String.join("\n",
-    "# Duty cycle = west lever position (0-15) out of 16 ticks",
-    "b = if(CLOCK() % 16 < g, 15, 0)"
+    "# Duty cycle = west lever position (0-15) out of 32 ticks",
+    "b = if(CLOCK() % 32 < g * 2, 15, 0)"
   );
 
   // Step sequencer: each button press advances cnt1 by 1; modulo 3 cycles r -> b -> g.
@@ -617,5 +666,13 @@ public final class DemoSections
     "r = if(step == 0, 15, 0)",
     "b = if(step == 1, 15, 0)",
     "g = if(step == 2, 15, 0)"
+  );
+
+  // Hold timer: button (y) triggers a countdown from g*4+2 ticks; lamp on while timer > 0.
+  // At g=0 the timer is 2 ticks; at g=15 it is 62 ticks.
+  private static final String HOLD_TIMER_PROGRAM = String.join("\n",
+    "# Button starts timed output; lever sets duration (2-62 ticks)",
+    "timer = if(y.re, g * 4 + 2, if(timer > 0, timer - 1, 0))",
+    "b = if(timer > 0, 15, 0)"
   );
 }
