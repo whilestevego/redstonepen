@@ -112,7 +112,9 @@ public class ModRedstonePen
     @SubscribeEvent
     public static void onRegisterModels(final ModelEvent.RegisterAdditional event)
     {
-      wile.redstonepen.detail.ModRenderers.TrackTer.registerModels().forEach(event::register);
+      wile.redstonepen.detail.ModRenderers.TrackTer.registerModels().stream()
+        .map(rl -> new net.minecraft.client.resources.model.ModelResourceLocation(rl, "standalone"))
+        .forEach(event::register);
     }
   }
 
