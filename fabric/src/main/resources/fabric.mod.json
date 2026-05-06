@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "redstonepen",
+  "version": "${version}",
+  "name": "Redstone Pen",
+  "description": "Adds a pen to draw detailed Redstone tracks, as well as Redstone relays, and the Redstone Logic Controller.",
+  "authors": [ "wilechaote" ],
+  "contact": {
+    "homepage": "https://github.com/stfwi/redstonepen",
+    "sources": "https://github.com/stfwi/redstonepen",
+    "issues": "https://github.com/stfwi/redstonepen/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/redstonepen/logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wile.redstonepen.fabric.ModRedstonePen"
+    ],
+    "client": [
+      "wile.redstonepen.fabric.ModRedstonePenClient"
+    ]
+  },
+  "mixins": [
+    "redstonepen.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "fabric-api": "*",
+    "minecraft": ">=1.21 <1.22",
+    "java": ">=21"
+  }
+}

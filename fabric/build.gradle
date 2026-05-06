@@ -9,6 +9,10 @@ architectury {
   fabric()
 }
 
+loom {
+  accessWidenerPath = project(':common').file("src/main/resources/redstonepen_common.accesswidener")
+}
+
 group   = project.meta_modgroup
 version = project.version_mod
 base { archivesName = "${project.meta_modid}-${project.version_minecraft_fabric}-fabric" }
