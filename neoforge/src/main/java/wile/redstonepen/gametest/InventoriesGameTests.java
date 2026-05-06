@@ -14,7 +14,6 @@ import wile.redstonepen.libmc.Inventories;
 @PrefixGameTestTemplate(false)
 public class InventoriesGameTests
 {
-  private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
   public InventoriesGameTests() {}
