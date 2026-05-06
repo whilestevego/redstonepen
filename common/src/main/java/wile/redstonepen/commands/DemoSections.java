@@ -394,8 +394,15 @@ public final class DemoSections
     for(int dx = 0; dx < CELL_SIZE; ++dx) {
       for(int dz = 0; dz < CELL_SIZE; ++dz) {
         final BlockPos pos = cell.offset(dx, 0, dz);
-        if(level.getBlockState(pos).is(Blocks.REDSTONE_WIRE)) {
-          level.neighborChanged(pos, Blocks.REDSTONE_WIRE, pos);
+        final BlockState state = level.getBlockState(pos);
+        if(!state.is(Blocks.REDSTONE_WIRE)) continue;
+        BlockState updated = state;
+        for(final Direction dir : Direction.Plane.HORIZONTAL) {
+          final BlockPos neighborPos = pos.relative(dir);
+          updated = updated.updateShape(dir, level.getBlockState(neighborPos), level, pos, neighborPos);
+        }
+        if(updated != state) {
+          level.setBlock(pos, updated, Block.UPDATE_CLIENTS);
         }
       }
     }
