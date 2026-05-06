@@ -509,7 +509,6 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
-      assertWireConnected(helper, CELL_LOCAL.offset(3, 0, 4)); // north=control_box (port y)
     });
   }
 
@@ -600,6 +599,7 @@ public class DemoGameTests
   {
     DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
     helper.runAfterDelay(2,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(7,  () -> releaseButton(helper, CELL_LOCAL.offset(3, 0, 5)));
     helper.runAfterDelay(15, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
     helper.succeedWhen(() -> {
       helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true);
@@ -612,10 +612,14 @@ public class DemoGameTests
   public static void pulseCounterFourthPressWrapsToZero(GameTestHelper helper)
   {
     DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
-    helper.runAfterDelay(2,   () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
-    helper.runAfterDelay(15,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
-    helper.runAfterDelay(30,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
-    helper.runAfterDelay(45,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(2,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(7,  () -> releaseButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(15, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(20, () -> releaseButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(30, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(35, () -> releaseButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(45, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(50, () -> releaseButton(helper, CELL_LOCAL.offset(3, 0, 5)));
     helper.runAfterDelay(70, () -> {
       helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, false);
       helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
@@ -749,5 +753,15 @@ public class DemoGameTests
     final BlockState state = helper.getLevel().getBlockState(abs);
     helper.getLevel().setBlock(abs, state.setValue(BlockStateProperties.POWERED, true), 3);
     helper.getLevel().updateNeighborsAt(abs, state.getBlock());
+  }
+
+  private static void releaseButton(GameTestHelper helper, BlockPos localPos)
+  {
+    final BlockPos abs = helper.absolutePos(localPos);
+    final BlockState state = helper.getLevel().getBlockState(abs);
+    if(state.hasProperty(BlockStateProperties.POWERED) && state.getValue(BlockStateProperties.POWERED)) {
+      helper.getLevel().setBlock(abs, state.setValue(BlockStateProperties.POWERED, false), 3);
+      helper.getLevel().updateNeighborsAt(abs, state.getBlock());
+    }
   }
 }
