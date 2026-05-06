@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,9 +21,10 @@ import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Registries;
 import java.util.List;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class ControlBoxGameTests
 {
-  private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_RELAY_TEMPLATE = "relay_activates_from_redstone";
   private static final BlockPos CONTROL_BOX_POS = new BlockPos(1, 1, 1);
 

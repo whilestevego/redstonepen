@@ -84,6 +84,7 @@ public class ModRedstonePen
       NetworkingPlatformNeoForge.setRegistrar(registrar);
       Networking.init();
     }
+
   }
 
   @EventBusSubscriber(modid=ModConstants.MODID, bus=EventBusSubscriber.Bus.MOD, value=Dist.CLIENT)

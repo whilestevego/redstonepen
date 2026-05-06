@@ -41,6 +41,7 @@ loom {
     gameTestServer {
       server()
       property 'neoforge.enabledGameTestNamespaces', "${project.meta_modid},minecraft"
+      property 'neoforge.gameTestServer', 'true'
       // JaCoCo offline-instrumentation: exec file written on JVM shutdown.
       property 'jacoco-agent.destfile', file("${layout.buildDirectory.get().asFile}/jacoco/gameTestServer.exec").absolutePath
       property 'jacoco-agent.output', 'file'
@@ -111,7 +112,7 @@ jar { archiveClassifier = 'dev' }
 // --- GameTest structures ----------------------------------------------------
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
-  into 'runs/gameTestServer/gameteststructures'
+  into 'run/gameteststructures'
 }
 
 // --- JaCoCo offline instrumentation for NeoForge GameTest server ------------

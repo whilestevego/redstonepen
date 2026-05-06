@@ -13,6 +13,8 @@ package wile.redstonepen.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,9 +26,10 @@ import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class DemoGameTests
 {
-  private static final String TEMPLATE_NAMESPACE = "minecraft";
   private static final String EMPTY_PAD = "empty_demo_pad";
 
   // Each contraption is built with cell-origin = (1, 1, 1) in template-local coords

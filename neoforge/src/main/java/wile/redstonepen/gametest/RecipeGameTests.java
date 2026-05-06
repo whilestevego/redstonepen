@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,6 +15,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.ExtendedShapelessRecipe;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class RecipeGameTests
 {
   private static final String NS = "minecraft";

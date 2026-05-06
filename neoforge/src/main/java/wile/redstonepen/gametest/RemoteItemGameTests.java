@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,6 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.Registries;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class RemoteItemGameTests
 {
   private static final String NS = "minecraft";

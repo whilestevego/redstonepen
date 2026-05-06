@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
@@ -10,6 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.Auxiliaries;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class AuxiliariesGameTests
 {
   private static final String NS = "minecraft";

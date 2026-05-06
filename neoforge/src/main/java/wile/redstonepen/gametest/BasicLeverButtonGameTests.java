@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +25,8 @@ import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.BasicGauge;
 import wile.redstonepen.libmc.Registries;
 
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
 public class BasicLeverButtonGameTests
 {
   private static final String NS = "minecraft";
