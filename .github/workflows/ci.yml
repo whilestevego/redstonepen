@@ -30,6 +30,8 @@ jobs:
       - name: Run build
         run: ./gradlew build
 
-      # GameTest steps restored in Phase 5/6 once sources exist in the modules.
-      # Running runGameTestServer with empty modules boots a full Minecraft
-      # server with nothing registered and hangs indefinitely.
+      - name: Run NeoForge GameTests
+        run: ./gradlew :neoforge:runGameTestServer
+
+      - name: Run Fabric GameTests
+        run: ./gradlew :fabric:runGameTestServer

@@ -32,9 +32,10 @@ public class ModRedstonePen implements ModInitializer
     Auxiliaries.init();
     Auxiliaries.logGitVersion();
     Registries.init();
-    Networking.init();
     ModContent.init();
+    Registries.instantiateAll();
     ModContent.initReferences();
+    Networking.init();
     wile.redstonepen.detail.RcaSync.CommonRca.init();
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
       ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, "creative_tab"), CREATIVE_TAB);
