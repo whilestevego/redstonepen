@@ -2,6 +2,7 @@
 plugins {
   id 'dev.architectury.loom'
   id 'com.github.johnrengelman.shadow'
+  id 'jacoco'
 }
 
 architectury {
@@ -17,6 +18,10 @@ loom {
       property 'fabric-api.gametest'
       property 'fabric-api.gametest.report-file', "${project.layout.buildDirectory.get().asFile}/junit.xml"
       runDir 'run'
+      // JaCoCo offline-instrumentation: exec file written on JVM shutdown.
+      property 'jacoco-agent.destfile', file("${layout.buildDirectory.get().asFile}/jacoco/gameTestServer.exec").absolutePath
+      property 'jacoco-agent.output', 'file'
+      property 'jacoco-agent.append', 'false'
     }
   }
 }
@@ -31,6 +36,7 @@ configurations {
   compileClasspath.extendsFrom common
   runtimeClasspath.extendsFrom common
   developmentFabric.extendsFrom common
+  jacocoOfflineRuntime
 }
 
 dependencies {
@@ -42,26 +48,231 @@ dependencies {
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
+
+  jacocoOfflineRuntime "org.jacoco:org.jacoco.agent:0.8.12:runtime"
 }
 
+jacoco { toolVersion = '0.8.12' }
+
 // --- GameTest structures ----------------------------------------------------
-// Vanilla StructureUtils.testStructuresDir defaults to "gameteststructures" and
-// reads binary .nbt files from that flat directory (relative to game CWD = run/).
-// NeoForge patches StructureUtils to also read .snbt; vanilla/Fabric only reads .nbt.
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
   include '**/*.nbt'
-  // Fabric's StructureTemplateManager.detectManagedStructure() reads from world/generated/<ns>/structures/
-  // (not from the flat gameteststructures/ directory that NeoForge patches StructureUtils to read)
   into 'run/world/generated/redstonepen/structures'
 }
 
 tasks.named('runGameTestServer') { dependsOn 'prepareGameTestStructures' }
 
+// --- JaCoCo offline instrumentation for Fabric GameTest server --------------
+// Fabric's classloader (Knot) applies mixins at load time; JaCoCo's online
+// javaagent conflicts with this. Offline-instrument the devlibs JARs instead.
+def fabricDevJar = layout.buildDirectory.file(
+  "devlibs/${project.meta_modid}-${project.version_minecraft_fabric}-fabric-${project.version_mod}-dev.jar")
+def fabricJarBak = layout.buildDirectory.file(
+  "devlibs/${project.meta_modid}-${project.version_minecraft_fabric}-fabric-${project.version_mod}-dev.jar.bak")
+def commonDevJar = project(':common').layout.buildDirectory.file(
+  "devlibs/${project.meta_modid}-${project.version_minecraft}-common-${project.version_mod}-dev.jar")
+def commonJarBak = project(':common').layout.buildDirectory.file(
+  "devlibs/${project.meta_modid}-${project.version_minecraft}-common-${project.version_mod}-dev.jar.bak")
+def jarInstrDir  = layout.buildDirectory.dir('jacoco-instr-jars')
+
+tasks.register('instrumentClassesForCoverage') {
+  group = 'verification'
+  description = 'Offline-instruments fabric + common devlibs JARs for JaCoCo coverage.'
+  dependsOn tasks.named('jar'), project(':common').tasks.named('jar')
+  inputs.file(fabricDevJar).optional(true)
+  inputs.file(commonDevJar).optional(true)
+  outputs.dir jarInstrDir
+  doLast {
+    def dst = jarInstrDir.get().asFile
+    delete dst
+    dst.mkdirs()
+    ant.taskdef(name: 'jacocoinstrument',
+                classname: 'org.jacoco.ant.InstrumentTask',
+                classpath: configurations.jacocoAnt.asPath)
+    [fabricDevJar, commonDevJar].each { jarProvider ->
+      def jar = jarProvider.get().asFile
+      if (jar.exists()) {
+        ant.jacocoinstrument(destdir: dst) {
+          fileset(dir: jar.parentFile, includes: jar.name)
+        }
+      }
+    }
+  }
+}
+
+tasks.register('swapInInstrumentedClasses') {
+  dependsOn tasks.named('instrumentClassesForCoverage')
+  doLast {
+    def dst = jarInstrDir.get().asFile
+    [
+      [orig: fabricDevJar.get().asFile, bak: fabricJarBak.get().asFile],
+      [orig: commonDevJar.get().asFile, bak: commonJarBak.get().asFile],
+    ].each { entry ->
+      def instr = new File(dst, entry.orig.name)
+      if (instr.exists()) {
+        copy { from entry.orig; into entry.bak.parentFile; rename { entry.bak.name } }
+        copy { from instr;      into entry.orig.parentFile; rename { entry.orig.name } }
+      }
+    }
+  }
+}
+
+tasks.register('restoreOriginalClasses') {
+  doLast {
+    [
+      [orig: fabricDevJar.get().asFile, bak: fabricJarBak.get().asFile],
+      [orig: commonDevJar.get().asFile, bak: commonJarBak.get().asFile],
+    ].each { entry ->
+      if (entry.bak.exists()) {
+        copy { from entry.bak; into entry.orig.parentFile; rename { entry.orig.name } }
+        delete entry.bak
+      }
+    }
+  }
+}
+
+afterEvaluate {
+  tasks.named('runGameTestServer').configure { task ->
+    dependsOn tasks.named('swapInInstrumentedClasses')
+    finalizedBy tasks.named('restoreOriginalClasses')
+    def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
+    task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
+  }
+}
+
+// --- JaCoCo report / verification -------------------------------------------
+def jacocoExcludes = [
+  '**/generated/**',
+  '**/*$$Lambda*.class',
+  // client-only / rendering / GUI
+  'wile/redstonepen/detail/ModRenderers*.class',
+  'wile/redstonepen/libmc/Guis*.class',
+  'wile/redstonepen/libmc/GuiTextEditing*.class',
+  'wile/redstonepen/libmc/Overlay*.class',
+  'wile/redstonepen/libmc/TooltipDisplay*.class',
+  'wile/redstonepen/libmc/NetworkingClient*.class',
+  'wile/api/rca/*ClientAdapter*.class',
+  '**/*$Client*.class',
+  'wile/redstonepen/blocks/ControlBox$ControlBoxGui*.class',
+  'wile/redstonepen/blocks/ControlBox$ControlBoxUiContainer*.class',
+  'wile/redstonepen/libmc/Auxiliaries$Tooltip*.class',
+  // Unused StandardBlocks utility-base subclasses
+  'wile/redstonepen/libmc/StandardBlocks$Directed*.class',
+  'wile/redstonepen/libmc/StandardBlocks$Horizontal*.class',
+  'wile/redstonepen/libmc/StandardBlocks$AxisAligned*.class',
+  'wile/redstonepen/libmc/StandardBlocks$DirectedWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$AxisAlignedWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$HorizontalWaterLoggable*.class',
+  'wile/redstonepen/libmc/StandardBlocks$HorizontalFourWayWaterLoggable*.class',
+  // Networking: requires live event bus / network context
+  'wile/redstonepen/libmc/Networking.class',
+  'wile/redstonepen/libmc/Networking$*ServerToClient*.class',
+  'wile/redstonepen/libmc/Networking$OverlayTextMessage*.class',
+  'wile/redstonepen/libmc/Networking$UnifiedPayload.class',
+  'wile/redstonepen/libmc/Networking$UnifiedPayload$UnifiedData.class',
+  'wile/redstonepen/libmc/Networking$IPacketTileNotifyReceiver.class',
+  'wile/redstonepen/libmc/Networking$PacketTileNotifyClientToServer.class',
+  'wile/redstonepen/libmc/Networking$PacketContainerSyncClientToServer.class',
+  // Client-branch / particle methods unreachable server-side
+  'wile/redstonepen/blocks/BasicLever$BasicLeverBlock.class',
+  'wile/redstonepen/blocks/BasicButton$BasicButtonBlock.class',
+  // Registration / mod-loader glue
+  'wile/redstonepen/libmc/Registries*.class',
+  'wile/redstonepen/fabric/ModRedstonePen*.class',
+  'wile/redstonepen/ModContent*.class',
+  // GameTest infrastructure (test code, not game logic)
+  'wile/redstonepen/gametest/**',
+  // Outer namespace wrappers with no executable logic
+  'wile/redstonepen/blocks/RedstoneTrack.class',
+  'wile/redstonepen/blocks/ControlBox.class',
+  'wile/redstonepen/blocks/CircuitComponents.class',
+  'wile/redstonepen/blocks/BasicLever.class',
+  'wile/redstonepen/blocks/BasicGauge.class',
+  'wile/redstonepen/blocks/BasicButton.class',
+  'wile/redstonepen/libmc/RcaSync.class',
+  'wile/redstonepen/libmc/StandardBlocks.class',
+  'wile/redstonepen/libmc/StandardBlocks$Cutout.class',
+  'wile/redstonepen/libmc/StandardEntityBlocks.class',
+  'wile/redstonepen/libmc/StandardItems.class',
+  'wile/redstonepen/ModConstants.class',
+  // Abstract / default-interface library bases
+  'wile/redstonepen/libmc/StandardBlocks$IStandardBlock.class',
+  'wile/redstonepen/libmc/StandardBlocks$IStandardBlock$RenderTypeHint.class',
+  'wile/redstonepen/libmc/StandardBlocks$BaseBlock.class',
+  'wile/redstonepen/libmc/StandardBlocks$WaterLoggable.class',
+  'wile/redstonepen/libmc/StandardItems$BaseBlockItem.class',
+  'wile/redstonepen/libmc/StandardItems$BaseItem.class',
+  'wile/redstonepen/libmc/StandardEntityBlocks$StandardBlockEntity.class',
+  'wile/redstonepen/libmc/StandardEntityBlocks$IStandardEntityBlock.class',
+  // ServerPlayer-lifecycle-gated
+  'wile/redstonepen/blocks/CircuitComponents$DirectedComponentBlockItem.class',
+  // RcaSync.CommonRca lambda fires on player disconnect event
+  'wile/redstonepen/detail/RcaSync.class',
+  'wile/redstonepen/detail/RcaSync$CommonRca.class',
+  // DemoCommand requires live CommandSourceStack context
+  'wile/redstonepen/commands/DemoCommand.class',
+  // Data record wrappers
+  'wile/redstonepen/items/RemoteItem$RemoteData.class',
+  'wile/redstonepen/blocks/ControlBox$ControlBoxLogic$MathExpr.class',
+  // Platform service interfaces + impl glue
+  'wile/redstonepen/libmc/INetworkingPlatform.class',
+  'wile/redstonepen/libmc/INetworkingClientPlatform.class',
+  'wile/redstonepen/libmc/IRenderingPlatform.class',
+  'wile/redstonepen/libmc/IPlatformHelper.class',
+  'wile/redstonepen/libmc/PlatformServices.class',
+  'wile/redstonepen/platform/NetworkingPlatformFabric.class',
+  'wile/redstonepen/platform/NetworkingClientPlatformFabric.class',
+  'wile/redstonepen/platform/RenderingPlatformFabric.class',
+  'wile/redstonepen/platform/PlatformHelperFabric.class',
+  // Fabric mixins
+  'wile/redstonepen/mixin/*.class',
+]
+
+jacocoTestReport {
+  executionData.setFrom(
+    fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec'),
+    project(':common').layout.buildDirectory.file('jacoco/test.exec').get().asFile
+  )
+  reports {
+    html.required = true
+    xml.required  = true
+    csv.required  = false
+  }
+  classDirectories.setFrom(
+    files(
+      (classDirectories.files + project(':common').sourceSets.main.output.classesDirs.toList()).collect {
+        fileTree(dir: it, exclude: jacocoExcludes)
+      }
+    )
+  )
+}
+
+jacocoTestCoverageVerification {
+  executionData.setFrom(
+    fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec'),
+    project(':common').layout.buildDirectory.file('jacoco/test.exec').get().asFile
+  )
+  classDirectories.setFrom(
+    files(
+      (classDirectories.files + project(':common').sourceSets.main.output.classesDirs.toList()).collect {
+        fileTree(dir: it, exclude: jacocoExcludes)
+      }
+    )
+  )
+  violationRules {
+    rule {
+      limit { counter = 'LINE';   minimum = 0.85 }
+      limit { counter = 'BRANCH'; minimum = 0.60 }
+    }
+  }
+}
+
 tasks.register('coverage') {
   group = 'verification'
-  description = 'Runs unit tests (common) + Fabric GameTests.'
+  description = 'Runs unit tests (common) + Fabric GameTests, produces merged JaCoCo report, and enforces coverage thresholds.'
   dependsOn ':common:test', tasks.named('runGameTestServer')
+  finalizedBy tasks.named('jacocoTestReport'), tasks.named('jacocoTestCoverageVerification')
 }
 
 // --- Shadow + Remap: produces a fat JAR embedding common classes -----------
