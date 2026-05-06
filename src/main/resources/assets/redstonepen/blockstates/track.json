@@ -1,6 +1,0 @@
-{
-  "variants": {
-    "waterlogged=false": { "model": "redstonepen:block/none" },
-    "waterlogged=true":  { "model": "redstonepen:block/none" }
-  }
-}
