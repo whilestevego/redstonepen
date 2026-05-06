@@ -19,6 +19,18 @@
     ],
     "client": [
       "wile.redstonepen.fabric.ModRedstonePenClient"
+    ],
+    "fabric-gametest": [
+      "wile.redstonepen.gametest.AuxiliariesGameTests",
+      "wile.redstonepen.gametest.BasicLeverButtonGameTests",
+      "wile.redstonepen.gametest.ControlBoxGameTests",
+      "wile.redstonepen.gametest.DemoGameTests",
+      "wile.redstonepen.gametest.InventoriesGameTests",
+      "wile.redstonepen.gametest.PenItemGameTests",
+      "wile.redstonepen.gametest.RecipeGameTests",
+      "wile.redstonepen.gametest.RelayGameTests",
+      "wile.redstonepen.gametest.RemoteItemGameTests",
+      "wile.redstonepen.gametest.TrackGameTests"
     ]
   },
   "mixins": [
