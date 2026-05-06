@@ -504,11 +504,19 @@ public class DemoGameTests
   public static void trafficLightPlacesBlocksCorrectly(GameTestHelper helper)
   {
     DemoSections.buildTrafficLight(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    // Wires between CB and lamps don't connect during placement (CB placed before wire,
+    // lamp doesn't trigger updateShape on the CB side). refreshWireConnections must
+    // explicitly call updateShape for all 4 directions to fix them. This test fails
+    // if that method is broken or missing.
+    DemoSections.refreshWireConnections(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
     helper.succeedWhen(() -> {
       assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(3, 0, 2)); // north wire: CB south, lamp north
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 3)); // west wire: CB east, lamp west
+      assertWireConnected(helper, CELL_LOCAL.offset(3, 0, 4)); // south wire: CB north, lamp south
     });
   }
 

@@ -389,7 +389,7 @@ public final class DemoSections
   // wire recalculates all four directional connections from the final world state. Without this,
   // bulk setBlock placement never calls neighborChanged on the wires themselves — only on their
   // neighbors — leaving the dot (all-NONE) visual until something interacts with the circuit.
-  private static void refreshWireConnections(Level level, BlockPos cell)
+  public static void refreshWireConnections(Level level, BlockPos cell)
   {
     for(int dx = 0; dx < CELL_SIZE; ++dx) {
       for(int dz = 0; dz < CELL_SIZE; ++dz) {
