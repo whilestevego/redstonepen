@@ -15,7 +15,6 @@ import wile.redstonepen.libmc.ExtendedShapelessRecipe;
 
 public class RecipeGameTests
 {
-  private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "redstonepen:relay_activates_from_redstone";
 
   public RecipeGameTests() {}
