@@ -8,8 +8,8 @@ public class PlatformServices
   public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
 
   // Client-only — loaded lazily to avoid server-side class loading
-  private static INetworkingClientPlatform networkingClient;
-  private static IRenderingPlatform rendering;
+  private static volatile INetworkingClientPlatform networkingClient;
+  private static volatile IRenderingPlatform rendering;
 
   public static INetworkingClientPlatform getNetworkingClient()
   {
