@@ -12,7 +12,6 @@ import wile.redstonepen.libmc.Auxiliaries;
 
 public class AuxiliariesGameTests
 {
-  private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "redstonepen:relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
 

@@ -17,7 +17,7 @@ build
 *.log
 common/logs/
 **/runs/
-wile/
+/wile/
 *.jks
 eclipse
 run
@@ -42,7 +42,3 @@ Thumbs.db
 forge*changelog.txt
 /*.txt
 
-## Initial testing:
-# RedstoneTrack.java
-# ControlBox.java
-# CircuitComponents.java
