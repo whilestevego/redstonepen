@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.core.Direction;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.CircuitComponents;
+import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
@@ -367,14 +368,43 @@ public class DemoGameTests
         BlockStateProperties.EXTENDED, true));
   }
 
-  /** Pen-track 3D route: lever on → wire climbs tower → relay output → lamp lights. */
-  @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
+  /** Pen-track 3D route: lever starts on → wire climbs tower → relay output → lamp lights from the start. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 40)
   public static void penTrackWallClimbLightsLamp(GameTestHelper helper)
   {
     DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
-    helper.runAfterDelay(4, () -> helper.pullLever(CELL_LOCAL.offset(4, 0, 6)));
     helper.succeedWhen(() ->
       helper.assertBlockProperty(CELL_LOCAL.offset(4, 3, 0), BlockStateProperties.LIT, true));
+  }
+
+  /**
+   * Pen-track 3D: all 6 tracks have wire-flags and power set immediately after build,
+   * with no lever interaction. This verifies the state that sync() sends to clients is
+   * correct from the start, ensuring tracks are visible without requiring a lever toggle.
+   */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void penTrackWallClimbTracksArePoweredImmediately(GameTestHelper helper)
+  {
+    DemoSections.buildPenTrackWallClimb(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      final BlockPos[] trackPositions = {
+        CELL_LOCAL.offset(4, 0, 5), CELL_LOCAL.offset(4, 1, 5), CELL_LOCAL.offset(4, 2, 5),
+        CELL_LOCAL.offset(4, 3, 4), CELL_LOCAL.offset(4, 3, 3), CELL_LOCAL.offset(4, 3, 2)
+      };
+      for(BlockPos local : trackPositions) {
+        final var te = helper.getLevel().getBlockEntity(helper.absolutePos(local));
+        if(!(te instanceof RedstoneTrack.TrackBlockEntity tbe)) {
+          helper.fail("expected TrackBlockEntity at " + local, local);
+          return;
+        }
+        if(tbe.getWireFlags() == 0) {
+          helper.fail("track at " + local + " has no wire flags", local);
+        }
+        if((tbe.getStateFlags() & RedstoneTrack.defs.STATE_FLAG_PWR_MASK) == 0) {
+          helper.fail("track at " + local + " has no power (state=0x" + Long.toHexString(tbe.getStateFlags()) + ")", local);
+        }
+      }
+    });
   }
 
   /** basic_gauge POWER property updates when an upstream lever is toggled on. */

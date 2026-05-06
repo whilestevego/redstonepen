@@ -319,11 +319,19 @@ public final class DemoSections
     level.setBlock(cell.offset(4, 2, 2), stone, FLAGS);
     level.setBlock(cell.offset(4, 2, 1), stone, FLAGS); // support for terminal relay
 
-    // Lever drives the wire from south on the platform.
+    DemoBuilder.placeAttached(level, cell.offset(4, 3, 1),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+    level.setBlock(cell.offset(4, 3, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+
+    // Lever drives the wire from south on the platform. Start powered so tracks are
+    // visible immediately; updateNeighborsAt below propagates that power through the net.
     level.setBlock(cell.offset(4, 0, 6),
       Blocks.LEVER.defaultBlockState()
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
-        .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
+        .setValue(LeverBlock.FACING, Direction.NORTH)
+        .setValue(LeverBlock.POWERED, true), FLAGS);
 
     // 1) Floor track + start of climb on south face of tower base.
     placePenTrack(level, cell.offset(4, 0, 5),
@@ -350,15 +358,8 @@ public final class DemoSections
       wireBit(Direction.DOWN, Direction.SOUTH)
         | wireBit(Direction.DOWN, Direction.NORTH));
 
-    // Terminal: relay reads input from south (the wire arriving from the tracks above)
-    // and drives a vanilla redstone lamp on its north output side.
-    DemoBuilder.placeAttached(level, cell.offset(4, 3, 1),
-      relay.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    level.setBlock(cell.offset(4, 3, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
-
     sign(level, cell.offset(4, 1, 8), "pen_track 3D", "lever to relay");
+    level.updateNeighborsAt(cell.offset(4, 0, 6), Blocks.LEVER);
   }
 
   private static long wireBit(Direction face, Direction wireDirection)
@@ -371,6 +372,7 @@ public final class DemoSections
     level.setBlock(pos, Registries.getBlock("track").defaultBlockState(), FLAGS);
     if(level.getBlockEntity(pos) instanceof RedstoneTrack.TrackBlockEntity te) {
       te.addWireFlags(wireFlags);
+      te.handleShapeUpdate(Direction.DOWN, level.getBlockState(pos.below()), pos.below(), false);
       te.sync(true);
     }
   }
