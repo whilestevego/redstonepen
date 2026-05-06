@@ -11,6 +11,14 @@ architectury {
 
 loom {
   accessWidenerPath = project(':common').file("src/main/resources/redstonepen_common.accesswidener")
+  runs {
+    gameTestServer {
+      server()
+      property 'fabric-api.gametest'
+      property 'fabric-api.gametest.report-file', "${project.layout.buildDirectory.get().asFile}/junit.xml"
+      runDir 'run'
+    }
+  }
 }
 
 group   = project.meta_modgroup
@@ -30,17 +38,16 @@ dependencies {
   mappings loom.officialMojangMappings()
   modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
   modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+  modImplementation fabricApi.module("fabric-gametest-api-v1", project.fabric_api_version)
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 }
 
 // --- GameTest structures ----------------------------------------------------
-// Run configuration and structure copying wired in Phase 6 when Fabric
-// GameTest sources and entry points are in place.
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
-  into 'runs/gameTestServer/gameteststructures'
+  into 'run/gameteststructures'
 }
 
 // --- Shadow + Remap: produces a fat JAR embedding common classes -----------
