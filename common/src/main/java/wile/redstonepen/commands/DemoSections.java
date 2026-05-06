@@ -61,6 +61,7 @@ public final class DemoSections
     for(int i = 0; i < contraptions.length; ++i) {
       final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, GRID_SPACING);
       contraptions[i].build(level, cell);
+      refreshWireConnections(level, cell);
     }
     buildGridBorders(level, origin, contraptions.length);
   }
@@ -383,6 +384,22 @@ public final class DemoSections
   // -----------------------------------------------------------------------------------------------
   // Helpers
   // -----------------------------------------------------------------------------------------------
+
+  // After all blocks in a cell are placed, call neighborChanged on every redstone wire so each
+  // wire recalculates all four directional connections from the final world state. Without this,
+  // bulk setBlock placement never calls neighborChanged on the wires themselves — only on their
+  // neighbors — leaving the dot (all-NONE) visual until something interacts with the circuit.
+  private static void refreshWireConnections(Level level, BlockPos cell)
+  {
+    for(int dx = 0; dx < CELL_SIZE; ++dx) {
+      for(int dz = 0; dz < CELL_SIZE; ++dz) {
+        final BlockPos pos = cell.offset(dx, 0, dz);
+        if(level.getBlockState(pos).is(Blocks.REDSTONE_WIRE)) {
+          level.neighborChanged(pos, Blocks.REDSTONE_WIRE, pos);
+        }
+      }
+    }
+  }
 
   private static void buildGridBorders(Level level, BlockPos origin, int numContraptions)
   {
