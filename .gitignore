@@ -16,6 +16,8 @@ build
 *.tmp
 *.log
 common/logs/
+**/runs/
+wile/
 *.jks
 eclipse
 run

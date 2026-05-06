@@ -5,10 +5,36 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
+// Root-level platform-specific run aliases.
+gradle.projectsEvaluated {
+  [
+    [name: 'runNeoForgeClient', task: 'runClient',  proj: ':neoforge'],
+    [name: 'runNeoForgeServer', task: 'runServer',  proj: ':neoforge'],
+    [name: 'runNeoForgeData',   task: 'runData',    proj: ':neoforge'],
+    [name: 'runFabricClient',   task: 'runClient',  proj: ':fabric'],
+    [name: 'runFabricServer',   task: 'runServer',  proj: ':fabric'],
+  ].each { entry ->
+    def target = project(entry.proj).tasks.findByName(entry.task)
+    if (target) {
+      tasks.register(entry.name) {
+        group = 'fabric loom'
+        dependsOn target
+      }
+    }
+  }
+}
+
 tasks.register('coverage') {
   group = 'verification'
   description = 'Runs all platform test suites and verifies JaCoCo coverage.'
   dependsOn ':neoforge:coverage', ':fabric:coverage'
+}
+
+tasks.register('verifyCoverage') {
+  group = 'verification'
+  description = 'Generates JaCoCo reports and enforces coverage thresholds without re-running tests.'
+  dependsOn ':neoforge:jacocoTestReport', ':neoforge:jacocoTestCoverageVerification',
+            ':fabric:jacocoTestReport',   ':fabric:jacocoTestCoverageVerification'
 }
 
 // GameTest servers bind a network port — run them sequentially to avoid conflicts.

@@ -24,14 +24,17 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Run unit tests
-        run: ./gradlew :common:test
-
-      - name: Run build
+      - name: Build all modules
         run: ./gradlew build
 
-      - name: Run NeoForge GameTests
+      - name: Common unit tests
+        run: ./gradlew :common:test
+
+      - name: NeoForge GameTests
         run: ./gradlew :neoforge:runGameTestServer
 
-      - name: Run Fabric GameTests
+      - name: Fabric GameTests
         run: ./gradlew :fabric:runGameTestServer
+
+      - name: Verify coverage
+        run: ./gradlew verifyCoverage
