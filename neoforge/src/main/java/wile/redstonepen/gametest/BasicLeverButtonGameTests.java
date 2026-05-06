@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -23,14 +25,16 @@ import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.BasicGauge;
 import wile.redstonepen.libmc.Registries;
 
-public final class BasicLeverButtonGameTests
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
+public class BasicLeverButtonGameTests
 {
   private static final String NS = "minecraft";
   private static final String EMPTY = "relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
   private static final BlockPos SUPPORT = POS.below();
 
-  private BasicLeverButtonGameTests() {}
+  public BasicLeverButtonGameTests() {}
 
   // --- BasicLever -----------------------------------------------------------------------
 

@@ -1,6 +1,8 @@
 package wile.redstonepen.gametest;
 
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -8,12 +10,14 @@ import net.minecraft.world.item.Items;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.Inventories;
 
-public final class InventoriesGameTests
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
+public class InventoriesGameTests
 {
   private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
-  private InventoriesGameTests() {}
+  public InventoriesGameTests() {}
 
   // --- InventoryRange.insert complex second-iteration paths --------------------------------
 
