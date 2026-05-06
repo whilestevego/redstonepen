@@ -459,4 +459,187 @@ public class DemoGameTests
         + " but found " + actual.getBlock(), localPos);
     }
   }
+
+  // ===========================================================================================
+  // RLC demo structural tests — verify blocks land at expected positions.
+  // ===========================================================================================
+
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void trafficLightPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildTrafficLight(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.REDSTONE_LAMP);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void pulseCounterPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void srLatchPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildSrLatch(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void pwmDemoPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildPwmDemo(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 20)
+  public static void stepSequencerPlacesBlocksCorrectly(GameTestHelper helper)
+  {
+    DemoSections.buildStepSequencer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+    });
+  }
+
+  // ===========================================================================================
+  // RLC demo behavioral tests — drive inputs and assert circuit outputs.
+  // ===========================================================================================
+
+  /** Traffic light: exactly one of the three lamps is lit at any given evaluation tick. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 40)
+  public static void trafficLightExactlyOneLampLit(GameTestHelper helper)
+  {
+    DemoSections.buildTrafficLight(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      final boolean rLit = helper.getBlockState(CELL_LOCAL.offset(3, 0, 1)).getValue(BlockStateProperties.LIT);
+      final boolean yLit = helper.getBlockState(CELL_LOCAL.offset(3, 0, 5)).getValue(BlockStateProperties.LIT);
+      final boolean gLit = helper.getBlockState(CELL_LOCAL.offset(1, 0, 3)).getValue(BlockStateProperties.LIT);
+      final int litCount = (rLit ? 1 : 0) + (yLit ? 1 : 0) + (gLit ? 1 : 0);
+      if(litCount != 1) helper.fail("expected exactly one traffic lamp lit, got " + litCount);
+    });
+  }
+
+  /** Pulse counter: pressing the button once lights the output lamp (count goes from 0 to 1). */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
+  public static void pulseCounterLightsLampOnFirstPress(GameTestHelper helper)
+  {
+    DemoSections.buildPulseCounter(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> {
+      final BlockPos btnAbs = helper.absolutePos(CELL_LOCAL.offset(3, 0, 5));
+      final BlockState btnState = helper.getLevel().getBlockState(btnAbs);
+      helper.getLevel().setBlock(btnAbs, btnState.setValue(BlockStateProperties.POWERED, true), 3);
+      helper.getLevel().updateNeighborsAt(btnAbs, btnState.getBlock());
+    });
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
+  /** SR latch: pressing the set button latches state — lamp stays lit after button release. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
+  public static void srLatchSetsAndHolds(GameTestHelper helper)
+  {
+    DemoSections.buildSrLatch(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 1)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
+  /** SR latch: pressing reset after set turns the lamp off. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 80)
+  public static void srLatchResetsAfterSet(GameTestHelper helper)
+  {
+    DemoSections.buildSrLatch(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 1)));  // set
+    helper.runAfterDelay(15, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));  // reset
+    helper.runAfterDelay(30, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
+      helper.succeed();
+    });
+  }
+
+  /** PWM: with lever off (g=0) the lamp stays dark — zero duty cycle. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 40)
+  public static void pwmZeroDutyLampStaysDark(GameTestHelper helper)
+  {
+    DemoSections.buildPwmDemo(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    // Lever starts off (g=0); b = if(clock%16 < 0, 15, 0) = always 0.
+    helper.runAfterDelay(20, () -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
+      helper.succeed();
+    });
+  }
+
+  /** PWM: pulling the lever (g=15) causes the lamp to light within one 16-tick period. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
+  public static void pwmFullDutyLightsLamp(GameTestHelper helper)
+  {
+    DemoSections.buildPwmDemo(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> helper.pullLever(CELL_LOCAL.offset(1, 0, 3)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
+  /** Step sequencer: step 0 (initial) — north lamp is lit, east and west are dark. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 40)
+  public static void stepSequencerStartsAtStepZero(GameTestHelper helper)
+  {
+    DemoSections.buildStepSequencer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.succeedWhen(() -> {
+      helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true);
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, false);
+      helper.assertBlockProperty(CELL_LOCAL.offset(1, 0, 3), BlockStateProperties.LIT, false);
+    });
+  }
+
+  /** Step sequencer: one button press advances to step 1 — east lamp lights. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 60)
+  public static void stepSequencerAdvancesToStepOne(GameTestHelper helper)
+  {
+    DemoSections.buildStepSequencer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
+  /** Step sequencer: three presses cycle back to step 0 — north lamp re-lights. */
+  @GameTest(template = EMPTY_PAD, timeoutTicks = 100)
+  public static void stepSequencerWrapsAroundToStepZero(GameTestHelper helper)
+  {
+    DemoSections.buildStepSequencer(helper.getLevel(), helper.absolutePos(CELL_LOCAL));
+    helper.runAfterDelay(2,  () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(15, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.runAfterDelay(30, () -> pressButton(helper, CELL_LOCAL.offset(3, 0, 5)));
+    helper.succeedWhen(() ->
+      helper.assertBlockProperty(CELL_LOCAL.offset(3, 0, 1), BlockStateProperties.LIT, true));
+  }
+
+  private static void pressButton(GameTestHelper helper, BlockPos localPos)
+  {
+    final BlockPos abs = helper.absolutePos(localPos);
+    final BlockState state = helper.getLevel().getBlockState(abs);
+    helper.getLevel().setBlock(abs, state.setValue(BlockStateProperties.POWERED, true), 3);
+    helper.getLevel().updateNeighborsAt(abs, state.getBlock());
+  }
 }
