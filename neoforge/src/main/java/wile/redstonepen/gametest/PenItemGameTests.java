@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -18,13 +20,15 @@ import wile.redstonepen.items.RedstonePenItem;
 import wile.redstonepen.libmc.Inventories;
 import wile.redstonepen.libmc.Registries;
 
-public final class PenItemGameTests
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
+public class PenItemGameTests
 {
   private static final String NS = "minecraft";
   private static final String EMPTY = "relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
 
-  private PenItemGameTests() {}
+  public PenItemGameTests() {}
 
   // --- isPen / isFullRedstone --------------------------------------------------------------
 

@@ -3,6 +3,8 @@ package wile.redstonepen.gametest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.gametest.framework.GameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,12 +15,14 @@ import net.minecraft.world.item.crafting.Ingredient;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.libmc.ExtendedShapelessRecipe;
 
-public final class RecipeGameTests
+@GameTestHolder(ModConstants.MODID)
+@PrefixGameTestTemplate(false)
+public class RecipeGameTests
 {
   private static final String NS = "minecraft";
   private static final String RELAY_TEMPLATE = "relay_activates_from_redstone";
 
-  private RecipeGameTests() {}
+  public RecipeGameTests() {}
 
   @GameTest(template = RELAY_TEMPLATE, timeoutTicks = 5)
   public static void extendedShapelessRecipeSerializerRoundTrip(GameTestHelper helper)

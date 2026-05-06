@@ -15,9 +15,20 @@ version = project.version_mod
 base { archivesName = "${project.meta_modid}-${project.version_minecraft}-neoforge" }
 
 loom {
+  accessWidenerPath = project(':common').file("src/main/resources/redstonepen_common.accesswidener")
   neoForge {}
 
   runs {
+    // Include neoforge classes in the mod's SecureJar so NeoForge scans them for
+    // @GameTestHolder, @Mod, etc. Without this Loom only provides the resources dir.
+    configureEach {
+      mods {
+        "${project.meta_modid}" {
+          sourceSet sourceSets.main
+        }
+      }
+    }
+
     client {
       client()
       property 'neoforge.enabledGameTestNamespaces', "${project.meta_modid},minecraft"
@@ -30,6 +41,7 @@ loom {
     gameTestServer {
       server()
       property 'neoforge.enabledGameTestNamespaces', "${project.meta_modid},minecraft"
+      property 'neoforge.gameTestServer', 'true'
       // JaCoCo offline-instrumentation: exec file written on JVM shutdown.
       property 'jacoco-agent.destfile', file("${layout.buildDirectory.get().asFile}/jacoco/gameTestServer.exec").absolutePath
       property 'jacoco-agent.output', 'file'
@@ -100,7 +112,7 @@ jar { archiveClassifier = 'dev' }
 // --- GameTest structures ----------------------------------------------------
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
-  into 'runs/gameTestServer/gameteststructures'
+  into 'run/gameteststructures'
 }
 
 // --- JaCoCo offline instrumentation for NeoForge GameTest server ------------
