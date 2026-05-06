@@ -30,8 +30,9 @@ public final class DemoSections
   private DemoSections() {}
 
   private static final int FLAGS = DemoBuilder.FLAGS;
-  private static final int CELL_SIZE = 9;     // each contraption gets a 9x9 footprint
-  private static final int GRID_COLUMNS = 4;  // 10 contraptions in a 4x3 grid (last row has 2)
+  private static final int CELL_SIZE = 9;                  // each contraption gets a 9×9 footprint
+  private static final int GRID_COLUMNS = 4;               // 16 contraptions in a 4×4 grid
+  private static final int GRID_SPACING = CELL_SIZE + 1;   // 1-block log border between cells
 
   /**
    * Builds the showcase: working redstone contraptions in a grid, each
@@ -58,9 +59,10 @@ public final class DemoSections
       DemoSections::buildHoldTimer
     };
     for(int i = 0; i < contraptions.length; ++i) {
-      final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, CELL_SIZE);
+      final BlockPos cell = DemoBuilder.cellOrigin(origin, i, GRID_COLUMNS, GRID_SPACING);
       contraptions[i].build(level, cell);
     }
+    buildGridBorders(level, origin, contraptions.length);
   }
 
 // -----------------------------------------------------------------------------------------------
@@ -382,13 +384,38 @@ public final class DemoSections
   // Helpers
   // -----------------------------------------------------------------------------------------------
 
+  private static void buildGridBorders(Level level, BlockPos origin, int numContraptions)
+  {
+    final int rows = (numContraptions + GRID_COLUMNS - 1) / GRID_COLUMNS;
+    final BlockState log = Blocks.OAK_LOG.defaultBlockState();
+    final BlockState air = Blocks.AIR.defaultBlockState();
+    final int totalX = GRID_COLUMNS * GRID_SPACING - 1;
+    final int totalZ = rows * GRID_SPACING - 1;
+
+    for(int c = 0; c < GRID_COLUMNS - 1; ++c) {
+      final int bx = c * GRID_SPACING + CELL_SIZE;
+      for(int dz = 0; dz < totalZ; ++dz) {
+        level.setBlock(origin.offset(bx, -1, dz), log, FLAGS);
+        for(int dy = 0; dy < 4; ++dy) level.setBlock(origin.offset(bx, dy, dz), air, FLAGS);
+      }
+    }
+
+    for(int r = 0; r < rows - 1; ++r) {
+      final int bz = r * GRID_SPACING + CELL_SIZE;
+      for(int dx = 0; dx < totalX; ++dx) {
+        level.setBlock(origin.offset(dx, -1, bz), log, FLAGS);
+        for(int dy = 0; dy < 4; ++dy) level.setBlock(origin.offset(dx, dy, bz), air, FLAGS);
+      }
+    }
+  }
+
   private static void platform(Level level, BlockPos cell)
   {
-    final BlockState stone = Blocks.STONE.defaultBlockState();
+    final BlockState gold = Blocks.GOLD_BLOCK.defaultBlockState();
     final BlockState air = Blocks.AIR.defaultBlockState();
     for(int dx = 0; dx < CELL_SIZE; ++dx) {
       for(int dz = 0; dz < CELL_SIZE; ++dz) {
-        level.setBlock(cell.offset(dx, -1, dz), stone, FLAGS);
+        level.setBlock(cell.offset(dx, -1, dz), gold, FLAGS);
         for(int dy = 0; dy < 4; ++dy) {
           level.setBlock(cell.offset(dx, dy, dz), air, FLAGS);
         }
