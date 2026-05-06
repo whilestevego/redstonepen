@@ -17,6 +17,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import net.minecraft.core.Direction;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.CircuitComponents;
@@ -48,6 +49,7 @@ public class DemoGameTests
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 4), "basic_lever");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 2), Blocks.REDSTONE_WIRE);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 2)); // middle of 3-wire run
     });
   }
 
@@ -63,6 +65,7 @@ public class DemoGameTests
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 4), "basic_button");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 1), Blocks.STICKY_PISTON);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.GLOWSTONE);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 3)); // south=button, north=wire
     });
   }
 
@@ -77,6 +80,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 5), Blocks.LEVER);
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 3), "inverted_relay");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 2)); // between relay and wire(2,0,1)
     });
   }
 
@@ -91,6 +95,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 5), Blocks.STONE_BUTTON);
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 3), "bistable_relay");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 2)); // between relay and wire(2,0,1)
     });
   }
 
@@ -105,6 +110,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 5), Blocks.LEVER);
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 3), "pulse_relay");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 2)); // between relay and wire(2,0,1)
     });
   }
 
@@ -119,6 +125,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 5), Blocks.LEVER);
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 3), "relay");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 0), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 2)); // between relay and wire(2,0,1)
     });
   }
 
@@ -136,6 +143,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), Blocks.LEVER);    // E-W input (adjacent to bridge)
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(4, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 4)); // south=lever, north=bridge
     });
   }
 
@@ -151,6 +159,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.LEVER);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -165,6 +174,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 5), Blocks.LEVER);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(2, 0, 3), Blocks.REPEATER);
       assertModBlockAt(helper, CELL_LOCAL.offset(2, 0, 1), "basic_gauge");
+      assertWireConnected(helper, CELL_LOCAL.offset(2, 0, 4)); // south=lever, north=repeater
     });
   }
 
@@ -499,6 +509,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(3, 0, 4)); // north=control_box (port y)
     });
   }
 
@@ -512,6 +523,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -524,6 +536,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.STONE_BUTTON);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -535,6 +548,7 @@ public class DemoGameTests
       assertModBlockAt(helper, CELL_LOCAL.offset(3, 0, 3), "control_box");
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -548,6 +562,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 1), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -700,6 +715,7 @@ public class DemoGameTests
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(3, 0, 5), Blocks.STONE_BUTTON);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(1, 0, 3), Blocks.LEVER);
       assertVanillaBlockAt(helper, CELL_LOCAL.offset(6, 0, 3), Blocks.REDSTONE_LAMP);
+      assertWireConnected(helper, CELL_LOCAL.offset(4, 0, 3)); // adjacent to wire(5,0,3)
     });
   }
 
@@ -714,6 +730,17 @@ public class DemoGameTests
     // Lamp should be on immediately after press.
     helper.succeedWhen(() ->
       helper.assertBlockProperty(CELL_LOCAL.offset(6, 0, 3), BlockStateProperties.LIT, true));
+  }
+
+  private static void assertWireConnected(GameTestHelper helper, BlockPos local)
+  {
+    final BlockState state = helper.getBlockState(local);
+    final boolean connected =
+      state.getValue(BlockStateProperties.NORTH_REDSTONE) != RedstoneSide.NONE
+      || state.getValue(BlockStateProperties.SOUTH_REDSTONE) != RedstoneSide.NONE
+      || state.getValue(BlockStateProperties.EAST_REDSTONE) != RedstoneSide.NONE
+      || state.getValue(BlockStateProperties.WEST_REDSTONE) != RedstoneSide.NONE;
+    if(!connected) helper.fail("redstone wire at " + local + " has no connections (dot state)", local);
   }
 
   private static void pressButton(GameTestHelper helper, BlockPos localPos)
