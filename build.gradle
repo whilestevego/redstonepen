@@ -5,6 +5,19 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
+// Root-level run aliases — delegate to NeoForge by default.
+// Use :fabric:runClient / :fabric:runServer for the Fabric platform.
+gradle.projectsEvaluated {
+  ['runClient', 'runServer', 'runData'].each { taskName ->
+    if (project(':neoforge').tasks.findByName(taskName)) {
+      tasks.register(taskName) {
+        group = 'fabric loom'
+        dependsOn project(':neoforge').tasks.named(taskName)
+      }
+    }
+  }
+}
+
 tasks.register('coverage') {
   group = 'verification'
   description = 'Runs all platform test suites and verifies JaCoCo coverage.'
