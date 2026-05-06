@@ -26,7 +26,7 @@ import java.util.List;
 
 public class TrackGameTests
 {
-  private static final String EMPTY_TEMPLATE = "relay_activates_from_redstone";
+  private static final String EMPTY_TEMPLATE = "redstonepen:relay_activates_from_redstone";
   private static final BlockPos TRACK_POS = new BlockPos(1, 1, 1);
 
   public TrackGameTests()

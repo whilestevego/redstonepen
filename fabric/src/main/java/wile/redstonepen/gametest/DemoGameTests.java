@@ -26,7 +26,7 @@ import wile.redstonepen.libmc.Registries;
 
 public class DemoGameTests
 {
-  private static final String EMPTY_PAD = "empty_demo_pad";
+  private static final String EMPTY_PAD = "redstonepen:empty_demo_pad";
 
   // Each contraption is built with cell-origin = (1, 1, 1) in template-local coords
   // so the 9x9 footprint fits inside the 16x6x16 pad with room to spare on every side.

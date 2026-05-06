@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ControlBoxGameTests
 {
-  private static final String EMPTY_RELAY_TEMPLATE = "relay_activates_from_redstone";
+  private static final String EMPTY_RELAY_TEMPLATE = "redstonepen:relay_activates_from_redstone";
   private static final BlockPos CONTROL_BOX_POS = new BlockPos(1, 1, 1);
 
   public ControlBoxGameTests()

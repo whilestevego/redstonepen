@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class RelayGameTests
 {
-  private static final String EMPTY_RELAY_TEMPLATE = "relay_activates_from_redstone";
+  private static final String EMPTY_RELAY_TEMPLATE = "redstonepen:relay_activates_from_redstone";
   private static final BlockPos RELAY_POS = new BlockPos(1, 1, 1);
   private static final BlockPos INPUT_POS = RELAY_POS.east();
 

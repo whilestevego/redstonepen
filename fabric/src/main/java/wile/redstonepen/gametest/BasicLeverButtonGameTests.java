@@ -26,7 +26,7 @@ import wile.redstonepen.libmc.Registries;
 public class BasicLeverButtonGameTests
 {
   private static final String NS = "minecraft";
-  private static final String EMPTY = "relay_activates_from_redstone";
+  private static final String EMPTY = "redstonepen:relay_activates_from_redstone";
   private static final BlockPos POS = new BlockPos(1, 1, 1);
   private static final BlockPos SUPPORT = POS.below();
 

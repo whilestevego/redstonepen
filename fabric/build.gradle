@@ -45,9 +45,11 @@ dependencies {
 }
 
 // --- GameTest structures ----------------------------------------------------
+// Fabric's StructureTemplateManager reads from <world-dir>/generated/<namespace>/structures/.
+// Default level-name is "world", so world dir is run/world/.
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
-  into 'run/gameteststructures'
+  into 'run/world/generated/redstonepen/structures'
 }
 
 // --- Shadow + Remap: produces a fat JAR embedding common classes -----------
