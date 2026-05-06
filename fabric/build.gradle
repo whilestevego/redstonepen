@@ -58,6 +58,12 @@ tasks.register('prepareGameTestStructures', Copy) {
 
 tasks.named('runGameTestServer') { dependsOn 'prepareGameTestStructures' }
 
+tasks.register('coverage') {
+  group = 'verification'
+  description = 'Runs unit tests (common) + Fabric GameTests.'
+  dependsOn ':common:test', tasks.named('runGameTestServer')
+}
+
 // --- Shadow + Remap: produces a fat JAR embedding common classes -----------
 shadowJar {
   exclude 'architectury.common.json'
