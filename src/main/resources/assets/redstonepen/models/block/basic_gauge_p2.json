@@ -1,6 +1,0 @@
-{
-  "parent": "redstonepen:block/basic_gauge_abstract",
-  "textures": {
-    "disp": "redstonepen:block/basic_gauge_p2"
-  }
-}
