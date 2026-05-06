@@ -5,7 +5,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -399,6 +401,67 @@ public class PenItemGameTests
 
   // --- doesSneakBypassUse ------------------------------------------------------------------
 
+  @GameTest(template = EMPTY, timeoutTicks = 5)
+  public static void penDoesSneakBypassUse(GameTestHelper helper)
+  {
+    // Pen returns true so sneak+right-click interacts with blocks instead of opening their GUI.
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(!pen.getItem().doesSneakBypassUse(pen, helper.getLevel(), helper.absolutePos(POS), player))
+      helper.fail("pen must bypass sneak use");
+    helper.succeed();
+  }
+
+  // --- inventoryTick (requires real ServerPlayer via FakePlayerFactory) --------------------
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversRedstonePath(GameTestHelper helper)
+  {
+    // inventoryTick checks entity instanceof ServerPlayer; FakePlayerFactory gives a real one.
+    // Place redstone wire in front of the fake player so pick() returns a BLOCK hit.
+    final BlockPos wireRel = new BlockPos(2, 1, 2);
+    helper.setBlock(wireRel.below(), Blocks.STONE);
+    helper.setBlock(wireRel, Blocks.REDSTONE_WIRE);
+    final BlockPos wireAbs = helper.absolutePos(wireRel);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    // Position eyes just west of the wire block, looking east; eye height ≈ 1.62 above feet.
+    fp.setPos(wireAbs.getX() - 1, wireAbs.getY() - 1.5, wireAbs.getZ() + 0.5);
+    fp.setYRot(-90f); // east
+    fp.setXRot(0f);
+    fp.setShiftKeyDown(true);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    fp.setItemInHand(InteractionHand.MAIN_HAND, pen);
+    // Call twice so at least one hits an even game-time tick (bypassing the % 2 throttle).
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversTrackPath(GameTestHelper helper)
+  {
+    // Same approach but looking at a track block (covers the track-power overlay branch).
+    final BlockPos trackRel = new BlockPos(2, 1, 2);
+    helper.setBlock(trackRel, wile.redstonepen.ModContent.references.TRACK_BLOCK);
+    final BlockPos trackAbs = helper.absolutePos(trackRel);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    fp.setPos(trackAbs.getX() - 1, trackAbs.getY() - 1.5, trackAbs.getZ() + 0.5);
+    fp.setYRot(-90f);
+    fp.setXRot(0f);
+    fp.setShiftKeyDown(true);
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    fp.setItemInHand(InteractionHand.MAIN_HAND, pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
   // --- quill (maxDamage=0) paths in pushRedstone / popRedstone / hasEnoughRedstone ----------
 
   @GameTest(template = EMPTY, timeoutTicks = 5)
@@ -528,5 +591,145 @@ public class PenItemGameTests
     helper.setBlock(POS.south().east(), Blocks.REDSTONE_BLOCK);
     // Just verifying no crash; track may or may not survive depending on segment state.
     helper.runAfterDelay(5, helper::succeed);
+  }
+
+  // --- inventoryTick branch-body coverage (look-down approach: thin-shape blocks need overhead pick()) ---
+
+  // Helper: position FakePlayer above blockAbs looking straight down, shift key down, pen in hand.
+  private static void setupFpLookingDown(net.minecraft.server.level.ServerPlayer fp, BlockPos blockAbs, ItemStack pen)
+  {
+    fp.setPos(blockAbs.getX() + 0.5, blockAbs.getY() + 3.0, blockAbs.getZ() + 0.5);
+    fp.setYRot(0f);
+    fp.setXRot(90f); // straight down; eye at blockAbs.y+4.62 → hits even thin (1/16) shapes
+    fp.setShiftKeyDown(true);
+    fp.setItemInHand(InteractionHand.MAIN_HAND, pen);
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversRedstoneBranchBody(GameTestHelper helper)
+  {
+    // inventoryTick wire branch body: pick() must return the wire via straight-down ray.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel.below(), Blocks.STONE);
+    helper.setBlock(blockRel, Blocks.REDSTONE_WIRE);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversTrackBranchBody(GameTestHelper helper)
+  {
+    // inventoryTick track branch body: straight-down pick() at track block.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel.below(), Blocks.STONE);
+    helper.setBlock(blockRel, wile.redstonepen.ModContent.references.TRACK_BLOCK);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversRepeaterBranchBody(GameTestHelper helper)
+  {
+    // inventoryTick repeater branch body: repeater shape is 2/16 high, requires down-looking pick().
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel.below(), Blocks.STONE);
+    helper.setBlock(blockRel, Blocks.REPEATER);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversComparatorBranchBody(GameTestHelper helper)
+  {
+    // inventoryTick comparator branch body; comparator BlockEntity supplies output signal.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel.below(), Blocks.STONE);
+    helper.setBlock(blockRel, Blocks.COMPARATOR);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversSignalSourceBranchBody(GameTestHelper helper)
+  {
+    // inventoryTick isSignalSource() branch: REDSTONE_BLOCK is always full-signal, full 1x1x1.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel, Blocks.REDSTONE_BLOCK);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penInventoryTickCoversCanEmitWeakPowerPath(GameTestHelper helper)
+  {
+    // canEmitWeakPower branch: stone is a redstone conductor (!isSignalSource, canEmitWeakPower=true).
+    // Adjacent redstone block gives it signal so p > 0 branch is also covered.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel, Blocks.STONE);
+    helper.setBlock(new BlockPos(3, 1, 2), Blocks.REDSTONE_BLOCK);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    setupFpLookingDown(fp, helper.absolutePos(blockRel), pen);
+    pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+    helper.runAfterDelay(1, () -> {
+      pen.getItem().inventoryTick(pen, helper.getLevel(), fp, 0, true);
+      fp.setShiftKeyDown(false);
+      helper.succeed();
+    });
+  }
+
+  // --- attack() track-path coverage (requires ServerPlayer for player.pick() to work) ----------
+
+  @GameTest(template = EMPTY, timeoutTicks = 15)
+  public static void penAttackOnTrackWithFakePlayer(GameTestHelper helper)
+  {
+    // attack() track branch: FakePlayer positioned above track, looking down → pick() returns track.
+    // Covers lines in attack() that are gated by rt.getType()==BLOCK and instanceof TrackBlock.
+    final BlockPos blockRel = new BlockPos(2, 1, 2);
+    helper.setBlock(blockRel.below(), Blocks.STONE);
+    helper.setBlock(blockRel, wile.redstonepen.ModContent.references.TRACK_BLOCK);
+    final var fp = FakePlayerFactory.getMinecraft(helper.getLevel());
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    fp.setItemInHand(InteractionHand.MAIN_HAND, pen);
+    final BlockPos blockAbs = helper.absolutePos(blockRel);
+    setupFpLookingDown(fp, blockAbs, pen);
+    pen.getItem().canAttackBlock(
+      helper.getLevel().getBlockState(blockAbs), helper.getLevel(), blockAbs, fp);
+    helper.succeed();
   }
 }

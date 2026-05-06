@@ -15,6 +15,7 @@ build
 .gradle
 *.tmp
 *.log
+common/logs/
 *.jks
 eclipse
 run
