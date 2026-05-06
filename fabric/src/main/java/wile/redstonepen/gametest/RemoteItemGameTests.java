@@ -94,4 +94,16 @@ public class RemoteItemGameTests
     if(result) helper.fail("onBlockStartBreak must return false");
     helper.succeed();
   }
+
+  // --- doesSneakBypassUse ------------------------------------------------------------------
+
+  @GameTest(template = EMPTY, timeoutTicks = 5)
+  public static void remoteDoesNotSneakBypassUse(GameTestHelper helper)
+  {
+    final ItemStack remote = new ItemStack(Registries.getItem("remote"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(remote.getItem().doesSneakBypassUse(remote, helper.getLevel(), helper.absolutePos(POS), player))
+      helper.fail("remote must not bypass sneak use");
+    helper.succeed();
+  }
 }
