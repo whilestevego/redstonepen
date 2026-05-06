@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,6 +24,7 @@ import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.blocks.RedstoneTrack.defs.connections;
 import wile.redstonepen.libmc.Auxiliaries;
+import wile.redstonepen.libmc.PlatformServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,29 +36,29 @@ public class ModRenderers
   @Environment(EnvType.CLIENT)
   public static class TrackTer implements BlockEntityRenderer<RedstoneTrack.TrackBlockEntity>
   {
-    private static final ModelResourceLocation[] model_rls  = new ModelResourceLocation[RedstoneTrack.defs.STATE_FLAG_WIR_COUNT];
-    private static final ModelResourceLocation[] modelm_rls = new ModelResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
-    private static final ModelResourceLocation[] modelc_rls = new ModelResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
+    private static final ResourceLocation[] model_rls  = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_WIR_COUNT];
+    private static final ResourceLocation[] modelm_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
+    private static final ResourceLocation[] modelc_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
     private static final ArrayList<Vec3> power_rgb = new ArrayList<>();
     private static int tesr_error_counter = 4;
     private final BlockEntityRendererProvider.Context renderer_;
 
-    public static List<ModelResourceLocation> registerModels()
+    public static List<ResourceLocation> registerModels()
     {
-      List<ModelResourceLocation> resources_to_register = new ArrayList<>();
+      List<ResourceLocation> resources_to_register = new ArrayList<>();
 
       RedstoneTrack.defs.models.STATE_WIRE_MAPPING.entrySet().forEach((kv->{
-        final ModelResourceLocation mrl = new ModelResourceLocation(ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/"), "standalone");
+        final ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
         for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_WIR_COUNT; ++i) {
           if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_WIR_POS+i))) != 0) {
             model_rls[i] = mrl;
             break;
           }
         }
-        resources_to_register.add(mrl); //  net.neoforged.client.model.ForgeModelBakery.addSpecialModel(mrl);
+        resources_to_register.add(mrl);
       }));
       RedstoneTrack.defs.models.STATE_CONNECT_MAPPING.entrySet().forEach((kv->{
-        ModelResourceLocation mrl = new ModelResourceLocation(ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/"), "standalone");
+        ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
         for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_CON_COUNT; ++i) {
           if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_CON_POS+i))) != 0) {
             modelc_rls[i] = mrl;
@@ -68,7 +68,7 @@ public class ModRenderers
         resources_to_register.add(mrl);
       }));
       RedstoneTrack.defs.models.STATE_CNTWIRE_MAPPING.entrySet().forEach((kv->{
-        ModelResourceLocation mrl = new ModelResourceLocation(ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/"), "standalone");
+        ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
         for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_CON_COUNT; ++i) {
           if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_CON_POS+i))) != 0) {
             modelm_rls[i] = mrl;
@@ -112,7 +112,7 @@ public class ModRenderers
           for(int i=0; i<wirfc; ++i, flag<<=1) {
             if((wirfl & flag) == 0) continue;
             final Vec3 rgb = getPowerRGB(te.getSidePower(connections.CONNECTION_BIT_ORDER[i/4]));
-            final BakedModel model = Minecraft.getInstance().getModelManager().getModel(model_rls[i]);
+            final BakedModel model = PlatformServices.getRendering().getBakedModel(Minecraft.getInstance().getModelManager(), model_rls[i]);
             Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
               mxs.last(),
               vxb,
@@ -134,8 +134,8 @@ public class ModRenderers
             if(((wirfl & wir)==0) && ((confl & con)==0)) continue;
             final Vec3 rgb = getPowerRGB(te.getSidePower(connections.CONNECTION_BIT_ORDER[i]));
             final BakedModel model = ((confl & con)==0)
-              ? Minecraft.getInstance().getModelManager().getModel(modelm_rls[i])  // center model
-              : Minecraft.getInstance().getModelManager().getModel(modelc_rls[i]); // connection blob model
+              ? PlatformServices.getRendering().getBakedModel(Minecraft.getInstance().getModelManager(), modelm_rls[i])
+              : PlatformServices.getRendering().getBakedModel(Minecraft.getInstance().getModelManager(), modelc_rls[i]);
             Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
               mxs.last(),
               vxb,
