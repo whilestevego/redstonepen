@@ -45,12 +45,18 @@ dependencies {
 }
 
 // --- GameTest structures ----------------------------------------------------
-// Fabric's StructureTemplateManager reads from <world-dir>/generated/<namespace>/structures/.
-// Default level-name is "world", so world dir is run/world/.
+// Vanilla StructureUtils.testStructuresDir defaults to "gameteststructures" and
+// reads binary .nbt files from that flat directory (relative to game CWD = run/).
+// NeoForge patches StructureUtils to also read .snbt; vanilla/Fabric only reads .nbt.
 tasks.register('prepareGameTestStructures', Copy) {
   from rootProject.file('common/gameteststructures')
+  include '**/*.nbt'
+  // Fabric's StructureTemplateManager.detectManagedStructure() reads from world/generated/<ns>/structures/
+  // (not from the flat gameteststructures/ directory that NeoForge patches StructureUtils to read)
   into 'run/world/generated/redstonepen/structures'
 }
+
+tasks.named('runGameTestServer') { dependsOn 'prepareGameTestStructures' }
 
 // --- Shadow + Remap: produces a fat JAR embedding common classes -----------
 shadowJar {
