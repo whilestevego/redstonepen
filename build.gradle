@@ -38,9 +38,14 @@ tasks.register('verifyCoverage') {
 }
 
 // GameTest servers bind a network port — run them sequentially to avoid conflicts.
+// swapInInstrumentedClasses for both platforms touch the shared common devlibs JAR;
+// enforce full NeoForge swap→run→restore sequence before Fabric swap begins.
 gradle.projectsEvaluated {
   project(':fabric').tasks.named('runGameTestServer') {
     mustRunAfter project(':neoforge').tasks.named('runGameTestServer')
+  }
+  project(':fabric').tasks.named('swapInInstrumentedClasses') {
+    mustRunAfter project(':neoforge').tasks.named('restoreOriginalClasses')
   }
 }
 
