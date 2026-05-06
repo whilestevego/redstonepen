@@ -11,6 +11,13 @@ tasks.register('coverage') {
   dependsOn ':neoforge:coverage', ':fabric:coverage'
 }
 
+tasks.register('verifyCoverage') {
+  group = 'verification'
+  description = 'Generates JaCoCo reports and enforces coverage thresholds without re-running tests.'
+  dependsOn ':neoforge:jacocoTestReport', ':neoforge:jacocoTestCoverageVerification',
+            ':fabric:jacocoTestReport',   ':fabric:jacocoTestCoverageVerification'
+}
+
 // GameTest servers bind a network port — run them sequentially to avoid conflicts.
 gradle.projectsEvaluated {
   project(':fabric').tasks.named('runGameTestServer') {
