@@ -398,7 +398,11 @@ public class PenItemGameTests
   @GameTest(template = EMPTY, timeoutTicks = 5)
   public static void penDoesSneakBypassUse(GameTestHelper helper)
   {
-    // doesSneakBypassUse is a NeoForge-only Item extension; not available in Fabric API.
+    // Cast to BaseItem since Fabric's Item class doesn't expose doesSneakBypassUse.
+    final ItemStack pen = new ItemStack(Registries.getItem("pen"));
+    final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    if(!((wile.redstonepen.libmc.StandardItems.BaseItem)pen.getItem()).doesSneakBypassUse(pen, helper.getLevel(), helper.absolutePos(POS), player))
+      helper.fail("pen must bypass sneak use");
     helper.succeed();
   }
 
