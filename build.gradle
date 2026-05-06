@@ -5,14 +5,20 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
-// Root-level run aliases — delegate to NeoForge by default.
-// Use :fabric:runClient / :fabric:runServer for the Fabric platform.
+// Root-level platform-specific run aliases.
 gradle.projectsEvaluated {
-  ['runClient', 'runServer', 'runData'].each { taskName ->
-    if (project(':neoforge').tasks.findByName(taskName)) {
-      tasks.register(taskName) {
+  [
+    [name: 'runNeoForgeClient', task: 'runClient',  proj: ':neoforge'],
+    [name: 'runNeoForgeServer', task: 'runServer',  proj: ':neoforge'],
+    [name: 'runNeoForgeData',   task: 'runData',    proj: ':neoforge'],
+    [name: 'runFabricClient',   task: 'runClient',  proj: ':fabric'],
+    [name: 'runFabricServer',   task: 'runServer',  proj: ':fabric'],
+  ].each { entry ->
+    def target = project(entry.proj).tasks.findByName(entry.task)
+    if (target) {
+      tasks.register(entry.name) {
         group = 'fabric loom'
-        dependsOn project(':neoforge').tasks.named(taskName)
+        dependsOn target
       }
     }
   }
