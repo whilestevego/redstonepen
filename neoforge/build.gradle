@@ -331,8 +331,8 @@ jacocoTestCoverageVerification {
 
 tasks.register('coverage') {
   group = 'verification'
-  description = 'Runs unit tests (common) + GameTests (neoforge + fabric), produces merged JaCoCo report, and enforces coverage thresholds.'
-  dependsOn ':common:test', tasks.named('runGameTestServer'), ':fabric:runGameTestServer'
+  description = 'Runs unit tests (common) + NeoForge GameTests, produces merged JaCoCo report, and enforces coverage thresholds.'
+  dependsOn ':common:test', tasks.named('runGameTestServer')
   finalizedBy tasks.named('jacocoTestReport'), tasks.named('jacocoTestCoverageVerification')
 }
 

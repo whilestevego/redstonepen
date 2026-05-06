@@ -5,6 +5,19 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
+tasks.register('coverage') {
+  group = 'verification'
+  description = 'Runs all platform test suites and verifies JaCoCo coverage.'
+  dependsOn ':neoforge:coverage', ':fabric:runGameTestServer'
+}
+
+// GameTest servers bind a network port — run them sequentially to avoid conflicts.
+gradle.projectsEvaluated {
+  project(':fabric').tasks.named('runGameTestServer') {
+    mustRunAfter project(':neoforge').tasks.named('runGameTestServer')
+  }
+}
+
 subprojects {
   apply plugin: 'java'
   apply plugin: 'architectury-plugin'
