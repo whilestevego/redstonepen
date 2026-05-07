@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import wile.redstonepen.blocks.ControlBox.ControlBoxBlockEntity.TestHooks;
+import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity.TestHooks;
 
 class ControlBoxTest
 {

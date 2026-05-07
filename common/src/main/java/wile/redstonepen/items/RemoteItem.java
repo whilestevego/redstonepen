@@ -33,7 +33,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.ModConstants;
-import wile.redstonepen.blocks.ControlBox;
+import wile.redstonepen.blocks.controlbox.ControlBoxBlock;
+import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Overlay;
 import wile.redstonepen.libmc.StandardItems;
@@ -127,9 +128,9 @@ public class RemoteItem extends StandardItems.BaseItem
     } else if(block instanceof LeverBlock lever) {
       lever.pull(state, world, pos, null);
       sound.accept(SoundEvents.LEVER_CLICK, powered ? 1.3f : 1.5f);
-    } else if(block instanceof ControlBox.ControlBoxBlock) {
+    } else if(block instanceof ControlBoxBlock) {
       final BlockEntity te = world.getBlockEntity(pos);
-      if(!(te instanceof ControlBox.ControlBoxBlockEntity rlc)) { fail.run(); return; }
+      if(!(te instanceof ControlBoxBlockEntity rlc)) { fail.run(); return; }
       rlc.setEnabled(!rlc.getEnabled());
       sound.accept(SoundEvents.LEVER_CLICK, rlc.getEnabled() ? 1.5f : 1.3f);
     } else {
@@ -159,7 +160,7 @@ public class RemoteItem extends StandardItems.BaseItem
     if(!(stack.getItem() instanceof RemoteItem)) return false;
     if(!(player instanceof ServerPlayer splayer)) return false;
     final BlockState state = splayer.serverLevel().getBlockState(pos);
-    if((state.getBlock() instanceof LeverBlock) || (state.getBlock() instanceof ButtonBlock) || (state.getBlock() instanceof ControlBox.ControlBoxBlock) ) {
+    if((state.getBlock() instanceof LeverBlock) || (state.getBlock() instanceof ButtonBlock) || (state.getBlock() instanceof ControlBoxBlock) ) {
       final String name = state.getBlock().getDescriptionId();
       setRemoteData(stack, pos, name);
       Overlay.show(splayer, Auxiliaries.localizable("overlay.remote_saved", pos.getX(), pos.getY(), pos.getZ(), Component.translatable(name)), 1500);

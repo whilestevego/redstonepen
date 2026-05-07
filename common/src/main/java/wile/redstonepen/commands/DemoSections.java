@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.blocks.CircuitComponents;
-import wile.redstonepen.blocks.ControlBox;
+import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Registries;
 
@@ -256,7 +256,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(CONTROL_BOX_AND_PROGRAM);
       cbe.setEnabled(true); // Without this, the program never executes.
       cbe.setChanged();
@@ -466,7 +466,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(TRAFFIC_LIGHT_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
@@ -498,7 +498,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(PULSE_COUNTER_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
@@ -536,7 +536,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(SR_LATCH_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
@@ -574,7 +574,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(PWM_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
@@ -606,7 +606,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(STEP_SEQUENCER_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
@@ -645,7 +645,7 @@ public final class DemoSections
       controlBox.defaultBlockState()
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBox.ControlBoxBlockEntity cbe) {
+    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
       cbe.setCode(HOLD_TIMER_PROGRAM);
       cbe.setEnabled(true);
       cbe.setChanged();
