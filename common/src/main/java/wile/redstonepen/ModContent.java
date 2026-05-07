@@ -60,46 +60,11 @@ public class ModContent
       ControlBoxBlockEntity::new,
       ControlBoxUiContainer::new
     );
-    Registries.addBlock("relay",
-      ()->new CircuitComponents.RelayBlock(
-        StandardBlocks.CFG_CUTOUT,
-        BlockBehaviour.Properties.of().noCollission().instabreak(),
-        Auxiliaries.getPixeledAABB(5,0,0, 11,1,16)
-      ),
-      CircuitComponents.DirectedComponentBlockItem::new
-    );
-    Registries.addBlock("inverted_relay",
-      ()->new CircuitComponents.InvertedRelayBlock(
-        StandardBlocks.CFG_CUTOUT,
-        BlockBehaviour.Properties.of().noCollission().instabreak(),
-        Auxiliaries.getPixeledAABB(5,0,0, 11,1,16)
-      ),
-      CircuitComponents.DirectedComponentBlockItem::new
-    );
-    Registries.addBlock("pulse_relay",
-      ()->new CircuitComponents.PulseRelayBlock(
-        StandardBlocks.CFG_CUTOUT,
-        BlockBehaviour.Properties.of().noCollission().instabreak(),
-        Auxiliaries.getPixeledAABB(5,0,0, 11,1,16)
-      ),
-      CircuitComponents.DirectedComponentBlockItem::new
-    );
-    Registries.addBlock("bistable_relay",
-      ()->new CircuitComponents.BistableRelayBlock(
-        StandardBlocks.CFG_CUTOUT,
-        BlockBehaviour.Properties.of().noCollission().instabreak(),
-        Auxiliaries.getPixeledAABB(5,0,0, 11,1,16)
-      ),
-      CircuitComponents.DirectedComponentBlockItem::new
-    );
-    Registries.addBlock("bridge_relay",
-      ()->new CircuitComponents.BridgeRelayBlock(
-        StandardBlocks.CFG_CUTOUT,
-        BlockBehaviour.Properties.of().noCollission().instabreak(),
-        Auxiliaries.getPixeledAABB(5,0,0, 11,1,16)
-      ),
-      CircuitComponents.DirectedComponentBlockItem::new
-    );
+    Registries.addBlock("relay",         CircuitComponents.RelayBlock::new,         CircuitComponents.DirectedComponentBlockItem::new);
+    Registries.addBlock("inverted_relay", CircuitComponents.InvertedRelayBlock::new, CircuitComponents.DirectedComponentBlockItem::new);
+    Registries.addBlock("pulse_relay",    CircuitComponents.PulseRelayBlock::new,    CircuitComponents.DirectedComponentBlockItem::new);
+    Registries.addBlock("bistable_relay", CircuitComponents.BistableRelayBlock::new, CircuitComponents.DirectedComponentBlockItem::new);
+    Registries.addBlock("bridge_relay",   CircuitComponents.BridgeRelayBlock::new,   CircuitComponents.DirectedComponentBlockItem::new);
     Registries.addBlock("basic_gauge",
       ()->new BasicGauge.BasicGaugeBlock(
         StandardBlocks.CFG_TRANSLUCENT,
