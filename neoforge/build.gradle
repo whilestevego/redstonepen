@@ -217,8 +217,8 @@ def jacocoExcludes = [
   'wile/redstonepen/libmc/NetworkingClient*.class',
   'wile/api/rca/*ClientAdapter*.class',
   '**/*$Client*.class',
-  'wile/redstonepen/blocks/ControlBox$ControlBoxGui*.class',
-  'wile/redstonepen/blocks/ControlBox$ControlBoxUiContainer*.class',
+  'wile/redstonepen/blocks/controlbox/client/ControlBoxGui*.class',
+  'wile/redstonepen/blocks/controlbox/ControlBoxUiContainer*.class',
   'wile/redstonepen/libmc/Auxiliaries$Tooltip*.class',
   // Unused StandardBlocks utility-base subclasses
   'wile/redstonepen/libmc/StandardBlocks$Directed*.class',
@@ -248,7 +248,6 @@ def jacocoExcludes = [
   'wile/redstonepen/gametest/**',
   // Outer namespace wrappers with no executable logic
   'wile/redstonepen/blocks/RedstoneTrack.class',
-  'wile/redstonepen/blocks/ControlBox.class',
   'wile/redstonepen/blocks/CircuitComponents.class',
   'wile/redstonepen/blocks/BasicLever.class',
   'wile/redstonepen/blocks/BasicGauge.class',

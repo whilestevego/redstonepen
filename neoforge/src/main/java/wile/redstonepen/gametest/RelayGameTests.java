@@ -53,17 +53,18 @@ public class RelayGameTests
       "expected inverted relay to register its powered input"));
   }
 
-  @GameTest(template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 30)
+  @GameTest(template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
   public static void pulseRelayClearsItsPulseAfterTick(GameTestHelper helper)
   {
     placePoweredInput(helper, Registries.getBlock("pulse_relay"));
 
     helper.runAtTickTime(1, () -> assertRelayState(helper, Registries.getBlock("pulse_relay"), true, 1,
       "expected pulse relay to enter its pulsing state"));
-    helper.runAtTickTime(6, () -> assertRelayState(helper, Registries.getBlock("pulse_relay"), true, 0,
-      "expected pulse relay to clear its pulse after the scheduled tick"));
-    helper.succeedWhen(() -> assertRelayState(helper, Registries.getBlock("pulse_relay"), true, 0,
-      "expected pulse relay to settle back to an unlatched state"));
+    helper.runAtTickTime(4, () -> {
+      assertRelayState(helper, Registries.getBlock("pulse_relay"), true, 0,
+        "expected pulse relay to clear its pulse after the scheduled tick");
+      helper.succeed();
+    });
   }
 
   @GameTest(template = EMPTY_RELAY_TEMPLATE, timeoutTicks = 20)
