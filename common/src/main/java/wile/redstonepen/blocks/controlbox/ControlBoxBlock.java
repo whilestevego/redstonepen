@@ -92,7 +92,7 @@ public class ControlBoxBlock extends CircuitComponents.DirectedComponentBlock im
   {
     if(!(world.getBlockEntity(pos) instanceof ControlBoxBlockEntity cb)) return 0;
     final Direction internal_side = getReverseStateMappedFacing(state, redstone_side.getOpposite());
-    return (cb.logic_.output_data >> (4*internal_side.ordinal())) & 0xf;
+    return cb.getOutputSignal(internal_side);
   }
 
   @Override
@@ -125,7 +125,7 @@ public class ControlBoxBlock extends CircuitComponents.DirectedComponentBlock im
   {
     if(world.isClientSide) return state;
     if(!(world.getBlockEntity(pos) instanceof final ControlBoxBlockEntity cb)) return state;
-    if(fromPos==null) { cb.tick_timer_=0; return state; }
+    if(fromPos==null) { cb.scheduleImmediateTick(); return state; }
     final BlockPos dp = fromPos.subtract(pos);
     final Direction world_side = Direction.fromDelta(dp.getX(), dp.getY(), dp.getZ());
     if(world_side!=null) cb.signal_update(world_side, getReverseStateMappedFacing(state, world_side));

@@ -3,7 +3,6 @@ package wile.redstonepen.blocks.controlbox;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -85,35 +84,7 @@ public class ControlBoxUiContainer extends AbstractContainerMenu implements Netw
   }
 
   public CompoundTag composeServerData(ControlBoxBlockEntity te, boolean full)
-  {
-    final ControlBoxLogic.Logic logic = te().logic_;
-    final CompoundTag nbt = new CompoundTag();
-    nbt.putString("action", "serverdata");
-    nbt.putBoolean("enabled", te.getEnabled());
-    nbt.putInt("inputs", logic.input_mask);
-    nbt.putInt("outputs", logic.output_mask);
-    nbt.putInt("ports", (logic.input_data & logic.input_mask)|(logic.output_data & logic.output_mask));
-    if(!logic.symbols().isEmpty()) {
-      final CompoundTag sym_nbt = new CompoundTag();
-      logic.symbols().forEach(sym_nbt::putInt);
-      nbt.put("symbols", sym_nbt);
-    }
-    if(!logic.valid()) {
-      final CompoundTag err_nbt = new CompoundTag();
-      logic.errors().forEach((e,l)->err_nbt.putString(e.toString(), l));
-      nbt.put("errors", err_nbt);
-    } else {
-      nbt.put("errors", new CompoundTag());
-    }
-    if(!full) return nbt;
-    nbt.putBoolean("debug", te.trace_enabled());
-    nbt.putString("code", te.getCode());
-    if(te().activating_player_ != null) {
-      final Player run_player = world().getPlayerByUUID(te().activating_player_);
-      nbt.putString("player", (run_player == null) ? "" : run_player.getScoreboardName());
-    }
-    return nbt;
-  }
+  { return te.composeGuiData(full, world()); }
 
   public CompoundTag fetchReceivedServerData()
   {

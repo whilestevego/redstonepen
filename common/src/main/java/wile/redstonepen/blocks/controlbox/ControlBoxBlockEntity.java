@@ -34,11 +34,11 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
 {
   public static final int TICK_INTERVAL = 4;
   private final Container block_inventory_ = new SimpleContainer(1);
-  final ControlBoxLogic.Logic logic_ = new ControlBoxLogic.Logic();
-  UUID activating_player_ = null;
+  private final ControlBoxLogic.Logic logic_ = new ControlBoxLogic.Logic();
+  private UUID activating_player_ = null;
   private Component custom_name_ = null;
   private boolean trace_ = false;
-  int tick_timer_ = 0;
+  private int tick_timer_ = 0;
   private int tick_interval_ = 0;
 
   public ControlBoxBlockEntity(BlockPos pos, BlockState state)
@@ -222,6 +222,42 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
 
   public void setCode(String text)
   { logic_.code(text); }
+
+  public int getOutputSignal(Direction internalSide)
+  { return (logic_.output_data >> (4 * internalSide.ordinal())) & 0xf; }
+
+  void scheduleImmediateTick()
+  { tick_timer_ = 0; }
+
+  CompoundTag composeGuiData(boolean full, Level world)
+  {
+    final CompoundTag nbt = new CompoundTag();
+    nbt.putString("action", "serverdata");
+    nbt.putBoolean("enabled", getEnabled());
+    nbt.putInt("inputs", logic_.input_mask);
+    nbt.putInt("outputs", logic_.output_mask);
+    nbt.putInt("ports", (logic_.input_data & logic_.input_mask) | (logic_.output_data & logic_.output_mask));
+    if(!logic_.symbols().isEmpty()) {
+      final CompoundTag sym_nbt = new CompoundTag();
+      logic_.symbols().forEach(sym_nbt::putInt);
+      nbt.put("symbols", sym_nbt);
+    }
+    if(!logic_.valid()) {
+      final CompoundTag err_nbt = new CompoundTag();
+      logic_.errors().forEach((e,l)->err_nbt.putString(e.toString(), l));
+      nbt.put("errors", err_nbt);
+    } else {
+      nbt.put("errors", new CompoundTag());
+    }
+    if(!full) return nbt;
+    nbt.putBoolean("debug", trace_enabled());
+    nbt.putString("code", getCode());
+    if(activating_player_ != null) {
+      final Player run_player = world.getPlayerByUUID(activating_player_);
+      nbt.putString("player", (run_player == null) ? "" : run_player.getScoreboardName());
+    }
+    return nbt;
+  }
 
   public void signal_update(Direction from_world_side, Direction from_mapped_side)
   {
