@@ -450,12 +450,19 @@ public class CircuitComponents
 
   }
 
+  static final AABB RELAY_AABB = Auxiliaries.getPixeledAABB(5, 0, 0, 11, 1, 16);
+  static BlockBehaviour.Properties relayProperties()
+  { return BlockBehaviour.Properties.of().noCollission().instabreak(); }
+
   //--------------------------------------------------------------------------------------------------------------------
   // RelayBlock
   //--------------------------------------------------------------------------------------------------------------------
 
   public static class RelayBlock extends DirectedComponentBlock
   {
+    public RelayBlock()
+    { this(StandardBlocks.CFG_CUTOUT, relayProperties(), RELAY_AABB); }
+
     protected boolean isPowered(BlockState state, Level world, BlockPos pos)
     {
       final Direction output_side = getOutputFacing(state);
@@ -512,6 +519,9 @@ public class CircuitComponents
 
   public static class InvertedRelayBlock extends RelayBlock
   {
+    public InvertedRelayBlock()
+    { super(StandardBlocks.CFG_CUTOUT, relayProperties(), RELAY_AABB); }
+
     public InvertedRelayBlock(long config, BlockBehaviour.Properties builder, AABB aabb)
     { super(config, builder, aabb); }
 
@@ -552,6 +562,9 @@ public class CircuitComponents
 
   public static class BistableRelayBlock extends RelayBlock
   {
+    public BistableRelayBlock()
+    { super(StandardBlocks.CFG_CUTOUT, relayProperties(), RELAY_AABB); }
+
     public BistableRelayBlock(long config, BlockBehaviour.Properties builder, AABB aabb)
     { super(config, builder, aabb); }
 
@@ -587,6 +600,9 @@ public class CircuitComponents
 
   public static class PulseRelayBlock extends RelayBlock
   {
+    public PulseRelayBlock()
+    { super(StandardBlocks.CFG_CUTOUT, relayProperties(), RELAY_AABB); }
+
     public PulseRelayBlock(long config, BlockBehaviour.Properties builder, AABB aabb)
     { super(config, builder, aabb); }
 
@@ -632,6 +648,9 @@ public class CircuitComponents
   public static class BridgeRelayBlock extends RelayBlock
   {
     private int power_update_recursion_level_ = 0;
+
+    public BridgeRelayBlock()
+    { super(StandardBlocks.CFG_CUTOUT, relayProperties(), RELAY_AABB); }
 
     public BridgeRelayBlock(long config, BlockBehaviour.Properties builder, AABB aabb)
     { super(config, builder, aabb); }
