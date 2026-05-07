@@ -347,26 +347,26 @@ class ControlBoxLogic
 
   static class MultiLineMathExpr
   {
-    public static final MultiLineMathExpr EMPTY = new MultiLineMathExpr();
+    static final MultiLineMathExpr EMPTY = new MultiLineMathExpr();
     static final String[] VALID_SYMBOL_SUFFIXES = { "", ".re", ".fe", ".co", ".co.re", ".co.fe", ".pt", ".et" }; // comparator override, edges, timers
 
-    public static class Entry
+    static class Entry
     {
-      public final int line_index, offset;
-      public final MathExpr.ParsedLine parsed;
-      public int last_result = 0;
+      final int line_index, offset;
+      final MathExpr.ParsedLine parsed;
+      int last_result = 0;
 
-      public Entry(int line_index, int offset, MathExpr.ParsedLine parsed)
+      Entry(int line_index, int offset, MathExpr.ParsedLine parsed)
       { this.line_index=line_index; this.offset=offset; this.parsed=parsed; }
     }
 
-    public static MultiLineMathExpr of(String code)
+    static MultiLineMathExpr of(String code)
     { return of(code, "", Collections.emptyList()); }
 
-    public static MultiLineMathExpr of(String code, String assignment_variable)
+    static MultiLineMathExpr of(String code, String assignment_variable)
     { return of(code, assignment_variable, Collections.emptyList()); }
 
-    public static MultiLineMathExpr of(String code, String assignment_variable, Collection<MathExpr.ExprFuncDef> functions)
+    static MultiLineMathExpr of(String code, String assignment_variable, Collection<MathExpr.ExprFuncDef> functions)
     {
       if(code.trim().isEmpty()) return EMPTY;
       final List<Entry> entries = new ArrayList<>();
@@ -408,16 +408,16 @@ class ControlBoxLogic
       return (entries.isEmpty() && parse_errors.isEmpty()) ? EMPTY : (new MultiLineMathExpr(entries, parse_errors, symbols, assignments));
     }
 
-    public MultiLineMathExpr()
+    MultiLineMathExpr()
     { this(Collections.emptyList(), Collections.emptyList(), Collections.emptySet(), Collections.emptySet()); }
 
-    public MultiLineMathExpr(List<Entry> lines, List<Entry> parse_error_entries, Set<String> symbols, Set<String> assignments)
+    MultiLineMathExpr(List<Entry> lines, List<Entry> parse_error_entries, Set<String> symbols, Set<String> assignments)
     { this.entries=lines; this.invalid_entries=parse_error_entries; this.symbols=symbols; this.assignments=assignments; }
 
-    public boolean isEmpty()
+    boolean isEmpty()
     { return entries.isEmpty(); }
 
-    public Map<String,Integer> recalculate(Map<String,Integer> mem, BiFunction<Entry, Map<String,Integer>, Integer> assignment_post_processor)
+    Map<String,Integer> recalculate(Map<String,Integer> mem, BiFunction<Entry, Map<String,Integer>, Integer> assignment_post_processor)
     {
       final Map<String,Integer> assigned = new HashMap<>();
       for(var entry:entries) {
@@ -429,56 +429,56 @@ class ControlBoxLogic
       return assigned;
     }
 
-    public final List<Entry> entries;
-    public final List<Entry> invalid_entries;
-    public final Set<String> symbols;
-    public final Set<String> assignments;
+    final List<Entry> entries;
+    final List<Entry> invalid_entries;
+    final Set<String> symbols;
+    final Set<String> assignments;
   }
 
   static class MathExpr
   {
-    public enum ExprType { VOID, CONST, VARREF, FUNC, NEG, NOT, MPY, DIV, MOD, ADD, SUB, AND, OR, XOR, NEQ, EQ, LE, GE, LT, GT, ASSIGN }
+    enum ExprType { VOID, CONST, VARREF, FUNC, NEG, NOT, MPY, DIV, MOD, ADD, SUB, AND, OR, XOR, NEQ, EQ, LE, GE, LT, GT, ASSIGN }
 
-    public static class Expr
+    static class Expr
     {
-      public static final Expr EMPTY = new Expr(ExprType.VOID, "<EMPTY>");
+      static final Expr EMPTY = new Expr(ExprType.VOID, "<EMPTY>");
       protected Expr(ExprType type, String name) { this.type=type; this.name=name; }
-      public int calc(Map<String, Integer> mem) { return 0; }
+      int calc(Map<String, Integer> mem) { return 0; }
       public String toString() { return "{VOID}"; }
-      public final ExprType type;
-      public final String name;
+      final ExprType type;
+      final String name;
       //-------------------------------
-      public static int bool_true()  { return 15; }
-      public static int bool_false() { return 0; }
-      public static int assignment_sanitize(int x) { return x; }
+      static int bool_true()  { return 15; }
+      static int bool_false() { return 0; }
+      static int assignment_sanitize(int x) { return x; }
     }
 
-    public static abstract class ExprOp extends Expr
+    static abstract class ExprOp extends Expr
     {
-      public ExprOp(ExprType type, List<Expr> args) { super(type, type.toString()); arguments=args; }
-      public abstract int calc(Map<String, Integer> mem);
+      ExprOp(ExprType type, List<Expr> args) { super(type, type.toString()); arguments=args; }
+      abstract int calc(Map<String, Integer> mem);
       public String toString() { return name+"{" + arguments.stream().map(Object::toString).collect(Collectors.joining(",")) + "}"; }
-      public final List<Expr> arguments;
+      final List<Expr> arguments;
     }
 
-    public static class ExprConst extends Expr
+    static class ExprConst extends Expr
     {
-      public ExprConst(int val) { super(ExprType.CONST, "<CONST>"); value=val; }
-      public int calc(Map<String, Integer> mem) { return value; }
+      ExprConst(int val) { super(ExprType.CONST, "<CONST>"); value=val; }
+      int calc(Map<String, Integer> mem) { return value; }
       public String toString() { return "CONST{"+value+"}"; }
       private final int value;
     }
 
-    public static class ExprVarRef extends Expr
+    static class ExprVarRef extends Expr
     {
-      public ExprVarRef(String ref) { super(ExprType.VARREF, ref); }
-      public int calc(Map<String, Integer> mem) { return mem.getOrDefault(name, 0); }
+      ExprVarRef(String ref) { super(ExprType.VARREF, ref); }
+      int calc(Map<String, Integer> mem) { return mem.getOrDefault(name, 0); }
       public String toString() { return "SYM{'"+name+"'}"; }
     }
 
-    public static class ExprFunc extends Expr
+    static class ExprFunc extends Expr
     {
-      public ExprFunc(String name, int nargs, BiFunction<Expr[], Map<String, Integer>, Integer> fn, List<Expr> args)
+      ExprFunc(String name, int nargs, BiFunction<Expr[], Map<String, Integer>, Integer> fn, List<Expr> args)
       {
         super(ExprType.FUNC, name);
         arguments = args;
@@ -486,115 +486,115 @@ class ControlBoxLogic
         this.num_arguments = nargs;
         if((nargs >= 0) && (nargs != args.size())) throw new RuntimeException("invalid_number_of_arguments");
       }
-      public int calc(Map<String, Integer> mem) { return func.apply(arguments.toArray(new Expr[0]), mem); }
+      int calc(Map<String, Integer> mem) { return func.apply(arguments.toArray(new Expr[0]), mem); }
       public String toString() { return "FN{'"+name+"'(" + arguments.stream().map(Object::toString).collect(Collectors.joining(",")) + ")}"; }
-      public int nargs() { return num_arguments; }
+      int nargs() { return num_arguments; }
       protected final List<Expr> arguments;
       protected final int num_arguments;
       private final BiFunction<Expr[], Map<String, Integer>, Integer> func;
     }
 
-    public static class ExprNeg extends ExprOp
+    static class ExprNeg extends ExprOp
     {
-      public ExprNeg(List<Expr> args) { super(ExprType.NEG, args); }
-      public int calc(Map<String, Integer> mem) { return -arguments.get(0).calc(mem); }
+      ExprNeg(List<Expr> args) { super(ExprType.NEG, args); }
+      int calc(Map<String, Integer> mem) { return -arguments.get(0).calc(mem); }
     }
 
-    public static class ExprNot extends ExprOp
+    static class ExprNot extends ExprOp
     {
-      public ExprNot(List<Expr> args) { super(ExprType.NOT, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem)==0) ? bool_true() : bool_false(); }
+      ExprNot(List<Expr> args) { super(ExprType.NOT, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem)==0) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprMpy extends ExprOp
+    static class ExprMpy extends ExprOp
     {
-      public ExprMpy(List<Expr> args) { super(ExprType.MPY, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) * arguments.get(1).calc(mem)); }
+      ExprMpy(List<Expr> args) { super(ExprType.MPY, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) * arguments.get(1).calc(mem)); }
     }
 
-    public static class ExprDiv extends ExprOp
+    static class ExprDiv extends ExprOp
     {
-      public ExprDiv(List<Expr> args) { super(ExprType.DIV, args); }
-      public int calc(Map<String, Integer> mem) { int b=arguments.get(1).calc(mem); return (b<=0) ? (0) : (arguments.get(0).calc(mem)/b); }
+      ExprDiv(List<Expr> args) { super(ExprType.DIV, args); }
+      int calc(Map<String, Integer> mem) { int b=arguments.get(1).calc(mem); return (b<=0) ? (0) : (arguments.get(0).calc(mem)/b); }
     }
 
-    public static class ExprMod extends ExprOp
+    static class ExprMod extends ExprOp
     {
-      public ExprMod(List<Expr> args) { super(ExprType.MOD, args); }
-      public int calc(Map<String, Integer> mem) { int b=arguments.get(1).calc(mem); return (b<=0) ? (0) : (arguments.get(0).calc(mem)%b); }
+      ExprMod(List<Expr> args) { super(ExprType.MOD, args); }
+      int calc(Map<String, Integer> mem) { int b=arguments.get(1).calc(mem); return (b<=0) ? (0) : (arguments.get(0).calc(mem)%b); }
     }
 
-    public static class ExprAdd extends ExprOp
+    static class ExprAdd extends ExprOp
     {
-      public ExprAdd(List<Expr> args) { super(ExprType.ADD, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) + arguments.get(1).calc(mem)); }
+      ExprAdd(List<Expr> args) { super(ExprType.ADD, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) + arguments.get(1).calc(mem)); }
     }
 
-    public static class ExprSub extends ExprOp
+    static class ExprSub extends ExprOp
     {
-      public ExprSub(List<Expr> args) { super(ExprType.SUB, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) - arguments.get(1).calc(mem)); }
+      ExprSub(List<Expr> args) { super(ExprType.SUB, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) - arguments.get(1).calc(mem)); }
     }
 
-    public static class ExprAnd extends ExprOp
+    static class ExprAnd extends ExprOp
     {
-      public ExprAnd(List<Expr> args) { super(ExprType.AND, args); }
-      public int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) && (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
+      ExprAnd(List<Expr> args) { super(ExprType.AND, args); }
+      int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) && (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprOr extends ExprOp
+    static class ExprOr extends ExprOp
     {
-      public ExprOr(List<Expr> args) { super(ExprType.OR, args); }
-      public int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) || (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
+      ExprOr(List<Expr> args) { super(ExprType.OR, args); }
+      int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) || (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprXor extends ExprOp
+    static class ExprXor extends ExprOp
     {
-      public ExprXor(List<Expr> args) { super(ExprType.XOR, args); }
-      public int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) ^ (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
+      ExprXor(List<Expr> args) { super(ExprType.XOR, args); }
+      int calc(Map<String, Integer> mem) { return ((arguments.get(0).calc(mem)>0) ^ (arguments.get(1).calc(mem)>0)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprNeq extends ExprOp
+    static class ExprNeq extends ExprOp
     {
-      public ExprNeq(List<Expr> args) { super(ExprType.NEQ, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) != arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprNeq(List<Expr> args) { super(ExprType.NEQ, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) != arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprEq extends ExprOp
+    static class ExprEq extends ExprOp
     {
-      public ExprEq(List<Expr> args) { super(ExprType.EQ, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) == arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprEq(List<Expr> args) { super(ExprType.EQ, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) == arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprGe extends ExprOp
+    static class ExprGe extends ExprOp
     {
-      public ExprGe(List<Expr> args) { super(ExprType.GE, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) >= arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprGe(List<Expr> args) { super(ExprType.GE, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) >= arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprLe extends ExprOp
+    static class ExprLe extends ExprOp
     {
-      public ExprLe(List<Expr> args) { super(ExprType.LE, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) <= arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprLe(List<Expr> args) { super(ExprType.LE, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) <= arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprGt extends ExprOp
+    static class ExprGt extends ExprOp
     {
-      public ExprGt(List<Expr> args) { super(ExprType.GT, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) > arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprGt(List<Expr> args) { super(ExprType.GT, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) > arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprLt extends ExprOp
+    static class ExprLt extends ExprOp
     {
-      public ExprLt(List<Expr> args) { super(ExprType.LT, args); }
-      public int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) < arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
+      ExprLt(List<Expr> args) { super(ExprType.LT, args); }
+      int calc(Map<String, Integer> mem) { return (arguments.get(0).calc(mem) < arguments.get(1).calc(mem)) ? bool_true() : bool_false(); }
     }
 
-    public static class ExprAssign extends Expr
+    static class ExprAssign extends Expr
     {
-      public final Expr value;
-      public ExprAssign(String ref, Expr value) { super(ExprType.ASSIGN, ref); this.value=value; }
-      public int calc(Map<String, Integer> mem) {
+      final Expr value;
+      ExprAssign(String ref, Expr value) { super(ExprType.ASSIGN, ref); this.value=value; }
+      int calc(Map<String, Integer> mem) {
         final int res = value.calc(mem);
         if(!name.isEmpty()) { mem.put(name, res); }
         return res;
@@ -602,33 +602,33 @@ class ControlBoxLogic
       public String toString() { return "ASSIGN{'"+name+"'," + value + "}"; }
     }
 
-    public static class ExprFuncDef
+    static class ExprFuncDef
     {
       ExprFuncDef(String name, int nargs, BiFunction<Expr[], Map<String, Integer>, Integer> func) { this.name=name; this.func=func; this.nargs=nargs; }
-      public final String name;
-      public final BiFunction<Expr[], Map<String, Integer>, Integer> func;
-      public final int nargs;
+      final String name;
+      final BiFunction<Expr[], Map<String, Integer>, Integer> func;
+      final int nargs;
     }
 
-    public static class ParsedLine
+    static class ParsedLine
     {
-      public final Expr expression;
-      public final String assignment_symbol;
-      public final String line;
-      public final Set<String> symbols = new HashSet<>();
+      final Expr expression;
+      final String assignment_symbol;
+      final String line;
+      final Set<String> symbols = new HashSet<>();
 
-      public String error;
-      public int pe = -1;
-      public char c = ' ';
-      public final Map<String, ExprFuncDef> functions = new HashMap<>();
+      String error;
+      int pe = -1;
+      char c = ' ';
+      final Map<String, ExprFuncDef> functions = new HashMap<>();
 
-      public static ParsedLine of(String line)
+      static ParsedLine of(String line)
       { return of(line, ""); }
 
-      public static ParsedLine of(String line, String default_assignment_variable)
+      static ParsedLine of(String line, String default_assignment_variable)
       { return of(line, default_assignment_variable, Collections.emptyList()); }
 
-      public static ParsedLine of(String line, String default_assignment_variable, Collection<ExprFuncDef> functions)
+      static ParsedLine of(String line, String default_assignment_variable, Collection<ExprFuncDef> functions)
       { return new ParsedLine(line, default_assignment_variable, functions); }
 
       public String toString()
