@@ -69,6 +69,17 @@ public class CircuitComponents
     private static final List<Direction> facing_mapping_ = make_facing_mappings();
     private static final Direction[][][] facing_fwd_state_mapping_ = new Direction[6][4][6];
     private static final Direction[][][] facing_rev_state_mapping_ = new Direction[6][4][6];
+    // Placement rotation indexed by [face.ordinal()][hit-direction.ordinal()].
+    // Mirrors the rotation→direction order defined in make_facing_mappings().
+    //   columns: DOWN=0, UP=1, NORTH=2, SOUTH=3, WEST=4, EAST=5
+    private static final int[][] PLACEMENT_ROTATION = {
+      /* DOWN  */ { 0, 0, 0, 2, 3, 1 },
+      /* UP    */ { 0, 0, 0, 2, 3, 1 },
+      /* NORTH */ { 2, 0, 0, 0, 3, 1 },
+      /* SOUTH */ { 2, 0, 0, 0, 1, 3 },
+      /* WEST  */ { 2, 0, 1, 3, 0, 0 },
+      /* EAST  */ { 2, 0, 3, 1, 0, 0 },
+    };
     protected final Map<BlockState, VoxelShape> shapes_ = new HashMap<>();
 
     private static List<Direction> make_facing_mappings()
@@ -251,6 +262,9 @@ public class CircuitComponents
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rnd)
     {}
 
+    static int placementRotation(Direction face, Direction dir)
+    { return PLACEMENT_ROTATION[face.ordinal()][dir.ordinal()]; }
+
     @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context)
@@ -265,50 +279,7 @@ public class CircuitComponents
         default -> hit_r.multiply(1, 0, 1);
       };
       final Direction dir = Direction.getNearest(hit.x(), hit.y(), hit.z());
-      int rotation = 0;
-      switch(face) {
-        case DOWN:
-        case UP:
-          switch(dir) {
-            case EAST  -> rotation = 1;
-            case SOUTH -> rotation = 2;
-            case WEST  -> rotation = 3;
-            default    -> {}
-          }
-          break;
-        case NORTH:
-          switch(dir) {
-            case EAST -> rotation = 1;
-            case DOWN -> rotation = 2;
-            case WEST -> rotation = 3;
-            default   -> {}
-          }
-          break;
-        case EAST:
-          switch(dir) {
-            case SOUTH -> rotation = 1;
-            case DOWN  -> rotation = 2;
-            case NORTH -> rotation = 3;
-            default    -> {}
-          }
-          break;
-        case SOUTH:
-          switch(dir) {
-            case WEST -> rotation = 1;
-            case DOWN -> rotation = 2;
-            case EAST -> rotation = 3;
-            default   -> {}
-          }
-          break;
-        case WEST:
-          switch(dir) {
-            case NORTH -> rotation = 1;
-            case DOWN  -> rotation = 2;
-            case SOUTH -> rotation = 3;
-            default    -> {}
-          }
-          break;
-      }
+      final int rotation = placementRotation(face, dir);
       state = state.setValue(FACING, face).setValue(ROTATION, rotation).setValue(POWERED, false).setValue(STATE,0);
       if(!canSurvive(state, context.getLevel(), context.getClickedPos())) return null;
       return state;
