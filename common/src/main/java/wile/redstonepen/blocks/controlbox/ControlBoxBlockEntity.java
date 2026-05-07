@@ -228,7 +228,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
   void scheduleImmediateTick()
   { tick_timer_ = 0; }
 
-  CompoundTag composeGuiData(boolean full)
+  CompoundTag collectSyncData(boolean full)
   {
     final Level world = getLevel();
     final CompoundTag nbt = new CompoundTag();

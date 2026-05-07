@@ -84,7 +84,7 @@ public class ControlBoxUiContainer extends AbstractContainerMenu implements Netw
   }
 
   public CompoundTag composeServerData(ControlBoxBlockEntity te, boolean full)
-  { return te.composeGuiData(full); }
+  { return te.collectSyncData(full); }
 
   public CompoundTag fetchReceivedServerData()
   {
