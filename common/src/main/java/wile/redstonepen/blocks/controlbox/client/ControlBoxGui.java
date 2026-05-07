@@ -1,4 +1,4 @@
-package wile.redstonepen.blocks.controlbox;
+package wile.redstonepen.blocks.controlbox.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -10,6 +10,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import wile.redstonepen.ModContent;
+import wile.redstonepen.blocks.controlbox.Defs;
+import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Guis;
 import wile.redstonepen.libmc.GuiTextEditing;

@@ -218,7 +218,7 @@ class ControlBoxLogic
     }
 
     private static final List<MathExpr.ExprFuncDef> functions_ = make_functions();
-    Map<String,Integer> symbols_ = new HashMap<>();
+    private Map<String,Integer> symbols_ = new HashMap<>();
     private MultiLineMathExpr expressions_ = MultiLineMathExpr.EMPTY;
     private String code_ = "";
 
@@ -239,6 +239,9 @@ class ControlBoxLogic
 
     public Map<String,Integer> symbols()
     { return symbols_; }
+
+    void clearSymbols()
+    { symbols_.clear(); }
 
     public String code()
     { return code_; }

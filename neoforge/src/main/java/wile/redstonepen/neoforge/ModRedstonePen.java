@@ -28,7 +28,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import wile.redstonepen.blocks.controlbox.ControlBoxGui;
+import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Auxiliaries;

@@ -53,8 +53,8 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
     logic_.input_data = logic_data.getInt("input");
     logic_.output_data = logic_data.getInt("output");
     final CompoundTag logic_symbols = logic_data.contains("symbols", Tag.TAG_COMPOUND) ? logic_data.getCompound("symbols") : new CompoundTag();
-    logic_.symbols_.clear();
-    logic_symbols.getAllKeys().forEach(k->logic_.symbols_.put(k, logic_symbols.getInt(k)));
+    logic_.clearSymbols();
+    logic_symbols.getAllKeys().forEach(k->logic_.symbol(k, logic_symbols.getInt(k)));
     activating_player_ = nbt.hasUUID("player") ? nbt.getUUID("player") : null;
     return nbt;
   }
@@ -68,7 +68,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
     logic_data.putInt("input", logic_.input_data);
     logic_data.putInt("output", logic_.output_data);
     final CompoundTag logic_symbols = new CompoundTag();
-    for(var e:logic_.symbols_.entrySet()) logic_symbols.putInt(e.getKey(), e.getValue());
+    logic_.symbols().forEach(logic_symbols::putInt);
     logic_data.put("symbols", logic_symbols);
     nbt.put("logic", logic_data);
     if(activating_player_ != null) nbt.putUUID("player", activating_player_);
@@ -208,7 +208,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
     getLevel().setBlock(getBlockPos(), getBlockState().setValue(ControlBoxBlock.STATE, en?1:0), 1|2|16);
     getLevel().setBlock(getBlockPos(), getBlockState().setValue(ControlBoxBlock.POWERED, en), 1|2|16);
     if(!en) {
-      logic_.symbols_.clear();
+      logic_.clearSymbols();
       final RcaSync.RcaData rca_data = ((logic_.rca_output_mask)==0) ? (RcaSync.CommonRca.EMPTY) : RcaSync.CommonRca.ofPlayer(activating_player_, false);
       if(rca_data != RcaSync.CommonRca.EMPTY) rca_data.server_outputs(0);
     }

@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import wile.redstonepen.ModContent;
-import wile.redstonepen.blocks.controlbox.ControlBoxGui;
+import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.NetworkingClient;
