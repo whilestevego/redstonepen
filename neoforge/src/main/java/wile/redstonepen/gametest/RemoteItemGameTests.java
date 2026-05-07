@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
-import wile.redstonepen.blocks.ControlBox;
+import wile.redstonepen.blocks.controlbox.*;
 import wile.redstonepen.items.RemoteItem;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Registries;

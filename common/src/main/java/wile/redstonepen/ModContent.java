@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import wile.redstonepen.blocks.*;
+import wile.redstonepen.blocks.controlbox.*;
 import wile.redstonepen.items.RedstonePenItem;
 import wile.redstonepen.items.RemoteItem;
 import wile.redstonepen.libmc.StandardBlocks;
@@ -44,7 +45,7 @@ public class ModContent
       RedstoneTrack.TrackBlockEntity::new
     );
     Registries.addBlock("control_box",
-      ()->new ControlBox.ControlBoxBlock(
+      ()->new ControlBoxBlock(
         StandardBlocks.CFG_CUTOUT,
         BlockBehaviour.Properties.of().noCollission().instabreak(),
         new AABB[]{
@@ -53,8 +54,8 @@ public class ModContent
         }
       ),
       CircuitComponents.DirectedComponentBlockItem::new,
-      ControlBox.ControlBoxBlockEntity::new,
-      ControlBox.ControlBoxUiContainer::new
+      ControlBoxBlockEntity::new,
+      ControlBoxUiContainer::new
     );
     Registries.addBlock("relay",
       ()->new CircuitComponents.RelayBlock(
@@ -139,7 +140,7 @@ public class ModContent
   {
     references.TRACK_BLOCK = (RedstoneTrack.RedstoneTrackBlock)Registries.getBlock("track");
     references.BRIDGE_RELAY_BLOCK = (CircuitComponents.BridgeRelayBlock)Registries.getBlock("bridge_relay");
-    references.CONTROLBOX_BLOCK = (ControlBox.ControlBoxBlock)Registries.getBlock("control_box");
+    references.CONTROLBOX_BLOCK = (ControlBoxBlock)Registries.getBlock("control_box");
     references.BASIC_GAUGE_BLOCK = (BasicGauge.BasicGaugeBlock)Registries.getBlock("basic_gauge");
   }
 
@@ -163,7 +164,7 @@ public class ModContent
   {
     public static RedstoneTrack.RedstoneTrackBlock TRACK_BLOCK = null;
     public static CircuitComponents.BridgeRelayBlock BRIDGE_RELAY_BLOCK = null;
-    public static ControlBox.ControlBoxBlock CONTROLBOX_BLOCK = null;
+    public static ControlBoxBlock CONTROLBOX_BLOCK = null;
     public static BasicGauge.BasicGaugeBlock BASIC_GAUGE_BLOCK = null;
   }
 

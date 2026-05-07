@@ -28,7 +28,8 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import wile.redstonepen.blocks.ControlBox;
+import wile.redstonepen.blocks.controlbox.ControlBoxGui;
+import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.blocks.RedstoneTrack;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Networking;
@@ -106,7 +107,7 @@ public class ModRedstonePen
     @SuppressWarnings({"unchecked"})
     public static void onRegisterMenuScreens(final RegisterMenuScreensEvent event)
     {
-      event.register((MenuType<ControlBox.ControlBoxUiContainer>)Registries.getMenuTypeOfBlock("control_box"), ControlBox.ControlBoxGui::new);
+      event.register((MenuType<ControlBoxUiContainer>)Registries.getMenuTypeOfBlock("control_box"), ControlBoxGui::new);
     }
 
     @SubscribeEvent
