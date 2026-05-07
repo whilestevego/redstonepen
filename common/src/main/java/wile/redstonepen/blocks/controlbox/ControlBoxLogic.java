@@ -345,7 +345,7 @@ class ControlBoxLogic
     rca_output_data &= rca_output_mask;
   }
 
-  public static class MultiLineMathExpr
+  static class MultiLineMathExpr
   {
     public static final MultiLineMathExpr EMPTY = new MultiLineMathExpr();
     static final String[] VALID_SYMBOL_SUFFIXES = { "", ".re", ".fe", ".co", ".co.re", ".co.fe", ".pt", ".et" }; // comparator override, edges, timers
@@ -435,7 +435,7 @@ class ControlBoxLogic
     public final Set<String> assignments;
   }
 
-  public static class MathExpr
+  static class MathExpr
   {
     public enum ExprType { VOID, CONST, VARREF, FUNC, NEG, NOT, MPY, DIV, MOD, ADD, SUB, AND, OR, XOR, NEQ, EQ, LE, GE, LT, GT, ASSIGN }
 
