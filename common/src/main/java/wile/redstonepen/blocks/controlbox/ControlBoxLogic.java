@@ -8,16 +8,16 @@ import java.util.stream.Collectors;
 
 class ControlBoxLogic
 {
-  public int input_mask  = 0x00000000;  // 24bit, direction ordinal nibbles
-  public int input_data  = 0x00000000;
-  public int output_mask = 0x00000000;
-  public int output_data = 0x00000000;
-  public int intr_redges = 0x00000000;  // Rising edges seen between logic ticks
-  public int intr_fedges = 0x00000000;  // Falling edges seen between logic ticks
-  public long rca_input_mask  = 0;      // 64bit, direction ordinal nibbles
-  public long rca_input_data  = 0;
-  public long rca_output_mask = 0;
-  public long rca_output_data = 0;
+  int input_mask  = 0x00000000;  // 24bit, direction ordinal nibbles
+  int input_data  = 0x00000000;
+  int output_mask = 0x00000000;
+  int output_data = 0x00000000;
+  int intr_redges = 0x00000000;  // Rising edges seen between logic ticks
+  int intr_fedges = 0x00000000;  // Falling edges seen between logic ticks
+  long rca_input_mask  = 0;      // 64bit, direction ordinal nibbles
+  long rca_input_data  = 0;
+  long rca_output_mask = 0;
+  long rca_output_data = 0;
 
   private static int counter_function(String sym, MathExpr.Expr[] x, Map<String, Integer> m)
   {
