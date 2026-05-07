@@ -29,6 +29,7 @@ import wile.redstonepen.libmc.PlatformServices;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.WeakHashMap;
 
 
 public class ModRenderers
@@ -40,7 +41,7 @@ public class ModRenderers
     private static final ResourceLocation[] modelm_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
     private static final ResourceLocation[] modelc_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
     private static final ArrayList<Vec3> power_rgb = new ArrayList<>();
-    private static int tesr_error_counter = 4;
+    private final WeakHashMap<RedstoneTrack.TrackBlockEntity, Long> broken_entities_ = new WeakHashMap<>();
     private final BlockEntityRendererProvider.Context renderer_;
 
     public static List<ResourceLocation> registerModels()
@@ -99,12 +100,13 @@ public class ModRenderers
     @SuppressWarnings("deprecation")
     public void render(final RedstoneTrack.TrackBlockEntity te, float unused1, PoseStack mxs, MultiBufferSource buf, int combinedLightIn, int combinedOverlayIn)
     {
-      if(tesr_error_counter <= 0) return;
+      final long current_flags = te.getStateFlags();
+      if(broken_entities_.getOrDefault(te, ~current_flags) == current_flags) return;
+      mxs.pushPose();
       try {
         final BlockState block_state = te.getBlockState();
         final VertexConsumer vxb = buf.getBuffer(ItemBlockRenderTypes.getRenderType(block_state, false));
         combinedOverlayIn = OverlayTexture.pack(0, 0);
-        mxs.pushPose();
         {
           final int wirfl = te.getWireFlags();
           final int wirfc = te.getWireFlagCount();
@@ -148,12 +150,14 @@ public class ModRenderers
           }
         }
       } catch(Throwable e) {
-        if(--tesr_error_counter<=0) {
-          Auxiliaries.logError("TER was disabled because broken, exception was: " + e.getMessage());
+        if(!broken_entities_.containsKey(te)) {
+          Auxiliaries.logError("TER render error for track at " + te.getBlockPos() + ", exception: " + e.getMessage());
           Auxiliaries.logError(String.join("\n", Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList()));
         }
+        broken_entities_.put(te, current_flags);
+      } finally {
+        mxs.popPose();
       }
-      mxs.popPose();
     }
   }
 
