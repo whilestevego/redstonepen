@@ -22,7 +22,8 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.blocks.CircuitComponents;
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity;
-import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.libmc.Registries;
 
 public final class DemoSections
@@ -368,13 +369,13 @@ public final class DemoSections
 
   private static long wireBit(Direction face, Direction wireDirection)
   {
-    return RedstoneTrack.defs.connections.getWireBit(face, wireDirection);
+    return RedstoneTrackDefs.connections.getWireBit(face, wireDirection);
   }
 
   private static void placePenTrack(Level level, BlockPos pos, long wireFlags)
   {
     level.setBlock(pos, Registries.getBlock("track").defaultBlockState(), FLAGS);
-    if(level.getBlockEntity(pos) instanceof RedstoneTrack.TrackBlockEntity te) {
+    if(level.getBlockEntity(pos) instanceof TrackBlockEntity te) {
       te.addWireFlags(wireFlags);
       te.handleShapeUpdate(Direction.DOWN, level.getBlockState(pos.below()), pos.below(), false);
       te.sync(true);

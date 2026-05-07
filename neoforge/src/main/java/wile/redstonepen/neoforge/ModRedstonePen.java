@@ -30,7 +30,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
-import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Networking;
 import wile.redstonepen.platform.NetworkingPlatformNeoForge;
@@ -97,7 +97,7 @@ public class ModRedstonePen
     {
       Networking.OverlayTextMessage.setHandler(Overlay.TextOverlayGui::show);
       Overlay.on_config(0.75, 0x00ffaa00, 0x55333333, 0x55333333, 0x55444444);
-      BlockEntityRenderers.register((BlockEntityType<RedstoneTrack.TrackBlockEntity>)Registries.getBlockEntityTypeOfBlock("track"), wile.redstonepen.detail.ModRenderers.TrackTer::new);
+      BlockEntityRenderers.register((BlockEntityType<TrackBlockEntity>)Registries.getBlockEntityTypeOfBlock("track"), wile.redstonepen.detail.ModRenderers.TrackTer::new);
       if(wile.redstonepen.detail.RcaSync.ClientRca.init()) {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, (final PlayerTickEvent.Post ev)->wile.redstonepen.detail.RcaSync.ClientRca.tick());
       }

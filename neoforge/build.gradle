@@ -247,7 +247,6 @@ def jacocoExcludes = [
   // GameTest infrastructure (test code, not game logic)
   'wile/redstonepen/gametest/**',
   // Outer namespace wrappers with no executable logic
-  'wile/redstonepen/blocks/RedstoneTrack.class',
   'wile/redstonepen/blocks/CircuitComponents.class',
   'wile/redstonepen/blocks/BasicLever.class',
   'wile/redstonepen/blocks/BasicGauge.class',

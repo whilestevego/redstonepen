@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import wile.redstonepen.ModContent;
 import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
-import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.libmc.NetworkingClient;
 import wile.redstonepen.libmc.Overlay;
 import wile.redstonepen.libmc.PlatformServices;
@@ -38,7 +38,7 @@ public class ModRedstonePenClient implements ClientModInitializer
       (MenuType<ControlBoxUiContainer>) Registries.getMenuTypeOfBlock("control_box"),
       ControlBoxGui::new);
     BlockEntityRenderers.register(
-      (BlockEntityType<RedstoneTrack.TrackBlockEntity>) Registries.getBlockEntityTypeOfBlock("track"),
+      (BlockEntityType<TrackBlockEntity>) Registries.getBlockEntityTypeOfBlock("track"),
       wile.redstonepen.detail.ModRenderers.TrackTer::new);
     PlatformServices.getRendering().setRenderLayer(ModContent.references.TRACK_BLOCK, RenderType.cutout());
     PlatformServices.getRendering().setRenderLayer(ModContent.references.BASIC_GAUGE_BLOCK, RenderType.translucent());

@@ -44,6 +44,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import wile.redstonepen.ModContent;
+import wile.redstonepen.blocks.track.RedstoneTrackBlock;
 import wile.redstonepen.libmc.RsSignals;
 import wile.redstonepen.libmc.StandardBlocks;
 import wile.redstonepen.libmc.Auxiliaries;
@@ -645,7 +646,7 @@ public class CircuitComponents
         if(state.is(Blocks.REDSTONE_WIRE)) {
           p = Math.max(0, state.getDirectSignal(world, pos, redstone_side)-2);
         } else if(state.is(ModContent.references.TRACK_BLOCK)) {
-          p = Math.max(0, RedstoneTrack.RedstoneTrackBlock.tile(world, pos).map(te->te.getRedstonePower(redstone_side, true)).orElse(0)-2);
+          p = Math.max(0, RedstoneTrackBlock.tile(world, pos).map(te->te.getRedstonePower(redstone_side, true)).orElse(0)-2);
         } else if(state.is(ModContent.references.BRIDGE_RELAY_BLOCK)) {
           if(state.getValue(FACING) != world.getBlockState(relay_pos).getValue(FACING)) {
             p = 0;
