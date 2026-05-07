@@ -14,9 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import wile.redstonepen.blocks.RedstoneTrack.TrackBlockEntity.TestHooks;
-import wile.redstonepen.blocks.RedstoneTrack.defs;
-import wile.redstonepen.blocks.RedstoneTrack.defs.connections;
+import wile.redstonepen.blocks.track.TestHooks;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections;
+import static wile.redstonepen.blocks.track.RedstoneTrackDefs.*;
 
 class RedstoneTrackStateTest
 {
@@ -32,9 +33,9 @@ class RedstoneTrackStateTest
     @Test
     void masksDontOverlap()
     {
-      assertEquals(0L, defs.STATE_FLAG_WIR_MASK & defs.STATE_FLAG_CON_MASK);
-      assertEquals(0L, defs.STATE_FLAG_WIR_MASK & defs.STATE_FLAG_PWR_MASK);
-      assertEquals(0L, defs.STATE_FLAG_CON_MASK & defs.STATE_FLAG_PWR_MASK);
+      assertEquals(0L, STATE_FLAG_WIR_MASK & STATE_FLAG_CON_MASK);
+      assertEquals(0L, STATE_FLAG_WIR_MASK & STATE_FLAG_PWR_MASK);
+      assertEquals(0L, STATE_FLAG_CON_MASK & STATE_FLAG_PWR_MASK);
     }
   }
 
@@ -51,7 +52,7 @@ class RedstoneTrackStateTest
     void getWireFlagsIgnoresUpperBits()
     {
       final TestHooks th = h();
-      th.setState(~defs.STATE_FLAG_WIR_MASK); // only non-wire bits set
+      th.setState(~STATE_FLAG_WIR_MASK); // only non-wire bits set
       assertEquals(0, th.getWireFlags());
     }
 
@@ -102,7 +103,7 @@ class RedstoneTrackStateTest
     void addWireFlagsAllAtOnceSetsAll24()
     {
       final TestHooks th = h();
-      th.addWireFlags(defs.STATE_FLAG_WIR_MASK);
+      th.addWireFlags(STATE_FLAG_WIR_MASK);
       assertEquals(0x00ffffff, th.getWireFlags());
     }
   }
@@ -212,7 +213,7 @@ class RedstoneTrackStateTest
     void redstoneDustCountAllWireBitsSetReturns24()
     {
       final TestHooks th = h();
-      th.setState(defs.STATE_FLAG_WIR_MASK);
+      th.setState(STATE_FLAG_WIR_MASK);
       assertEquals(24, th.getRedstoneDustCount());
     }
 
@@ -220,7 +221,7 @@ class RedstoneTrackStateTest
     void redstoneDustCountAllConnectionBitsSetZeroWireBitsReturns6()
     {
       final TestHooks th = h();
-      th.setState(defs.STATE_FLAG_CON_MASK);
+      th.setState(STATE_FLAG_CON_MASK);
       assertEquals(6, th.getRedstoneDustCount());
     }
 

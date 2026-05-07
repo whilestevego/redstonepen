@@ -32,8 +32,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.ModContent;
-import wile.redstonepen.blocks.RedstoneTrack;
-import wile.redstonepen.blocks.RedstoneTrack.TrackBlockEntity;
+import wile.redstonepen.blocks.track.RedstoneTrackBlock;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.libmc.*;
 
 import java.util.Arrays;
@@ -115,13 +115,13 @@ public class RedstonePenItem extends StandardItems.BaseItem
     final BlockState state = world.getBlockState(pos);
     final ItemStack stack = context.getItemInHand();
     // Add to track
-    if(state.getBlock() instanceof RedstoneTrack.RedstoneTrackBlock track) {
+    if(state.getBlock() instanceof RedstoneTrackBlock track) {
       if(world.isClientSide()) return InteractionResult.SUCCESS;
       final BlockHitResult rtr = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), context.getClickedPos(), context.isInside());
       return track.modifySegments(state, world, pos, player, stack, hand, rtr, false, true);
     }
     // Check if a new track can be placed.
-    if(!RedstoneTrack.RedstoneTrackBlock.canBePlacedOnFace(state, world, pos, facing)) {
+    if(!RedstoneTrackBlock.canBePlacedOnFace(state, world, pos, facing)) {
       // Cannot place here.
       return InteractionResult.FAIL;
     }
@@ -129,7 +129,7 @@ public class RedstonePenItem extends StandardItems.BaseItem
     // Place new track
     final BlockPos target_pos = pos.relative(facing);
     final BlockState target_state = world.getBlockState(target_pos);
-    if(target_state.getBlock() instanceof RedstoneTrack.RedstoneTrackBlock track_block) {
+    if(target_state.getBlock() instanceof RedstoneTrackBlock track_block) {
       // Add/remove tracks to existing RedstoneTrackBlock
       final BlockHitResult rtr = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), target_pos, context.isInside());
       return track_block.modifySegments(target_state, world, target_pos, player, stack, hand, rtr, false, true);
@@ -141,7 +141,7 @@ public class RedstonePenItem extends StandardItems.BaseItem
       if(!target_state.canBeReplaced(ctx)) return InteractionResult.FAIL;
       if(!world.setBlock(target_pos, rs_state, 1|2|16)) return InteractionResult.FAIL;
       final BlockState placed_state = world.getBlockState(target_pos);
-      if(placed_state.getBlock() instanceof RedstoneTrack.RedstoneTrackBlock track_block) {
+      if(placed_state.getBlock() instanceof RedstoneTrackBlock track_block) {
         return (track_block.modifySegments(target_state, world, target_pos, player, stack, hand, rtr, false, true) == InteractionResult.FAIL) ? InteractionResult.FAIL : InteractionResult.CONSUME;
       } else {
         world.removeBlock(target_pos, false);
@@ -165,7 +165,7 @@ public class RedstonePenItem extends StandardItems.BaseItem
     if(block == Blocks.REDSTONE_WIRE) {
       tc = Auxiliaries.localizable("overlay.wire_power", powerFormatted(state.getValue(RedStoneWireBlock.POWER)));
     } else if(block == ModContent.references.TRACK_BLOCK) {
-      TrackBlockEntity te = RedstoneTrack.RedstoneTrackBlock.tile(world, pos).orElse(null);
+      TrackBlockEntity te = RedstoneTrackBlock.tile(world, pos).orElse(null);
       if(te==null) return;
       tc = Auxiliaries.localizable("overlay.track_power", powerFormatted(te.getSidePower(rs_side)));
       if(Auxiliaries.isDevelopmentMode()) {
@@ -232,7 +232,7 @@ public class RedstonePenItem extends StandardItems.BaseItem
       final HitResult rt = player.pick(10.0, 0f, false);
       if(rt.getType() != HitResult.Type.BLOCK) return false;
       final InteractionHand hand = (player.getItemInHand(InteractionHand.MAIN_HAND).getItem()==this) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-      if(!(state.getBlock() instanceof RedstoneTrack.RedstoneTrackBlock track)) return false;
+      if(!(state.getBlock() instanceof RedstoneTrackBlock track)) return false;
       track.modifySegments(state, player.getCommandSenderWorld(), pos, player, stack, hand, ((BlockHitResult)rt), true, false);
       return true;
     } else if(state.is(Blocks.REDSTONE_WIRE)) {

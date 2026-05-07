@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import wile.redstonepen.McBootstrap;
-import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
@@ -27,7 +27,7 @@ class ModRenderersTest
   void poseStackIsBalancedWhenEntityThrowsDuringRender()
   {
     final var ter = new ModRenderers.TrackTer(null);
-    final var te  = mock(RedstoneTrack.TrackBlockEntity.class);
+    final var te  = mock(TrackBlockEntity.class);
     final var mxs = new PoseStack();
     final var buf = mock(MultiBufferSource.class);
 
@@ -48,8 +48,8 @@ class ModRenderersTest
   void renderErrorIsIsolatedToFailingEntityAndClearsOnStateChange()
   {
     final var ter = new ModRenderers.TrackTer(null);
-    final var teA = mock(RedstoneTrack.TrackBlockEntity.class);
-    final var teB = mock(RedstoneTrack.TrackBlockEntity.class);
+    final var teA = mock(TrackBlockEntity.class);
+    final var teB = mock(TrackBlockEntity.class);
     final var mxs = new PoseStack();
     final var buf = mock(MultiBufferSource.class);
 

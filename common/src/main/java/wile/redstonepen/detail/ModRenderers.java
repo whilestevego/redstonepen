@@ -21,8 +21,9 @@ import net.minecraft.world.phys.Vec3;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import wile.redstonepen.ModConstants;
-import wile.redstonepen.blocks.RedstoneTrack;
-import wile.redstonepen.blocks.RedstoneTrack.defs.connections;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.PlatformServices;
 
@@ -35,43 +36,43 @@ import java.util.WeakHashMap;
 public class ModRenderers
 {
   @Environment(EnvType.CLIENT)
-  public static class TrackTer implements BlockEntityRenderer<RedstoneTrack.TrackBlockEntity>
+  public static class TrackTer implements BlockEntityRenderer<TrackBlockEntity>
   {
-    private static final ResourceLocation[] model_rls  = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_WIR_COUNT];
-    private static final ResourceLocation[] modelm_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
-    private static final ResourceLocation[] modelc_rls = new ResourceLocation[RedstoneTrack.defs.STATE_FLAG_CON_COUNT];
+    private static final ResourceLocation[] model_rls  = new ResourceLocation[RedstoneTrackDefs.STATE_FLAG_WIR_COUNT];
+    private static final ResourceLocation[] modelm_rls = new ResourceLocation[RedstoneTrackDefs.STATE_FLAG_CON_COUNT];
+    private static final ResourceLocation[] modelc_rls = new ResourceLocation[RedstoneTrackDefs.STATE_FLAG_CON_COUNT];
     private static final ArrayList<Vec3> power_rgb = new ArrayList<>();
-    private final WeakHashMap<RedstoneTrack.TrackBlockEntity, Long> broken_entities_ = new WeakHashMap<>();
+    private final WeakHashMap<TrackBlockEntity, Long> broken_entities_ = new WeakHashMap<>();
     private final BlockEntityRendererProvider.Context renderer_;
 
     public static List<ResourceLocation> registerModels()
     {
       List<ResourceLocation> resources_to_register = new ArrayList<>();
 
-      RedstoneTrack.defs.models.STATE_WIRE_MAPPING.entrySet().forEach((kv->{
+      RedstoneTrackDefs.models.STATE_WIRE_MAPPING.entrySet().forEach((kv->{
         final ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
-        for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_WIR_COUNT; ++i) {
-          if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_WIR_POS+i))) != 0) {
+        for(int i=0; i<RedstoneTrackDefs.STATE_FLAG_WIR_COUNT; ++i) {
+          if((kv.getKey() & (1L<<(RedstoneTrackDefs.STATE_FLAG_WIR_POS+i))) != 0) {
             model_rls[i] = mrl;
             break;
           }
         }
         resources_to_register.add(mrl);
       }));
-      RedstoneTrack.defs.models.STATE_CONNECT_MAPPING.entrySet().forEach((kv->{
+      RedstoneTrackDefs.models.STATE_CONNECT_MAPPING.entrySet().forEach((kv->{
         ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
-        for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_CON_COUNT; ++i) {
-          if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_CON_POS+i))) != 0) {
+        for(int i=0; i<RedstoneTrackDefs.STATE_FLAG_CON_COUNT; ++i) {
+          if((kv.getKey() & (1L<<(RedstoneTrackDefs.STATE_FLAG_CON_POS+i))) != 0) {
             modelc_rls[i] = mrl;
             break;
           }
         }
         resources_to_register.add(mrl);
       }));
-      RedstoneTrack.defs.models.STATE_CNTWIRE_MAPPING.entrySet().forEach((kv->{
+      RedstoneTrackDefs.models.STATE_CNTWIRE_MAPPING.entrySet().forEach((kv->{
         ResourceLocation mrl = ResourceLocation.tryBuild(ModConstants.MODID, kv.getValue()).withPrefix("item/");
-        for(int i=0; i<RedstoneTrack.defs.STATE_FLAG_CON_COUNT; ++i) {
-          if((kv.getKey() & (1L<<(RedstoneTrack.defs.STATE_FLAG_CON_POS+i))) != 0) {
+        for(int i=0; i<RedstoneTrackDefs.STATE_FLAG_CON_COUNT; ++i) {
+          if((kv.getKey() & (1L<<(RedstoneTrackDefs.STATE_FLAG_CON_POS+i))) != 0) {
             modelm_rls[i] = mrl;
             break;
           }
@@ -98,7 +99,7 @@ public class ModRenderers
 
     @Override
     @SuppressWarnings("deprecation")
-    public void render(final RedstoneTrack.TrackBlockEntity te, float unused1, PoseStack mxs, MultiBufferSource buf, int combinedLightIn, int combinedOverlayIn)
+    public void render(final TrackBlockEntity te, float unused1, PoseStack mxs, MultiBufferSource buf, int combinedLightIn, int combinedOverlayIn)
     {
       final long current_flags = te.getStateFlags();
       if(broken_entities_.getOrDefault(te, ~current_flags) == current_flags) return;

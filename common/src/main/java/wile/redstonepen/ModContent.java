@@ -17,6 +17,8 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import wile.redstonepen.blocks.*;
 import wile.redstonepen.blocks.controlbox.*;
+import wile.redstonepen.blocks.track.RedstoneTrackBlock;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.items.RedstonePenItem;
 import wile.redstonepen.items.RemoteItem;
 import wile.redstonepen.libmc.StandardBlocks;
@@ -38,11 +40,11 @@ public class ModContent
     final BlockBehaviour.StateArgumentPredicate<EntityType<?>> never = (w,s,p,e)->false;
 
     Registries.addBlock("track",
-      ()->new RedstoneTrack.RedstoneTrackBlock(
+      ()->new RedstoneTrackBlock(
         StandardBlocks.CFG_DEFAULT,
         BlockBehaviour.Properties.of().noCollission().instabreak().dynamicShape().randomTicks()
       ),
-      RedstoneTrack.TrackBlockEntity::new
+      TrackBlockEntity::new
     );
     Registries.addBlock("control_box",
       ()->new ControlBoxBlock(
@@ -138,7 +140,7 @@ public class ModContent
 
   public static void initReferences()
   {
-    references.TRACK_BLOCK = (RedstoneTrack.RedstoneTrackBlock)Registries.getBlock("track");
+    references.TRACK_BLOCK = (RedstoneTrackBlock)Registries.getBlock("track");
     references.BRIDGE_RELAY_BLOCK = (CircuitComponents.BridgeRelayBlock)Registries.getBlock("bridge_relay");
     references.CONTROLBOX_BLOCK = (ControlBoxBlock)Registries.getBlock("control_box");
     references.BASIC_GAUGE_BLOCK = (BasicGauge.BasicGaugeBlock)Registries.getBlock("basic_gauge");
@@ -162,7 +164,7 @@ public class ModContent
 
   public static final class references
   {
-    public static RedstoneTrack.RedstoneTrackBlock TRACK_BLOCK = null;
+    public static RedstoneTrackBlock TRACK_BLOCK = null;
     public static CircuitComponents.BridgeRelayBlock BRIDGE_RELAY_BLOCK = null;
     public static ControlBoxBlock CONTROLBOX_BLOCK = null;
     public static BasicGauge.BasicGaugeBlock BASIC_GAUGE_BLOCK = null;

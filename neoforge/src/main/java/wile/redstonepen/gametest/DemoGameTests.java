@@ -23,7 +23,8 @@ import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import net.minecraft.core.Direction;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.CircuitComponents;
-import wile.redstonepen.blocks.RedstoneTrack;
+import wile.redstonepen.blocks.track.RedstoneTrackDefs;
+import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
 import wile.redstonepen.libmc.Registries;
@@ -403,14 +404,14 @@ public class DemoGameTests
       };
       for(BlockPos local : trackPositions) {
         final var te = helper.getLevel().getBlockEntity(helper.absolutePos(local));
-        if(!(te instanceof RedstoneTrack.TrackBlockEntity tbe)) {
+        if(!(te instanceof TrackBlockEntity tbe)) {
           helper.fail("expected TrackBlockEntity at " + local, local);
           return;
         }
         if(tbe.getWireFlags() == 0) {
           helper.fail("track at " + local + " has no wire flags", local);
         }
-        if((tbe.getStateFlags() & RedstoneTrack.defs.STATE_FLAG_PWR_MASK) == 0) {
+        if((tbe.getStateFlags() & RedstoneTrackDefs.STATE_FLAG_PWR_MASK) == 0) {
           helper.fail("track at " + local + " has no power (state=0x" + Long.toHexString(tbe.getStateFlags()) + ")", local);
         }
       }
