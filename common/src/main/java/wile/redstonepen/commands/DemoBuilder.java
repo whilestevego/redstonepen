@@ -75,19 +75,7 @@ public final class DemoBuilder
       .setValue(WallSignBlock.FACING, facing);
     level.setBlock(pos.relative(facing.getOpposite()), Blocks.STONE.defaultBlockState(), FLAGS);
     level.setBlock(pos, sign, FLAGS);
-    if(level.getBlockEntity(pos) instanceof SignBlockEntity be) {
-      final Component[] msgs = new Component[4];
-      for(int i = 0; i < 4; ++i) {
-        msgs[i] = Component.literal(i < lines.length && lines[i] != null ? truncate(lines[i]) : "");
-      }
-      be.updateText(text -> text
-        .setMessage(0, msgs[0])
-        .setMessage(1, msgs[1])
-        .setMessage(2, msgs[2])
-        .setMessage(3, msgs[3]),
-        true);
-      be.setChanged();
-    }
+    if(level.getBlockEntity(pos) instanceof SignBlockEntity be) configureSign(be, lines);
   }
 
   public static void placeStandingSign(Level level, BlockPos pos, int rotation, String... lines)
@@ -96,19 +84,22 @@ public final class DemoBuilder
       .setValue(BlockStateProperties.ROTATION_16, rotation & 0xf);
     level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), FLAGS);
     level.setBlock(pos, sign, FLAGS);
-    if(level.getBlockEntity(pos) instanceof SignBlockEntity be) {
-      final Component[] msgs = new Component[4];
-      for(int i = 0; i < 4; ++i) {
-        msgs[i] = Component.literal(i < lines.length && lines[i] != null ? truncate(lines[i]) : "");
-      }
-      be.updateText(text -> text
-        .setMessage(0, msgs[0])
-        .setMessage(1, msgs[1])
-        .setMessage(2, msgs[2])
-        .setMessage(3, msgs[3]),
-        true);
-      be.setChanged();
+    if(level.getBlockEntity(pos) instanceof SignBlockEntity be) configureSign(be, lines);
+  }
+
+  private static void configureSign(SignBlockEntity be, String[] lines)
+  {
+    final Component[] msgs = new Component[4];
+    for(int i = 0; i < 4; ++i) {
+      msgs[i] = Component.literal(i < lines.length && lines[i] != null ? truncate(lines[i]) : "");
     }
+    be.updateText(text -> text
+      .setMessage(0, msgs[0])
+      .setMessage(1, msgs[1])
+      .setMessage(2, msgs[2])
+      .setMessage(3, msgs[3]),
+      true);
+    be.setChanged();
   }
 
   private static String truncate(String s)
