@@ -18,6 +18,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -709,6 +712,11 @@ public class RedstoneTrack
     @Override
     public void onClientPacketReceived(Player player, CompoundTag nbt)
     {}
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket()
+    { return ClientboundBlockEntityDataPacket.create(this); }
 
     @Environment(EnvType.CLIENT)
     public double getViewDistance()
