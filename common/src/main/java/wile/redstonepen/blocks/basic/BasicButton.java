@@ -4,7 +4,7 @@
  * @copyright (C) 2020 Stefan Wilhelm
  * @license MIT (see https://opensource.org/licenses/MIT)
  */
-package wile.redstonepen.blocks;
+package wile.redstonepen.blocks.basic;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,32 +20,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import wile.redstonepen.libmc.Auxiliaries;
 
 import java.util.List;
 
 
 @SuppressWarnings("deprecation")
-public class BasicLever
+public class BasicButton
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // BasicLeverBlock
+  // BasicButtonBlock
   //--------------------------------------------------------------------------------------------------------------------
 
-  public static class BasicLeverBlock extends net.minecraft.world.level.block.LeverBlock
+  public static class BasicButtonBlock extends net.minecraft.world.level.block.ButtonBlock
   {
-    public record Config(float sound_pitch_unpowered, float sound_pitch_powered) {}
+    public record Config(float sound_pitch_unpowered, float sound_pitch_powered, int active_time) {}
 
     public final Config config;
 
-    public BasicLeverBlock(Config conf, BlockBehaviour.Properties properties)
-    { super(properties); config = conf; }
+    public BasicButtonBlock(Config conf, BlockBehaviour.Properties properties)
+    { super(BlockSetType.SPRUCE, conf.active_time(), properties); config = conf; }
 
     @Override
     @Environment(EnvType.CLIENT)
@@ -55,27 +55,25 @@ public class BasicLever
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult brh)
     {
-      if(world.isClientSide) {
-        final BlockState new_state = state.cycle(POWERED);
-        if(new_state.getValue(POWERED)) makeParticle(new_state, world, pos, 1.0f);
-        return InteractionResult.SUCCESS;
-      } else {
-        final BlockState new_state = state.cycle(POWERED);
-        world.setBlock(pos, new_state, 1|2);
-        world.updateNeighborsAt(pos, this);
-        world.updateNeighborsAt(pos.relative(LeverBlock.getConnectedDirection(new_state).getOpposite()), this);
-        world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, new_state.getValue(POWERED) ? config.sound_pitch_powered() : config.sound_pitch_unpowered());
-        world.gameEvent(player, new_state.getValue(POWERED) ? GameEvent.BLOCK_ACTIVATE : GameEvent.BLOCK_DEACTIVATE, pos);
-        return InteractionResult.CONSUME;
-      }
+      if(state.getValue(POWERED)) return InteractionResult.CONSUME;
+      world.setBlock(pos, state.setValue(POWERED, true), 1|2);
+      this.press(state, world, pos, player);
+      if(world.isClientSide) makeParticle(state, world, pos, 1.0f);
+      return InteractionResult.sidedSuccess(world.isClientSide);
+    }
+
+    @Override
+    protected void playSound(@Nullable Player player, LevelAccessor world, BlockPos pos, boolean on)
+    {
+      world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, on ? config.sound_pitch_powered() : config.sound_pitch_unpowered());
     }
 
     private static void makeParticle(BlockState state, LevelAccessor world, BlockPos pos, float f)
     {
-      for(int i=0; i<2; ++i) {
+      for(int i=0; i<3; ++i) {
         final Vec3 vpos = Vec3.atCenterOf(pos)
           .add(Vec3.atBottomCenterOf(state.getValue(FACING).getOpposite().getNormal()).scale(0.1))
-          .add(Vec3.atLowerCornerOf(net.minecraft.world.level.block.LeverBlock.getConnectedDirection(state).getOpposite().getNormal()).scale(0.2));
+          .add(Vec3.atLowerCornerOf(net.minecraft.world.level.block.LeverBlock.getConnectedDirection(state).getOpposite().getNormal()).scale(0.4));
         world.addParticle(new DustParticleOptions(DustParticleOptions.REDSTONE_PARTICLE_COLOR, f), vpos.x(), vpos.y(), vpos.z(), 0.0, 0.0, 0.0);
       }
     }

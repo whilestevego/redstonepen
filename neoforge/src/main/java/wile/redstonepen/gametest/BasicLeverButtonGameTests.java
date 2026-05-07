@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
-import wile.redstonepen.blocks.BasicGauge;
+import wile.redstonepen.blocks.basic.BasicGauge;
 import wile.redstonepen.libmc.Registries;
 
 @GameTestHolder(ModConstants.MODID)

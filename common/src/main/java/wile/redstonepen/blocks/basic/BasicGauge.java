@@ -4,7 +4,7 @@
  * @copyright (C) 2020 Stefan Wilhelm
  * @license MIT (see https://opensource.org/licenses/MIT)
  */
-package wile.redstonepen.blocks;
+package wile.redstonepen.blocks.basic;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
