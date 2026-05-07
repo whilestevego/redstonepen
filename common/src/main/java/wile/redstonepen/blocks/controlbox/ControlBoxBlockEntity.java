@@ -229,8 +229,9 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
   void scheduleImmediateTick()
   { tick_timer_ = 0; }
 
-  CompoundTag composeGuiData(boolean full, Level world)
+  CompoundTag composeGuiData(boolean full)
   {
+    final Level world = getLevel();
     final CompoundTag nbt = new CompoundTag();
     nbt.putString("action", "serverdata");
     nbt.putBoolean("enabled", getEnabled());
