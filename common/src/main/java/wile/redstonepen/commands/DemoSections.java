@@ -131,15 +131,8 @@ public final class DemoSections
     // Wire from lever NORTH into relay
     level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     // inverted_relay at (2,0,3): FACING=DOWN ROTATION=0 → input from south, output NORTH
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
-      relay.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    // Wire from relay NORTH to lamp
-    for(int dz = 2; dz >= 1; --dz) {
-      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    }
-    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    placeFloorRelay(level, cell, relay);
+    wireAndLamp(level, cell);
     sign(level, cell.offset(4, 1, 6), "inverted_relay", "NOT gate");
   }
 
@@ -154,14 +147,8 @@ public final class DemoSections
         .setValue(ButtonBlock.FACE, AttachFace.FLOOR)
         .setValue(ButtonBlock.FACING, Direction.NORTH), FLAGS);
     level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
-      relay.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    for(int dz = 2; dz >= 1; --dz) {
-      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    }
-    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    placeFloorRelay(level, cell, relay);
+    wireAndLamp(level, cell);
     sign(level, cell.offset(4, 1, 6), "bistable_relay", "T flip-flop");
   }
 
@@ -176,14 +163,8 @@ public final class DemoSections
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
         .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
     level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
-      relay.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    for(int dz = 2; dz >= 1; --dz) {
-      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    }
-    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    placeFloorRelay(level, cell, relay);
+    wireAndLamp(level, cell);
     sign(level, cell.offset(4, 1, 6), "pulse_relay", "edge pulse");
   }
 
@@ -198,14 +179,8 @@ public final class DemoSections
         .setValue(LeverBlock.FACE, AttachFace.FLOOR)
         .setValue(LeverBlock.FACING, Direction.NORTH), FLAGS);
     level.setBlock(cell.offset(2, 0, 4), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
-      relay.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    for(int dz = 2; dz >= 1; --dz) {
-      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
-    }
-    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+    placeFloorRelay(level, cell, relay);
+    wireAndLamp(level, cell);
     sign(level, cell.offset(4, 1, 6), "relay", "buffer / direction");
   }
 
@@ -248,20 +223,9 @@ public final class DemoSections
   public static void buildControlBoxAndGate(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
     // Control box mounted on the platform (FACING=DOWN ROTATION=0). Port mapping:
     // d=DOWN, u=UP, r=NORTH, y=SOUTH, g=WEST, b=EAST.
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(CONTROL_BOX_AND_PROGRAM);
-      cbe.setEnabled(true); // Without this, the program never executes.
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, CONTROL_BOX_AND_PROGRAM);
     // South-input lever feeds port y via a wire run.
     level.setBlock(cell.offset(3, 0, 5),
       Blocks.LEVER.defaultBlockState()
@@ -453,13 +417,8 @@ public final class DemoSections
     DemoBuilder.placeStandingSign(level, pos, 8, line1, line2);
   }
 
-  /**
-   * Traffic light: CLOCK() drives a three-phase cycle (red/green/yellow) with no inputs.
-   * Port r (NORTH) = red lamp, g (WEST) = green lamp, y (SOUTH) = yellow lamp.
-   */
-  public static void buildTrafficLight(Level level, BlockPos cell)
+  private static void placeControlBox(Level level, BlockPos cell, String program)
   {
-    platform(level, cell);
     final Block controlBox = Registries.getBlock("control_box");
     if(controlBox == null) return;
     final BlockPos cbPos = cell.offset(3, 0, 3);
@@ -468,10 +427,36 @@ public final class DemoSections
         .setValue(BlockStateProperties.FACING, Direction.DOWN)
         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
     if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(TRAFFIC_LIGHT_PROGRAM);
+      cbe.setCode(program);
       cbe.setEnabled(true);
       cbe.setChanged();
     }
+  }
+
+  private static void placeFloorRelay(Level level, BlockPos cell, Block relay)
+  {
+    DemoBuilder.placeAttached(level, cell.offset(2, 0, 3),
+      relay.defaultBlockState()
+        .setValue(BlockStateProperties.FACING, Direction.DOWN)
+        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
+  }
+
+  private static void wireAndLamp(Level level, BlockPos cell)
+  {
+    for(int dz = 2; dz >= 1; --dz) {
+      level.setBlock(cell.offset(2, 0, dz), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
+    }
+    level.setBlock(cell.offset(2, 0, 0), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
+  }
+
+  /**
+   * Traffic light: CLOCK() drives a three-phase cycle (red/green/yellow) with no inputs.
+   * Port r (NORTH) = red lamp, g (WEST) = green lamp, y (SOUTH) = yellow lamp.
+   */
+  public static void buildTrafficLight(Level level, BlockPos cell)
+  {
+    platform(level, cell);
+    placeControlBox(level, cell, TRAFFIC_LIGHT_PROGRAM);
     // Red lamp — north output (port r)
     level.setBlock(cell.offset(3, 0, 2), Blocks.REDSTONE_WIRE.defaultBlockState(), FLAGS);
     level.setBlock(cell.offset(3, 0, 1), Blocks.REDSTONE_LAMP.defaultBlockState(), FLAGS);
@@ -492,18 +477,7 @@ public final class DemoSections
   public static void buildPulseCounter(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(PULSE_COUNTER_PROGRAM);
-      cbe.setEnabled(true);
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, PULSE_COUNTER_PROGRAM);
     // Button — south input (port y)
     level.setBlock(cell.offset(3, 0, 5),
       Blocks.STONE_BUTTON.defaultBlockState()
@@ -530,18 +504,7 @@ public final class DemoSections
   public static void buildSrLatch(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(SR_LATCH_PROGRAM);
-      cbe.setEnabled(true);
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, SR_LATCH_PROGRAM);
     // Set button — north input (port r)
     level.setBlock(cell.offset(3, 0, 1),
       Blocks.STONE_BUTTON.defaultBlockState()
@@ -568,18 +531,7 @@ public final class DemoSections
   public static void buildPwmDemo(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(PWM_PROGRAM);
-      cbe.setEnabled(true);
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, PWM_PROGRAM);
     // Lever — west input (port g); signal level sets duty cycle
     level.setBlock(cell.offset(1, 0, 3),
       Blocks.LEVER.defaultBlockState()
@@ -600,18 +552,7 @@ public final class DemoSections
   public static void buildStepSequencer(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(STEP_SEQUENCER_PROGRAM);
-      cbe.setEnabled(true);
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, STEP_SEQUENCER_PROGRAM);
     // Advance button — south input (port y)
     level.setBlock(cell.offset(3, 0, 5),
       Blocks.STONE_BUTTON.defaultBlockState()
@@ -639,18 +580,7 @@ public final class DemoSections
   public static void buildHoldTimer(Level level, BlockPos cell)
   {
     platform(level, cell);
-    final Block controlBox = Registries.getBlock("control_box");
-    if(controlBox == null) return;
-    final BlockPos cbPos = cell.offset(3, 0, 3);
-    DemoBuilder.placeAttached(level, cbPos,
-      controlBox.defaultBlockState()
-        .setValue(BlockStateProperties.FACING, Direction.DOWN)
-        .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0));
-    if(level.getBlockEntity(cbPos) instanceof ControlBoxBlockEntity cbe) {
-      cbe.setCode(HOLD_TIMER_PROGRAM);
-      cbe.setEnabled(true);
-      cbe.setChanged();
-    }
+    placeControlBox(level, cell, HOLD_TIMER_PROGRAM);
     // Trigger button — south input (port y)
     level.setBlock(cell.offset(3, 0, 5),
       Blocks.STONE_BUTTON.defaultBlockState()
