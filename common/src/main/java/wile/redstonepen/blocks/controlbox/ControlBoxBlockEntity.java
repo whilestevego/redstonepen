@@ -34,7 +34,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
 {
   public static final int TICK_INTERVAL = 4;
   private final Container block_inventory_ = new SimpleContainer(1);
-  private final ControlBoxLogic.Logic logic_ = new ControlBoxLogic.Logic();
+  private final ControlBoxLogic logic_ = new ControlBoxLogic();
   private UUID activating_player_ = null;
   private Component custom_name_ = null;
   private boolean trace_ = false;
@@ -286,7 +286,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
 
   public static final class TestHooks
   {
-    private final ControlBoxLogic.Logic logic_ = new ControlBoxLogic.Logic();
+    private final ControlBoxLogic logic_ = new ControlBoxLogic();
 
     public boolean setCode(String text)
     { return logic_.code(text); }
