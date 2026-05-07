@@ -24,6 +24,162 @@ class ControlBoxTest
   }
 
   @Nested
+  class AlternateOperators
+  {
+    @Test
+    void andKeywordActsAsLogicalAnd()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d and u"));
+      h.setInput(Direction.DOWN, 3);
+      h.setInput(Direction.UP, 5);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.DOWN, 0);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void orKeywordActsAsLogicalOr()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d or u"));
+      h.setInput(Direction.DOWN, 0);
+      h.setInput(Direction.UP, 5);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.UP, 0);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void notKeywordInvertsValue()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=not d"));
+      h.setInput(Direction.DOWN, 0);
+      h.tick();
+      assertTrue(h.output(Direction.EAST) > 0);
+      h.setInput(Direction.DOWN, 3);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void xorKeywordActsAsExclusiveOr()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d xor u"));
+      h.setInput(Direction.DOWN, 1);
+      h.setInput(Direction.UP, 0);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.UP, 1);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void diamondOperatorActsAsInequality()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d<>5"));
+      h.setInput(Direction.DOWN, 6);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.DOWN, 5);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void singlePipeActsAsLogicalOr()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d|u"));
+      h.setInput(Direction.DOWN, 0);
+      h.setInput(Direction.UP, 5);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.UP, 0);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void singleAmpersandActsAsLogicalAnd()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=d&u"));
+      h.setInput(Direction.DOWN, 3);
+      h.setInput(Direction.UP, 5);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+      h.setInput(Direction.DOWN, 0);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+  }
+
+  @Nested
+  class UserVariables
+  {
+    @Test
+    void userVariableChainPropagatesWithinSameTick()
+    {
+      // ExprAssign.calc mutates symbols_ during recalculate, so a later line
+      // reading foo sees the value foo=d wrote in the same tick.
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("foo=d\nb=foo+1"));
+      h.setInput(Direction.DOWN, 4);
+      h.tick();
+      assertEquals(5, h.output(Direction.EAST));
+    }
+
+    @Test
+    void settingNewCodeClearsSymbolTable()
+    {
+      final TestHooks h = new TestHooks();
+      h.setCode("b=d");
+      h.setSymbol("myvar", 9);
+      assertEquals(9, h.getSymbol("myvar"));
+      h.setCode("b=u"); // Logic.code() calls symbols_.clear()
+      assertEquals(0, h.getSymbol("myvar"));
+    }
+
+    @Test
+    void userVariableRisingEdgeFiresOneLaterThanPort()
+    {
+      // Edge detection (step 2 in tick) reads foo's value from the *previous* tick
+      // because recalculate (step 4) has not yet run this tick.  So foo.re fires
+      // one tick after the port-level d.re would fire for the same transition.
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("foo=d\nb=foo.re"));
+      h.setInput(Direction.DOWN, 0);
+      tickAt(h, 0);
+      assertEquals(0, h.output(Direction.EAST));
+      h.setInput(Direction.DOWN, 1);
+      tickAt(h, 1); // foo becomes 1 this tick, but edge detection already ran with foo=0
+      assertEquals(0, h.output(Direction.EAST));
+      tickAt(h, 2); // edge detection now sees foo transition 0→1
+      assertTrue(h.output(Direction.EAST) > 0);
+      tickAt(h, 3); // edge is one-shot
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void userVariableNotInPortMasks()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("foo=3"));
+      assertEquals(0, h.inputMask());
+      assertEquals(0, h.outputMask());
+    }
+  }
+
+  @Nested
   class Parsing
   {
     @Test
@@ -114,6 +270,42 @@ class ControlBoxTest
       final TestHooks hooks = new TestHooks();
       assertTrue(hooks.setCode("b=d"));
       assertTrue(hooks.setCode("b=d"));
+    }
+
+    @Test
+    void trailingDotSuffixIsInvalid()
+    {
+      // "d." has an empty suffix after the dot; VALID_SYMBOL_SUFFIXES requires a non-empty suffix.
+      final TestHooks hooks = new TestHooks();
+      assertFalse(hooks.setCode("b=d."));
+      assertFalse(hooks.errors().isEmpty());
+    }
+
+    @Test
+    void invalidCharacterAfterExpressionIsRejected()
+    {
+      // After fully parsing "b=3", the "5" has no operator and cannot be consumed,
+      // so the parser reports invalid_character.
+      final TestHooks hooks = new TestHooks();
+      assertFalse(hooks.setCode("b=3 5"));
+      assertFalse(hooks.errors().isEmpty());
+      assertTrue(hooks.errors().values().contains("invalid_character"));
+    }
+
+    @Test
+    void comparatorOverrideSuffixIsValid()
+    {
+      final TestHooks hooks = new TestHooks();
+      assertTrue(hooks.setCode("b=d.co"));
+      assertTrue(hooks.valid());
+    }
+
+    @Test
+    void timerElapsedAndPresetSuffixesAreValid()
+    {
+      final TestHooks hooks = new TestHooks();
+      assertTrue(hooks.setCode("b=ton1.et\nu=ton1.pt"));
+      assertTrue(hooks.valid());
     }
   }
 
@@ -209,6 +401,16 @@ class ControlBoxTest
       assertTrue(hooks.setCode("b=-5"));
       hooks.tick();
       // negative results clamp to 0 on the port
+      assertEquals(0, hooks.output(Direction.EAST));
+    }
+
+    @Test
+    void moduloByZeroReturnsZero()
+    {
+      final TestHooks hooks = new TestHooks();
+      assertTrue(hooks.setCode("b=d%0"));
+      hooks.setInput(Direction.DOWN, 9);
+      hooks.tick();
       assertEquals(0, hooks.output(Direction.EAST));
     }
   }
@@ -578,6 +780,78 @@ class ControlBoxTest
       final int v = hooks.output(Direction.EAST);
       assertTrue(v >= 0 && v <= 15);
     }
+
+    @Test
+    void invOfZeroReturnsMaxSignal()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=inv(d)"));
+      h.setInput(Direction.DOWN, 0);
+      h.tick();
+      assertEquals(15, h.output(Direction.EAST));
+    }
+
+    @Test
+    void invOfFifteenReturnsZero()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=inv(d)"));
+      h.setInput(Direction.DOWN, 15);
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void maxWithOneArgReturnsThatArg()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=max(d)"));
+      h.setInput(Direction.DOWN, 7);
+      h.tick();
+      assertEquals(7, h.output(Direction.EAST));
+    }
+
+    @Test
+    void maxWithZeroArgsReturnsZero()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=max()"));
+      h.tick();
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void minWithOneArgReturnsThatArg()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=min(d)"));
+      h.setInput(Direction.DOWN, 7);
+      h.tick();
+      assertEquals(7, h.output(Direction.EAST));
+    }
+
+    @Test
+    void meanWithThreeArgsReturnsTruncatedAverage()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=mean(d,u,r)"));
+      h.setInput(Direction.DOWN, 3);
+      h.setInput(Direction.UP, 6);
+      h.setInput(Direction.NORTH, 9);
+      h.tick();
+      assertEquals(6, h.output(Direction.EAST)); // (3+6+9)/3 = 6
+    }
+
+    @Test
+    void limWithInvertedRangeClampsToUpperBound()
+    {
+      // lim(d, min=8, max=3): Math.min(3, Math.max(8, d)) always yields 3.
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=lim(d,8,3)"));
+      h.setInput(Direction.DOWN, 5);
+      h.tick();
+      assertEquals(3, h.output(Direction.EAST));
+    }
   }
 
   @Nested
@@ -934,6 +1208,37 @@ class ControlBoxTest
       tickAt(h, 6);           // et=3 still in map, >= pt → already-complete branch → false
       assertEquals(0, h.output(Direction.EAST));
     }
+
+    @Test
+    void tivWithNoArgsAlwaysReturnsZero()
+    {
+      // tiv1 is variadic; 0 args hits the x.length < 1 guard and always returns 0.
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=tiv1()"));
+      tickAt(h, 0);
+      assertEquals(0, h.output(Direction.EAST));
+      tickAt(h, 100);
+      assertEquals(0, h.output(Direction.EAST));
+    }
+
+    @Test
+    void twoTimerInstancesMaintainIndependentState()
+    {
+      // ton1 and ton2 store state under different symbol-table keys, so they
+      // run independently even when both are active in the same program.
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=ton1(d, 3)\nu=ton2(r, 6)"));
+      h.setInput(Direction.DOWN, 1);   // d=1 → starts ton1
+      h.setInput(Direction.NORTH, 1);  // r=1 → starts ton2
+      tickAt(h, 0);
+      assertEquals(0, h.output(Direction.EAST)); // ton1 not yet elapsed
+      assertEquals(0, h.output(Direction.UP));   // ton2 not yet elapsed
+      tickAt(h, 4);                              // ton1 period (3) elapsed; ton2 (6) not yet
+      assertTrue(h.output(Direction.EAST) > 0);
+      assertEquals(0, h.output(Direction.UP));
+      tickAt(h, 7);                              // ton2 period elapsed
+      assertTrue(h.output(Direction.UP) > 0);
+    }
   }
 
   @Nested
@@ -995,6 +1300,21 @@ class ControlBoxTest
       tickAt(h, 2);
       final int after_fall = h.output(Direction.EAST);
       assertTrue(after_fall <= after_rise);
+    }
+
+    @Test
+    void counterFourArgsClampsBetweenExplicitMinAndMax()
+    {
+      final TestHooks h = new TestHooks();
+      assertTrue(h.setCode("b=cnt1(d, u, 2, 8)"));
+      h.setInput(Direction.DOWN, 0);
+      h.setInput(Direction.UP, 1); // decrement
+      for(int i = 0; i < 10; ++i) h.tick();
+      assertEquals(2, h.output(Direction.EAST)); // clamped at min=2
+      h.setInput(Direction.UP, 0);
+      h.setInput(Direction.DOWN, 1); // increment
+      for(int i = 0; i < 10; ++i) h.tick();
+      assertEquals(8, h.output(Direction.EAST)); // clamped at max=8
     }
   }
 
