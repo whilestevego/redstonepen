@@ -223,8 +223,8 @@ class ControlBoxLogic
   public boolean valid()
   { return expressions_.invalid_entries.isEmpty(); }
 
-  public MultiLineMathExpr expressions()
-  { return expressions_; }
+  boolean usesSymbol(String s)
+  { return expressions_.symbols.contains(s); }
 
   public Map<Integer,String> errors()
   { return expressions_.invalid_entries.stream().collect(Collectors.toMap(e->(e.offset+e.parsed.pe), e->(e.parsed.error))); }

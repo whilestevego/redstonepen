@@ -115,7 +115,6 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
     final BlockPos device_pos = getBlockPos();
     final boolean device_enabled = (device_state.getValue(ControlBoxBlock.STATE) > 0) || (device_state.getValue(ControlBoxBlock.POWERED));
     if(!(device_state.getBlock() instanceof final ControlBoxBlock device_block)) return;
-    final java.util.Set<String> esyms = logic_.expressions().symbols;
     final int last_output_data = logic_.output_data;
     final int last_input_data = logic_.input_data;
     final RcaSync.RcaData rca_data = (((logic_.rca_input_mask|logic_.rca_output_mask)==0) ? (RcaSync.CommonRca.EMPTY) : RcaSync.CommonRca.ofPlayer(activating_player_, false));
@@ -128,7 +127,7 @@ public class ControlBoxBlockEntity extends StandardEntityBlocks.StandardBlockEnt
           if(device_enabled) {
             // Comparator overrides only if really needed - may be inventories that do expensive lookups.
             final String port_name = Defs.PORT_NAMES.get(d.ordinal());
-            if(esyms.contains(port_name+".co")) {
+            if(logic_.usesSymbol(port_name+".co")) {
               final BlockPos target_pos = device_pos.relative(world_dir);
               final net.minecraft.world.level.block.state.BlockState target_state = world.getBlockState(target_pos);
               if(target_state.hasAnalogOutputSignal()) {
