@@ -100,11 +100,11 @@ public class ModRenderers
     public void render(final RedstoneTrack.TrackBlockEntity te, float unused1, PoseStack mxs, MultiBufferSource buf, int combinedLightIn, int combinedOverlayIn)
     {
       if(tesr_error_counter <= 0) return;
+      mxs.pushPose();
       try {
         final BlockState block_state = te.getBlockState();
         final VertexConsumer vxb = buf.getBuffer(ItemBlockRenderTypes.getRenderType(block_state, false));
         combinedOverlayIn = OverlayTexture.pack(0, 0);
-        mxs.pushPose();
         {
           final int wirfl = te.getWireFlags();
           final int wirfc = te.getWireFlagCount();
@@ -152,8 +152,9 @@ public class ModRenderers
           Auxiliaries.logError("TER was disabled because broken, exception was: " + e.getMessage());
           Auxiliaries.logError(String.join("\n", Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList()));
         }
+      } finally {
+        mxs.popPose();
       }
-      mxs.popPose();
     }
   }
 
