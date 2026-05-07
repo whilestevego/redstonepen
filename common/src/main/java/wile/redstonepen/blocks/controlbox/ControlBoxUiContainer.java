@@ -1,7 +1,5 @@
 package wile.redstonepen.blocks.controlbox;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -12,7 +10,6 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.NetworkingClient;
 import wile.redstonepen.libmc.Registries;
 
 import org.jetbrains.annotations.Nullable;
@@ -71,17 +68,6 @@ public class ControlBoxUiContainer extends AbstractContainerMenu implements Netw
   { return ItemStack.EMPTY; }
 
   // Container client/server synchronization --------------------------------------------------
-
-  @Environment(EnvType.CLIENT)
-  public void onGuiAction(String message)
-  { onGuiAction(message, new CompoundTag()); }
-
-  @Environment(EnvType.CLIENT)
-  public void onGuiAction(String message, CompoundTag nbt)
-  {
-    nbt.putString("action", message);
-    NetworkingClient.PacketContainerSyncClientToServer.sendToServer(containerId, nbt);
-  }
 
   public CompoundTag composeServerData(ControlBoxBlockEntity te, boolean full)
   { return te.collectSyncData(full); }

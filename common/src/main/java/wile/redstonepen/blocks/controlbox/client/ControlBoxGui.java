@@ -15,6 +15,7 @@ import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.libmc.Auxiliaries;
 import wile.redstonepen.libmc.Guis;
 import wile.redstonepen.libmc.GuiTextEditing;
+import wile.redstonepen.libmc.NetworkingClient;
 import wile.redstonepen.libmc.TooltipDisplay;
 
 import java.util.ArrayList;
@@ -45,6 +46,15 @@ public class ControlBoxGui extends Guis.ContainerGui<ControlBoxUiContainer>
   private boolean code_requested_ = false;
   private Component activating_player_ = Component.empty();
 
+  private void onGuiAction(String message)
+  { onGuiAction(message, new net.minecraft.nbt.CompoundTag()); }
+
+  private void onGuiAction(String message, net.minecraft.nbt.CompoundTag nbt)
+  {
+    nbt.putString("action", message);
+    NetworkingClient.PacketContainerSyncClientToServer.sendToServer(getMenu().containerId, nbt);
+  }
+
   public ControlBoxGui(ControlBoxUiContainer container, Inventory player_inventory, Component title)
   {
     super(container, player_inventory, title,"textures/gui/control_box_gui.png", 238, 206);
@@ -74,7 +84,7 @@ public class ControlBoxGui extends Guis.ContainerGui<ControlBoxUiContainer>
           final wile.api.rca.RedstoneClientAdapter rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance();
           if(rca != null && rca.isOpen()) nbt.putBoolean("withrca", true);
         }
-        getMenu().onGuiAction("enabled", nbt);
+        onGuiAction("enabled", nbt);
         focus_editor_=true;
       });
       addRenderableWidget(start_stop);
@@ -160,7 +170,7 @@ public class ControlBoxGui extends Guis.ContainerGui<ControlBoxUiContainer>
     setInitialFocus(textbox);
     setFocused(textbox);
     textbox.active = false;
-    getMenu().onGuiAction("serverdata");
+    onGuiAction("serverdata");
   }
 
   @Override
@@ -241,9 +251,9 @@ public class ControlBoxGui extends Guis.ContainerGui<ControlBoxUiContainer>
         update_counter_ = VALUE_UPDATE_INTERVAL;
         if(!code_requested_) {
           code_requested_ = true;
-          getMenu().onGuiAction("serverdata");
+          onGuiAction("serverdata");
         } else {
-          getMenu().onGuiAction("servervalues");
+          onGuiAction("servervalues");
         }
       }
     }
@@ -288,7 +298,7 @@ public class ControlBoxGui extends Guis.ContainerGui<ControlBoxUiContainer>
   {
     final net.minecraft.nbt.CompoundTag nbt = new net.minecraft.nbt.CompoundTag();
     nbt.putString("code", text);
-    getMenu().onGuiAction("codeupdate", nbt);
+    onGuiAction("codeupdate", nbt);
   }
 
 }
