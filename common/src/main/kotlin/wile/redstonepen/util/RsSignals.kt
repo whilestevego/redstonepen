@@ -1,11 +1,3 @@
-/*
- * @file RsSignals.kt
- * @author Stefan Wilhelm (wile)
- * @copyright (C) 2020 Stefan Wilhelm
- * @license MIT (see https://opensource.org/licenses/MIT)
- *
- * General redstone signal related functionality.
- */
 package wile.redstonepen.util
 
 import net.minecraft.core.BlockPos

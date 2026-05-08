@@ -1,11 +1,3 @@
-/*
- * @file Inventories.kt
- * @author Stefan Wilhelm (wile)
- * @copyright (C) 2020 Stefan Wilhelm
- * @license MIT (see https://opensource.org/licenses/MIT)
- *
- * General inventory item handling functionality.
- */
 package wile.redstonepen.util
 
 import net.minecraft.core.component.DataComponentMap
