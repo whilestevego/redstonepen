@@ -40,11 +40,9 @@ public class BasicLever
 
   public static class BasicLeverBlock extends net.minecraft.world.level.block.LeverBlock
   {
-    public record Config(float sound_pitch_unpowered, float sound_pitch_powered) {}
+    public final BasicLeverConfig config;
 
-    public final Config config;
-
-    public BasicLeverBlock(Config conf, BlockBehaviour.Properties properties)
+    public BasicLeverBlock(BasicLeverConfig conf, BlockBehaviour.Properties properties)
     { super(properties); config = conf; }
 
     @Override
@@ -64,7 +62,7 @@ public class BasicLever
         world.setBlock(pos, new_state, 1|2);
         world.updateNeighborsAt(pos, this);
         world.updateNeighborsAt(pos.relative(LeverBlock.getConnectedDirection(new_state).getOpposite()), this);
-        world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, new_state.getValue(POWERED) ? config.sound_pitch_powered() : config.sound_pitch_unpowered());
+        world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, new_state.getValue(POWERED) ? config.getSoundPitchPowered() : config.getSoundPitchUnpowered());
         world.gameEvent(player, new_state.getValue(POWERED) ? GameEvent.BLOCK_ACTIVATE : GameEvent.BLOCK_DEACTIVATE, pos);
         return InteractionResult.CONSUME;
       }

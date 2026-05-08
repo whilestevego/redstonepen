@@ -40,12 +40,10 @@ public class BasicButton
 
   public static class BasicButtonBlock extends net.minecraft.world.level.block.ButtonBlock
   {
-    public record Config(float sound_pitch_unpowered, float sound_pitch_powered, int active_time) {}
+    public final BasicButtonConfig config;
 
-    public final Config config;
-
-    public BasicButtonBlock(Config conf, BlockBehaviour.Properties properties)
-    { super(BlockSetType.SPRUCE, conf.active_time(), properties); config = conf; }
+    public BasicButtonBlock(BasicButtonConfig conf, BlockBehaviour.Properties properties)
+    { super(BlockSetType.SPRUCE, conf.getActiveTime(), properties); config = conf; }
 
     @Override
     @Environment(EnvType.CLIENT)
@@ -65,7 +63,7 @@ public class BasicButton
     @Override
     protected void playSound(@Nullable Player player, LevelAccessor world, BlockPos pos, boolean on)
     {
-      world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, on ? config.sound_pitch_powered() : config.sound_pitch_unpowered());
+      world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f, on ? config.getSoundPitchPowered() : config.getSoundPitchUnpowered());
     }
 
     private static void makeParticle(BlockState state, LevelAccessor world, BlockPos pos, float f)

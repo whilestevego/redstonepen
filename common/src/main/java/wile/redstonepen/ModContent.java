@@ -73,19 +73,19 @@ public class ModContent
     );
     Registries.addBlock("basic_lever",
       ()->new BasicLever.BasicLeverBlock(
-        new BasicLever.BasicLeverBlock.Config(0.8f, 0.9f),
+        new BasicLeverConfig(0.8f, 0.9f),
         BlockBehaviour.Properties.of().noCollission().isValidSpawn(never).strength(0.3f).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY)
       )
     );
     Registries.addBlock("basic_button",
       ()->new BasicButton.BasicButtonBlock(
-        new BasicButton.BasicButtonBlock.Config(0.8f, 0.9f, 20),
+        new BasicButtonConfig(0.8f, 0.9f, 20),
         BlockBehaviour.Properties.of().noCollission().isValidSpawn(never).strength(0.3f).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY)
       )
     );
     Registries.addBlock("basic_pulse_button",
       ()->new BasicButton.BasicButtonBlock(
-        new BasicButton.BasicButtonBlock.Config(0.8f, 0.9f, 2),
+        new BasicButtonConfig(0.8f, 0.9f, 2),
         BlockBehaviour.Properties.of().noCollission().isValidSpawn(never).strength(0.3f).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY)
       )
     );
