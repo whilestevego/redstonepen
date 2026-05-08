@@ -141,7 +141,7 @@ afterEvaluate {
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
-    timeout.set(Duration.ofMinutes(10))
+    timeout.set(Duration.ofSeconds(165)) // 5× observed max (33 s)
   }
 }
 
