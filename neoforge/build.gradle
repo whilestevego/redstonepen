@@ -72,10 +72,13 @@ dependencies {
   minecraft "com.mojang:minecraft:${project.version_minecraft}"
   mappings loom.officialMojangMappings()
   neoForge "net.neoforged:neoforge:${project.version_neoforge}"
-  // kotlinforforge-neoforge deferred: KFF loads as an isolated NeoForge plugin layer
-  // whose classloader cannot see its own bundled Kotlin stdlib in the Loom dev
+  // kotlin-stdlib: the Kotlin JVM plugin only auto-adds stdlib when Kotlin sources exist
+  // in this subproject. Until neoforge has its own .kt files, add it explicitly so the
+  // NeoForge runtime classloader can find Kotlin runtime classes from :common.
+  // KFF (kotlinforforge-neoforge) is still deferred — it loads as an isolated NeoForge
+  // plugin layer whose classloader cannot see its own bundled stdlib in the Loom dev
   // environment, causing ClassNotFoundException on kotlin.jvm.internal.Intrinsics.
-  // Add this dep in the first phase that produces actual Kotlin classes in the mod JAR.
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
