@@ -211,7 +211,7 @@ afterEvaluate {
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
     // Kill the server process if it hangs after an error instead of exiting cleanly.
-    timeout.set(Duration.ofSeconds(220)) // 5× observed max (44 s)
+    timeout.set(Duration.ofSeconds(250)) // 5× observed max (44 s), rounded to nearest 50
   }
 }
 

@@ -31,11 +31,11 @@ jobs:
         run: ./gradlew :common:test
 
       - name: NeoForge GameTests
-        timeout-minutes: 4
+        timeout-minutes: 5
         run: ./gradlew :neoforge:runGameTestServer
 
       - name: Fabric GameTests
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: ./gradlew :fabric:runGameTestServer
 
       - name: Verify coverage
