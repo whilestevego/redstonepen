@@ -2,6 +2,8 @@
 plugins {
   id 'dev.architectury.loom'
   id 'jacoco'
+  id 'org.jetbrains.kotlin.jvm'
+  id 'org.jetbrains.kotlin.plugin.power-assert'
 }
 
 architectury { common('neoforge', 'fabric') }
@@ -25,6 +27,13 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
   testImplementation 'org.mockito:mockito-core:5.11.0'
+  testImplementation 'io.mockk:mockk:1.13.12'
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+  }
 }
 
 jacoco { toolVersion = '0.8.12' }

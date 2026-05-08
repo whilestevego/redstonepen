@@ -1,8 +1,10 @@
 // neoforge/build.gradle
 plugins {
   id 'dev.architectury.loom'
-  id 'com.github.johnrengelman.shadow'
+  id 'com.gradleup.shadow'
   id 'jacoco'
+  id 'org.jetbrains.kotlin.jvm'
+  id 'org.jetbrains.kotlin.plugin.power-assert'
 }
 
 architectury {
@@ -70,6 +72,10 @@ dependencies {
   minecraft "com.mojang:minecraft:${project.version_minecraft}"
   mappings loom.officialMojangMappings()
   neoForge "net.neoforged:neoforge:${project.version_neoforge}"
+  // kotlinforforge-neoforge deferred: KFF loads as an isolated NeoForge plugin layer
+  // whose classloader cannot see its own bundled Kotlin stdlib in the Loom dev
+  // environment, causing ClassNotFoundException on kotlin.jvm.internal.Intrinsics.
+  // Add this dep in the first phase that produces actual Kotlin classes in the mod JAR.
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
@@ -84,6 +90,12 @@ dependencies {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+kotlin {
+  compilerOptions {
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+  }
+}
 
 jacoco { toolVersion = '0.8.12' }
 
@@ -201,6 +213,8 @@ afterEvaluate {
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
+    // Kill the server process if it hangs after an error instead of exiting cleanly.
+    timeout.set(Duration.ofSeconds(250)) // 5× observed max (44 s), rounded to nearest 50
   }
 }
 
@@ -208,6 +222,9 @@ afterEvaluate {
 def jacocoExcludes = [
   '**/generated/**',
   '**/*$$Lambda*.class',
+  '**/*$sam$*',           // Kotlin SAM conversions
+  '**/*$WhenMappings.class', // Kotlin when-on-enum dispatch tables
+  '**/*$$special$$inlined*', // Kotlin inlined lambda bodies
   // client-only / rendering / GUI
   'wile/redstonepen/detail/ModRenderers*.class',
   'wile/redstonepen/client/Guis*.class',

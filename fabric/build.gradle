@@ -1,8 +1,10 @@
 // fabric/build.gradle
 plugins {
   id 'dev.architectury.loom'
-  id 'com.github.johnrengelman.shadow'
+  id 'com.gradleup.shadow'
   id 'jacoco'
+  // Kotlin plugin deferred to Phase 14: applying it triggers Loom's Kotlin metadata
+  // remapping for all mod deps; deferred until Fabric sources are ready to migrate.
 }
 
 architectury {
@@ -44,6 +46,7 @@ dependencies {
   mappings loom.officialMojangMappings()
   modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
   modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+  // fabric-language-kotlin deferred to Phase 14 (alongside Loom upgrade for Kotlin 2.2.x support)
   modImplementation fabricApi.module("fabric-gametest-api-v1", project.fabric_api_version)
 
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
@@ -138,6 +141,7 @@ afterEvaluate {
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
+    timeout.set(Duration.ofSeconds(250)) // 5× observed max (33 s), rounded to nearest 50
   }
 }
 
@@ -145,6 +149,9 @@ afterEvaluate {
 def jacocoExcludes = [
   '**/generated/**',
   '**/*$$Lambda*.class',
+  '**/*$sam$*',              // Kotlin SAM conversions
+  '**/*$WhenMappings.class', // Kotlin when-on-enum dispatch tables
+  '**/*$$special$$inlined*', // Kotlin inlined lambda bodies
   // client-only / rendering / GUI
   'wile/redstonepen/detail/ModRenderers*.class',
   'wile/redstonepen/client/Guis*.class',
