@@ -52,9 +52,10 @@ dependencies {
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 
-  // kotlin-stdlib needed for javac to resolve KMappedMarker on Kotlin classes from :common.
-  // The Kotlin plugin is deferred to Phase 14; this compileOnly dep bridges the gap.
-  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
+  // kotlin-stdlib: Kotlin plugin deferred to Phase 14, so stdlib is not auto-added.
+  // implementation (not compileOnly) so the JAR is on runtimeClasspath and can be
+  // appended to the bootstrap classpath for the GameTest server (see afterEvaluate below).
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
 
   jacocoOfflineRuntime "org.jacoco:org.jacoco.agent:0.8.12:runtime"
 }
@@ -145,6 +146,10 @@ afterEvaluate {
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
+    // Fabric's Knot classloader does not see the system classpath, so stdlib must be on
+    // the bootstrap classpath — same pattern as JaCoCo above.
+    def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
+    if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
     timeout.set(Duration.ofSeconds(250)) // 5× observed max (33 s), rounded to nearest 50
   }
 }
