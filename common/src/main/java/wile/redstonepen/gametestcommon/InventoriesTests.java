@@ -4,7 +4,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import wile.redstonepen.libmc.Inventories;
+import wile.redstonepen.util.Inventories;
 
 public final class InventoriesTests
 {

@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.blocks.CircuitComponents;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 
 import java.util.HashSet;
 import java.util.Set;

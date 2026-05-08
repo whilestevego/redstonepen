@@ -34,11 +34,11 @@ import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModContent;
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections;
 import wile.redstonepen.items.RedstonePenItem;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.Registries;
-import wile.redstonepen.libmc.RsSignals;
-import wile.redstonepen.libmc.StandardEntityBlocks;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.net.Networking;
+import wile.redstonepen.registry.Registries;
+import wile.redstonepen.util.RsSignals;
+import wile.redstonepen.blocks.StandardEntityBlocks;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.*;

@@ -12,9 +12,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.ModContent;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.net.Networking;
+import wile.redstonepen.registry.Registries;
 
 public class ModRedstonePen implements ModInitializer
 {

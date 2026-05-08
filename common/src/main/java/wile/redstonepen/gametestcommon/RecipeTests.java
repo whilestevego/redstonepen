@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
-import wile.redstonepen.libmc.ExtendedShapelessRecipe;
+import wile.redstonepen.registry.ExtendedShapelessRecipe;
 
 public final class RecipeTests
 {

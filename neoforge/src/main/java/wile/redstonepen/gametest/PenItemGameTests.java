@@ -19,8 +19,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.items.RedstonePenItem;
-import wile.redstonepen.libmc.Inventories;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.util.Inventories;
+import wile.redstonepen.registry.Registries;
 
 @GameTestHolder(ModConstants.MODID)
 @PrefixGameTestTemplate(false)
@@ -329,7 +329,7 @@ public class PenItemGameTests
     player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
 
     final BlockPos wireAbs = helper.absolutePos(POS.above());
-    ((wile.redstonepen.libmc.StandardItems.BaseItem)pen.getItem()).onBlockStartBreak(pen, wireAbs, player);
+    ((wile.redstonepen.items.StandardItems.BaseItem)pen.getItem()).onBlockStartBreak(pen, wireAbs, player);
 
     final BlockState after = helper.getLevel().getBlockState(wireAbs);
     if(!after.isAir()) helper.fail("expected redstone wire removed by onBlockStartBreak, got: " + after);

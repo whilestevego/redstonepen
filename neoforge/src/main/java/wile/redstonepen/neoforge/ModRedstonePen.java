@@ -31,11 +31,11 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.platform.NetworkingPlatformNeoForge;
-import wile.redstonepen.libmc.Overlay;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.net.Networking;
+import wile.redstonepen.neoforge.NetworkingPlatformNeoForge;
+import wile.redstonepen.client.Overlay;
+import wile.redstonepen.registry.Registries;
 
 @Mod("redstonepen")
 public class ModRedstonePen

@@ -25,8 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import wile.redstonepen.blocks.CircuitComponents;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.StandardEntityBlocks;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.blocks.StandardEntityBlocks;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;

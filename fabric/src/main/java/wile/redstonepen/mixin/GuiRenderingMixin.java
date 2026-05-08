@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wile.redstonepen.libmc.Overlay;
+import wile.redstonepen.client.Overlay;
 
 @Environment(EnvType.CLIENT)
 @Mixin(net.minecraft.client.gui.Gui.class)

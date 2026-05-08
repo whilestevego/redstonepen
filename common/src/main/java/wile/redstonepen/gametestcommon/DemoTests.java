@@ -12,7 +12,7 @@ import wile.redstonepen.blocks.track.RedstoneTrackDefs;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.commands.DemoBuilder;
 import wile.redstonepen.commands.DemoSections;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 
 public final class DemoTests
 {

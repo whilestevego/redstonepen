@@ -9,8 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.net.Networking;
+import wile.redstonepen.registry.Registries;
 
 import org.jetbrains.annotations.Nullable;
 

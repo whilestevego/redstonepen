@@ -12,7 +12,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import wile.redstonepen.libmc.Auxiliaries;
+import wile.redstonepen.util.Auxiliaries;
 
 import java.util.*;
 
