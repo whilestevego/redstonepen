@@ -52,6 +52,10 @@ dependencies {
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 
+  // kotlin-stdlib needed for javac to resolve KMappedMarker on Kotlin classes from :common.
+  // The Kotlin plugin is deferred to Phase 14; this compileOnly dep bridges the gap.
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
+
   jacocoOfflineRuntime "org.jacoco:org.jacoco.agent:0.8.12:runtime"
 }
 
