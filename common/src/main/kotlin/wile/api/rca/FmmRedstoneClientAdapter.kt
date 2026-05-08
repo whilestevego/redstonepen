@@ -8,8 +8,17 @@ import java.nio.channels.FileChannel
 import java.nio.file.Files
 import java.nio.file.Path
 
+/** File Memory Mapped Redstone Client Adapter implementation. */
 class FmmRedstoneClientAdapter {
 
+    /**
+     * Memory Mapping auxiliary class.
+     * Wraps the common processes of using MappedByteBuffer/RandomAccessFile
+     * in java. Under Linux the native `mmap()` functionality will be implicitly
+     * used, Windows provides the similar functionality via the `CreateFileMapping()`/
+     * `OpenFileMapping()` WINAPI functions (a bit more is needed, but in essence
+     * these are the key functions).
+     */
     private class FileMemMap(
         private val mapFilePath: String,
         private val isWrite: Boolean,
@@ -69,6 +78,7 @@ class FmmRedstoneClientAdapter {
         }
     }
 
+    /** Memory Mapped IPC adapter implementation. */
     class Adapter(private val isSystemSide: Boolean) : RedstoneClientAdapter {
         private val reopenDelay = if (isSystemSide) 0 else ERROR_RELOAD_DELAY
         private val inFile  = FileMemMap(ipcIoPath(isSystemSide),  false, reopenDelay, MAP_SIZE)
@@ -79,16 +89,34 @@ class FmmRedstoneClientAdapter {
         private var outputDataChanged = true
         private var ipcOpen = false
 
+        /** @see RedstoneClientAdapter */
         override fun getInputs(): Long = inputDataWord
+
+        /** @see RedstoneClientAdapter */
         override fun setInputs(value: Long) { if (value != inputDataWord) { inputDataWord = value; inputDataChanged = true } }
+
+        /** @see RedstoneClientAdapter */
         override fun isInputsChanged(): Boolean = inputDataChanged
+
+        /** @see RedstoneClientAdapter */
         override fun setInputsChanged(changed: Boolean) { inputDataChanged = changed }
+
+        /** @see RedstoneClientAdapter */
         override fun getOutputs(): Long = outputDataWord
+
+        /** @see RedstoneClientAdapter */
         override fun setOutputs(value: Long) { if (value != outputDataWord) { outputDataWord = value; outputDataChanged = true } }
+
+        /** @see RedstoneClientAdapter */
         override fun isOutputsChanged(): Boolean = outputDataChanged
+
+        /** @see RedstoneClientAdapter */
         override fun setOutputsChanged(changed: Boolean) { outputDataChanged = changed }
+
+        /** @see RedstoneClientAdapter */
         override fun isOpen(): Boolean = ipcOpen
 
+        /** Timed/client tick related cyclic IPC I/O method. @see RedstoneClientAdapter */
         override fun tick() {
             if (!ipcOpen) {
                 ipcOpen = if (isSystemSide) {
@@ -134,20 +162,42 @@ class FmmRedstoneClientAdapter {
                 else -> '0'.code.toByte()
             }
 
+            /**
+             * Returns the IPC map file path ("[prefix].i.mmap" or "[prefix].o.mmap") from
+             * the reference perspective of the MC mod side.
+             *
+             * @param mcSideOutput True if output for the mod side and input for system side, or vice versa.
+             * @return System formatted IPC file path string representation.
+             */
             @JvmStatic
             fun ipcIoPath(mcSideOutput: Boolean): String =
                 Auxiliaries.getGameDirectory().resolve("redstonepen." + (if (mcSideOutput) 'o' else 'i') + ".mmap").toString()
 
+            /**
+             * Returns true if the feature is enabled. Initialized after
+             * the first invocation of `instance()`.
+             * @return bool
+             */
             @JvmStatic
             fun available(): Boolean = featureEnabled && singletonInstance != null
 
+            /**
+             * Mod side singleton instance getter. Returns `null`
+             * on error or if the preconditions to allow enabling
+             * this feature are not met.
+             *
+             * If you use this class for writing a system-side
+             * adapter program, call the constructor directly.
+             *
+             * @return Adapter
+             */
             @JvmStatic
             fun instance(): Adapter? {
                 if (!featureEnabled) return null
                 if (singletonInstance != null) return singletonInstance
                 return try {
-                    if (!java.nio.file.Files.exists(Path.of(ipcIoPath(false))) ||
-                        !java.nio.file.Files.exists(Path.of(ipcIoPath(true)))) {
+                    if (!Files.exists(Path.of(ipcIoPath(false))) ||
+                        !Files.exists(Path.of(ipcIoPath(true)))) {
                         featureEnabled = false; null
                     } else {
                         Adapter(false).also { singletonInstance = it }
