@@ -1,7 +1,7 @@
 // fabric/build.gradle
 plugins {
   id 'dev.architectury.loom'
-  id 'com.github.johnrengelman.shadow'
+  id 'com.gradleup.shadow'
   id 'jacoco'
   // Kotlin plugin deferred to Phase 14: applying it triggers Loom's Kotlin metadata
   // remapping for all mod deps; deferred until Fabric sources are ready to migrate.

@@ -1,7 +1,7 @@
 // neoforge/build.gradle
 plugins {
   id 'dev.architectury.loom'
-  id 'com.github.johnrengelman.shadow'
+  id 'com.gradleup.shadow'
   id 'jacoco'
   id 'org.jetbrains.kotlin.jvm'
   id 'org.jetbrains.kotlin.plugin.power-assert'
