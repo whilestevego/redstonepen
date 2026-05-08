@@ -41,8 +41,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3f;
 import wile.redstonepen.items.RedstonePenItem;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.StandardBlocks;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.blocks.StandardBlocks;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.*;

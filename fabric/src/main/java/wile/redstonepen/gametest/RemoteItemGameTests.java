@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 
 public class RemoteItemGameTests
 {
@@ -88,7 +88,7 @@ public class RemoteItemGameTests
     final ItemStack remote = new ItemStack(Registries.getItem("remote"));
     player.setItemInHand(InteractionHand.MAIN_HAND, remote);
     final BlockPos leverAbs = helper.absolutePos(POS);
-    final boolean result = ((wile.redstonepen.libmc.StandardItems.BaseItem)remote.getItem())
+    final boolean result = ((wile.redstonepen.items.StandardItems.BaseItem)remote.getItem())
       .onBlockStartBreak(remote, leverAbs, player);
     if(result) helper.fail("onBlockStartBreak must return false");
     helper.succeed();
@@ -102,7 +102,7 @@ public class RemoteItemGameTests
     // Cast to BaseItem since Fabric's Item class doesn't expose doesSneakBypassUse.
     final ItemStack remote = new ItemStack(Registries.getItem("remote"));
     final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-    if(((wile.redstonepen.libmc.StandardItems.BaseItem)remote.getItem()).doesSneakBypassUse(remote, helper.getLevel(), helper.absolutePos(POS), player))
+    if(((wile.redstonepen.items.StandardItems.BaseItem)remote.getItem()).doesSneakBypassUse(remote, helper.getLevel(), helper.absolutePos(POS), player))
       helper.fail("remote must not bypass sneak use");
     helper.succeed();
   }

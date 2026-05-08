@@ -15,10 +15,10 @@ import wile.redstonepen.ModContent;
 import wile.redstonepen.blocks.controlbox.client.ControlBoxGui;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
-import wile.redstonepen.libmc.NetworkingClient;
-import wile.redstonepen.libmc.Overlay;
-import wile.redstonepen.libmc.PlatformServices;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.net.NetworkingClient;
+import wile.redstonepen.client.Overlay;
+import wile.redstonepen.platform.PlatformServices;
+import wile.redstonepen.registry.Registries;
 
 @Environment(EnvType.CLIENT)
 public class ModRedstonePenClient implements ClientModInitializer

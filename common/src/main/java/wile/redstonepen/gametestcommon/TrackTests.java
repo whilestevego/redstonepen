@@ -21,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.blocks.track.RedstoneTrackBlock;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.blocks.track.TrackNet;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 import java.util.List;
 
 public final class TrackTests

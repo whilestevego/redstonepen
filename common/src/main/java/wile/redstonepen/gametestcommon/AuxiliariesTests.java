@@ -6,7 +6,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.entity.player.Player;
-import wile.redstonepen.libmc.Auxiliaries;
+import wile.redstonepen.util.Auxiliaries;
 
 public final class AuxiliariesTests
 {

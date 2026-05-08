@@ -22,9 +22,9 @@ import wile.redstonepen.blocks.track.RedstoneTrackBlock;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
 import wile.redstonepen.items.RedstonePenItem;
 import wile.redstonepen.items.RemoteItem;
-import wile.redstonepen.libmc.StandardBlocks;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.blocks.StandardBlocks;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.registry.Registries;
 
 
 public class ModContent
@@ -33,7 +33,7 @@ public class ModContent
   {
     initBlocks();
     initItems();
-    Registries.addRecipeSerializer("crafting_extended_shapeless", ()->wile.redstonepen.libmc.ExtendedShapelessRecipe.SERIALIZER);
+    Registries.addRecipeSerializer("crafting_extended_shapeless", ()->wile.redstonepen.registry.ExtendedShapelessRecipe.SERIALIZER);
   }
 
   public static void initBlocks()

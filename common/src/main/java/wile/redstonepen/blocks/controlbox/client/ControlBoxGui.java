@@ -12,11 +12,11 @@ import net.minecraft.world.inventory.Slot;
 import wile.redstonepen.ModContent;
 import wile.redstonepen.blocks.controlbox.Defs;
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Guis;
-import wile.redstonepen.libmc.GuiTextEditing;
-import wile.redstonepen.libmc.NetworkingClient;
-import wile.redstonepen.libmc.TooltipDisplay;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.client.Guis;
+import wile.redstonepen.client.GuiTextEditing;
+import wile.redstonepen.net.NetworkingClient;
+import wile.redstonepen.client.TooltipDisplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;

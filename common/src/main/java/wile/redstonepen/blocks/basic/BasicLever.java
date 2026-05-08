@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import wile.redstonepen.libmc.Auxiliaries;
+import wile.redstonepen.util.Auxiliaries;
 
 import java.util.List;
 

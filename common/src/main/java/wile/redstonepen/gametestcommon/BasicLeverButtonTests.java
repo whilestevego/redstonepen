@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.blocks.basic.BasicGauge;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 
 public final class BasicLeverButtonTests
 {

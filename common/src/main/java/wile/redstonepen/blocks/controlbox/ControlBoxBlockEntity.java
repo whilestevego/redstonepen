@@ -19,10 +19,10 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import wile.redstonepen.detail.RcaSync;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Networking;
-import wile.redstonepen.libmc.Registries;
-import wile.redstonepen.libmc.StandardEntityBlocks;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.net.Networking;
+import wile.redstonepen.registry.Registries;
+import wile.redstonepen.blocks.StandardEntityBlocks;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.Map;

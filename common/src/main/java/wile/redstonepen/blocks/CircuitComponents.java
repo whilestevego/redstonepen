@@ -45,10 +45,9 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import wile.redstonepen.ModContent;
 import wile.redstonepen.blocks.track.RedstoneTrackBlock;
-import wile.redstonepen.libmc.RsSignals;
-import wile.redstonepen.libmc.StandardBlocks;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Overlay;
+import wile.redstonepen.util.RsSignals;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.client.Overlay;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.*;

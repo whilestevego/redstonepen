@@ -22,8 +22,8 @@ import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.controlbox.*;
 import wile.redstonepen.items.RemoteItem;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.registry.Registries;
 
 @GameTestHolder(ModConstants.MODID)
 @PrefixGameTestTemplate(false)
@@ -98,7 +98,7 @@ public class RemoteItemGameTests
     final ItemStack remote = new ItemStack(Registries.getItem("remote"));
     player.setItemInHand(InteractionHand.MAIN_HAND, remote);
     final BlockPos leverAbs = helper.absolutePos(POS);
-    final boolean result = ((wile.redstonepen.libmc.StandardItems.BaseItem)remote.getItem())
+    final boolean result = ((wile.redstonepen.items.StandardItems.BaseItem)remote.getItem())
       .onBlockStartBreak(remote, leverAbs, player);
     if(result) helper.fail("onBlockStartBreak must return false");
     helper.succeed();

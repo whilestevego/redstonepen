@@ -24,7 +24,7 @@ import wile.redstonepen.blocks.CircuitComponents;
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity;
 import wile.redstonepen.blocks.track.RedstoneTrackDefs;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.registry.Registries;
 
 public final class DemoSections
 {

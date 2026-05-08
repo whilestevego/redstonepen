@@ -35,9 +35,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.controlbox.ControlBoxBlock;
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.Overlay;
-import wile.redstonepen.libmc.StandardItems;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.client.Overlay;
 
 import java.util.List;
 import java.util.Optional;

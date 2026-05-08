@@ -15,8 +15,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import wile.redstonepen.ModConstants;
 import wile.redstonepen.items.RedstonePenItem;
-import wile.redstonepen.libmc.Inventories;
-import wile.redstonepen.libmc.Registries;
+import wile.redstonepen.util.Inventories;
+import wile.redstonepen.registry.Registries;
 
 public class PenItemGameTests
 {
@@ -323,7 +323,7 @@ public class PenItemGameTests
     player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, pen);
 
     final BlockPos wireAbs = helper.absolutePos(POS.above());
-    ((wile.redstonepen.libmc.StandardItems.BaseItem)pen.getItem()).onBlockStartBreak(pen, wireAbs, player);
+    ((wile.redstonepen.items.StandardItems.BaseItem)pen.getItem()).onBlockStartBreak(pen, wireAbs, player);
 
     final BlockState after = helper.getLevel().getBlockState(wireAbs);
     if(!after.isAir()) helper.fail("expected redstone wire removed by onBlockStartBreak, got: " + after);
@@ -400,7 +400,7 @@ public class PenItemGameTests
     // Cast to BaseItem since Fabric's Item class doesn't expose doesSneakBypassUse.
     final ItemStack pen = new ItemStack(Registries.getItem("pen"));
     final Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-    if(!((wile.redstonepen.libmc.StandardItems.BaseItem)pen.getItem()).doesSneakBypassUse(pen, helper.getLevel(), helper.absolutePos(POS), player))
+    if(!((wile.redstonepen.items.StandardItems.BaseItem)pen.getItem()).doesSneakBypassUse(pen, helper.getLevel(), helper.absolutePos(POS), player))
       helper.fail("pen must bypass sneak use");
     helper.succeed();
   }

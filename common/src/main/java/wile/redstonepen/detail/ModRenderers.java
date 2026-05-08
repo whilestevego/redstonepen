@@ -24,8 +24,8 @@ import wile.redstonepen.ModConstants;
 import wile.redstonepen.blocks.track.RedstoneTrackDefs;
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections;
 import wile.redstonepen.blocks.track.TrackBlockEntity;
-import wile.redstonepen.libmc.Auxiliaries;
-import wile.redstonepen.libmc.PlatformServices;
+import wile.redstonepen.util.Auxiliaries;
+import wile.redstonepen.platform.PlatformServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;

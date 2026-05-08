@@ -1,6 +1,6 @@
 package wile.api.rca;
 
-import wile.redstonepen.libmc.Auxiliaries;
+import wile.redstonepen.util.Auxiliaries;
 
 import java.io.File;
 import java.io.RandomAccessFile;
