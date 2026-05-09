@@ -1,4 +1,3 @@
-@file:Suppress("DEPRECATION")
 package wile.redstonepen.items
 
 import net.fabricmc.api.EnvType

@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION") // CompoundTag.unsafe is deprecated in Java but has no replacement for direct NBT access
 package wile.redstonepen.util
 
 import com.mojang.blaze3d.platform.InputConstants

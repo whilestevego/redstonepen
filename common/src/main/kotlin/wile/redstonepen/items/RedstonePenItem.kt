@@ -1,4 +1,3 @@
-@file:Suppress("DEPRECATION")
 package wile.redstonepen.items
 
 import net.fabricmc.api.EnvType
@@ -105,7 +104,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
             return trackBlock.modifySegments(targetState, world, targetPos, player, stack, hand, rtr, false, true)
         } else {
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, targetPos, context.isInside)
-            val ctx = BlockPlaceContext(player, context.hand, ItemStack(Items.REDSTONE), rtr)
+            val ctx = BlockPlaceContext(player ?: return InteractionResult.FAIL, context.hand, ItemStack(Items.REDSTONE), rtr)
             val rsState = ModContent.references.TRACK_BLOCK.getStateForPlacement(ctx) ?: return InteractionResult.FAIL
             if (!targetState.canBeReplaced(ctx)) return InteractionResult.FAIL
             if (!world.setBlock(targetPos, rsState, 1 or 2 or 16)) return InteractionResult.FAIL
