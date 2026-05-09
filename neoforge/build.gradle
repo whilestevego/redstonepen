@@ -222,7 +222,7 @@ afterEvaluate {
     def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
     if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
     // Kill the server process if it hangs after an error instead of exiting cleanly.
-    timeout.set(Duration.ofSeconds(250)) // 5× observed max (44 s), rounded to nearest 50
+    timeout.set(Duration.ofSeconds(90)) // 2× observed max (44 s); tighter bound surfaces failures faster
   }
 }
 
