@@ -150,7 +150,7 @@ afterEvaluate {
     // the bootstrap classpath — same pattern as JaCoCo above.
     def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
     if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
-    timeout.set(Duration.ofSeconds(250)) // 5× observed max (33 s), rounded to nearest 50
+    timeout.set(Duration.ofSeconds(90)) // 2.5× observed max (33 s); tighter bound surfaces failures faster
   }
 }
 
