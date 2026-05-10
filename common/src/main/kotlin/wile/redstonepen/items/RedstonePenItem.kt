@@ -90,7 +90,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
             val track = state.block as RedstoneTrackBlock
             if (world.isClientSide) return InteractionResult.SUCCESS
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, context.clickedPos, context.isInside)
-            return track.modifySegments(state, world, pos, player, stack, hand, rtr, false, true)
+            return track.modifySegments(state, world, pos, player ?: return InteractionResult.FAIL, stack, hand, rtr, false, true)
         }
         // Check if a new track can be placed.
         if (!RedstoneTrackBlock.canBePlacedOnFace(state, world, pos, facing)) return InteractionResult.FAIL
@@ -101,7 +101,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         if (targetState.block is RedstoneTrackBlock) {
             val trackBlock = targetState.block as RedstoneTrackBlock
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, targetPos, context.isInside)
-            return trackBlock.modifySegments(targetState, world, targetPos, player, stack, hand, rtr, false, true)
+            return trackBlock.modifySegments(targetState, world, targetPos, player ?: return InteractionResult.FAIL, stack, hand, rtr, false, true)
         } else {
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, targetPos, context.isInside)
             val ctx = BlockPlaceContext(player ?: return InteractionResult.FAIL, context.hand, ItemStack(Items.REDSTONE), rtr)
@@ -139,7 +139,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                 val te: TrackBlockEntity = RedstoneTrackBlock.tile(world, pos).orElse(null) ?: return
                 tc = Auxiliaries.localizable("overlay.track_power", powerFormatted(te.getSidePower(rsSide)))
                 if (Auxiliaries.isDevelopmentMode()) {
-                    tc.append(Component.literal(String.format(" | flags: %016x, p: ", te.stateFlags)))
+                    tc.append(Component.literal(String.format(" | flags: %016x, p: ", te.getStateFlags())))
                     tc.append(Component.literal(Direction.values().joinToString(",") { side -> side.toString().substring(0, 1) + te.getRedstonePower(side.opposite, false) }))
                 }
             }
