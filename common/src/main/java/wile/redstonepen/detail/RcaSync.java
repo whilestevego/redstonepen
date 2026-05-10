@@ -74,17 +74,24 @@ public class RcaSync
     {
       Networking.PacketNbtNotifyClientToServer.handlers.put(MESSAGE_HANDLER_ID, (player, nbt)->{
         // Function thread safe via Networking packet handler task queuing.
-        if((!nbt.contains("i")) || (num_exceptions >= ERROR_CUTOFF_COUNT)) return;
-        try {
-          final RcaData rca = ofPlayer(player.getUUID(), true);
-          rca.client_inputs(nbt.getLong("i"));
-          nbt.remove("i");
-          nbt.putLong("o", rca.server_outputs());
-          Networking.PacketNbtNotifyServerToClient.sendToPlayer(player, nbt);
-        } catch(Throwable ignored) {
-          ++num_exceptions;
-        }
+        if(applyRcaUpdate(player.getUUID(), nbt)) Networking.PacketNbtNotifyServerToClient.sendToPlayer(player, nbt);
       });
+    }
+
+    // package-private: applies "i" → client_inputs, writes "o" ← server_outputs; returns true if nbt was updated
+    static boolean applyRcaUpdate(UUID uid, CompoundTag nbt)
+    {
+      if((!nbt.contains("i")) || (num_exceptions >= ERROR_CUTOFF_COUNT)) return false;
+      try {
+        final RcaData rca = ofPlayer(uid, true);
+        rca.client_inputs(nbt.getLong("i"));
+        nbt.remove("i");
+        nbt.putLong("o", rca.server_outputs());
+        return true;
+      } catch(Throwable ignored) {
+        ++num_exceptions;
+        return false;
+      }
     }
   }
 
