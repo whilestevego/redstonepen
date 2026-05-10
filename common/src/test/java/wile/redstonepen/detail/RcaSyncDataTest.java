@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import wile.redstonepen.detail.RcaSync.CommonRca;
 import wile.redstonepen.detail.RcaSync.RcaData;
@@ -101,5 +101,48 @@ class RcaSyncDataTest
     // Cache must return the same object — structural equality (Kotlin data class)
     // on the UUID would break this if RcaData were ever converted to a data class.
     assertSame(first, second);
+  }
+
+  @Test
+  void rcaDataToStringContainsUuid()
+  {
+    final UUID uid = UUID.randomUUID();
+    assertTrue(new RcaData(uid).toString().contains(uid.toString()),
+      "toString must include the UUID string");
+  }
+
+  @Test
+  void rcaDataToStringShowsZeroClientOutputs()
+  {
+    final RcaData data = new RcaData(UUID.randomUUID());
+    // client_outputs_ starts at 0; toString renders it as the "co:" field
+    assertTrue(data.toString().contains("co:0000000000000000"),
+      "toString must include co: field with zero-padded hex");
+  }
+
+  @Test
+  void commonRcaApplyRcaUpdateIgnoresNbtWithoutInputKey()
+  {
+    final CompoundTag nbt = new CompoundTag();
+    nbt.putLong("x", 42L);
+    CommonRca.applyRcaUpdate(UUID.randomUUID(), nbt);
+    // no "i" key — must return false and leave nbt unchanged
+    assertTrue(nbt.contains("x"));
+    assertFalse(nbt.contains("o"));
+  }
+
+  @Test
+  void commonRcaApplyRcaUpdateAppliesClientInputsAndWritesServerOutputs()
+  {
+    final UUID uid = UUID.randomUUID();
+    final RcaData rca = CommonRca.ofPlayer(uid, true);
+    rca.server_outputs(0xCAFEL);
+    final CompoundTag nbt = new CompoundTag();
+    nbt.putLong("i", 0xDEADL);
+    final boolean result = CommonRca.applyRcaUpdate(uid, nbt);
+    assertTrue(result, "applyRcaUpdate must return true when 'i' key is present");
+    assertEquals(0xDEADL, rca.client_inputs(), "client_inputs must be updated from nbt 'i'");
+    assertFalse(nbt.contains("i"), "'i' key must be removed after processing");
+    assertEquals(0xCAFEL, nbt.getLong("o"), "'o' key must reflect server_outputs");
   }
 }
