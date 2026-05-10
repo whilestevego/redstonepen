@@ -1,11 +1,3 @@
-/*
- * @file Networking.java
- * @author Stefan Wilhelm (wile)
- * @copyright (C) 2020 Stefan Wilhelm
- * @license MIT (see https://opensource.org/licenses/MIT)
- *
- * Main client/server message handling.
- */
 package wile.redstonepen.net;
 
 import net.fabricmc.api.EnvType;
@@ -40,42 +32,47 @@ public class Networking
     PlatformServices.NETWORKING.registerPayloads();
   }
 
-  // Called by platform networking impl after registering — dispatches C2S receives
   public static void handleServerReceive(UnifiedPayload unified_payload, ServerPlayer player)
   {
     final ServerLevel world = player.serverLevel();
-    final CompoundTag payload = unified_payload.data().nbt();
-    player.server.execute(()->{
-      switch(unified_payload.data().id()) {
-        case PacketTileNotifyClientToServer.PACKET_ID -> {
-          final BlockPos pos = BlockPos.of(payload.getLong("pos"));
-          final CompoundTag nbt = payload.getCompound("nbt");
-          final BlockEntity te = world.getBlockEntity(pos);
-          if(!(te instanceof IPacketTileNotifyReceiver)) return;
-          ((IPacketTileNotifyReceiver)te).onClientPacketReceived(player, nbt);
-        }
-        case PacketContainerSyncClientToServer.PACKET_ID -> {
-          final int container_id = payload.getInt("cid");
-          final CompoundTag nbt = payload.getCompound("nbt");
-          if(!(player.containerMenu instanceof INetworkSynchronisableContainer nsc)) return;
-          if(player.containerMenu.containerId != container_id) return;
-          nsc.onClientPacketReceived(container_id, player, nbt);
-        }
-        case PacketNbtNotifyClientToServer.PACKET_ID -> {
-          final String hnd = payload.getString("hnd");
-          final CompoundTag nbt = payload.getCompound("nbt");
-          if(hnd.isEmpty() || (!PacketNbtNotifyClientToServer.handlers.containsKey(hnd))) return;
-          PacketNbtNotifyClientToServer.handlers.get(hnd).accept(player, nbt);
-        }
-      }
-    });
+    player.server.execute(() -> dispatchServerReceive(unified_payload, world, player));
   }
 
-  // Called by platform networking impl after registering — dispatches S2C receives
+  public static void dispatchServerReceive(UnifiedPayload unified_payload, ServerLevel world, Player player)
+  {
+    final CompoundTag payload = unified_payload.data().nbt();
+    switch(unified_payload.data().id()) {
+      case PacketTileNotifyClientToServer.PACKET_ID -> {
+        final BlockPos pos = BlockPos.of(payload.getLong("pos"));
+        final CompoundTag nbt = payload.getCompound("nbt");
+        final BlockEntity te = world.getBlockEntity(pos);
+        if(!(te instanceof IPacketTileNotifyReceiver)) return;
+        ((IPacketTileNotifyReceiver)te).onClientPacketReceived(player, nbt);
+      }
+      case PacketContainerSyncClientToServer.PACKET_ID -> {
+        final int container_id = payload.getInt("cid");
+        final CompoundTag nbt = payload.getCompound("nbt");
+        if(!(player.containerMenu instanceof INetworkSynchronisableContainer nsc)) return;
+        if(player.containerMenu.containerId != container_id) return;
+        nsc.onClientPacketReceived(container_id, player, nbt);
+      }
+      case PacketNbtNotifyClientToServer.PACKET_ID -> {
+        final String hnd = payload.getString("hnd");
+        final CompoundTag nbt = payload.getCompound("nbt");
+        if(hnd.isEmpty() || (!PacketNbtNotifyClientToServer.handlers.containsKey(hnd))) return;
+        PacketNbtNotifyClientToServer.handlers.get(hnd).accept(player, nbt);
+      }
+    }
+  }
+
   @Environment(EnvType.CLIENT)
   public static void handleClientReceive(UnifiedPayload unified_payload, LocalPlayer player)
   {
-    final Level world = player.level();
+    dispatchClientReceive(unified_payload, player.level(), player.containerMenu);
+  }
+
+  public static void dispatchClientReceive(UnifiedPayload unified_payload, Level world, AbstractContainerMenu containerMenu)
+  {
     final CompoundTag payload = unified_payload.data().nbt();
     switch(unified_payload.data().id()) {
       case PacketTileNotifyServerToClient.PACKET_ID -> {
@@ -88,8 +85,8 @@ public class Networking
       case PacketContainerSyncServerToClient.PACKET_ID -> {
         final int container_id = payload.getInt("cid");
         final CompoundTag nbt = payload.getCompound("nbt");
-        if(!(player.containerMenu instanceof INetworkSynchronisableContainer nsc)) return;
-        if(player.containerMenu.containerId != container_id) return;
+        if(!(containerMenu instanceof INetworkSynchronisableContainer nsc)) return;
+        if(containerMenu.containerId != container_id) return;
         nsc.onServerPacketReceived(container_id, nbt);
       }
       case PacketNbtNotifyServerToClient.PACKET_ID -> {
@@ -158,12 +155,12 @@ public class Networking
 
   public static class PacketTileNotifyClientToServer
   {
-    protected static final String PACKET_ID = "tnc2s";
+    public static final String PACKET_ID = "tnc2s";
   }
 
   public static class PacketTileNotifyServerToClient
   {
-    protected static final String PACKET_ID = "tns2c";
+    public static final String PACKET_ID = "tns2c";
 
     public static void sendToPlayer(ServerPlayer player, BlockEntity te, CompoundTag nbt)
     {
@@ -196,12 +193,12 @@ public class Networking
 
   public static class PacketContainerSyncClientToServer
   {
-    protected static final String PACKET_ID = "csc2s";
+    public static final String PACKET_ID = "csc2s";
   }
 
   public static class PacketContainerSyncServerToClient
   {
-    protected static final String PACKET_ID = "css2c";
+    public static final String PACKET_ID = "css2c";
 
     public static void sendToPlayer(ServerPlayer player, int windowId, CompoundTag nbt)
     {
@@ -231,13 +228,13 @@ public class Networking
 
   public static class PacketNbtNotifyClientToServer
   {
-    protected static final String PACKET_ID = "nnc2s";
+    public static final String PACKET_ID = "nnc2s";
     public static final Map<String, BiConsumer<Player, CompoundTag>> handlers = new HashMap<>();
   }
 
   public static class PacketNbtNotifyServerToClient
   {
-    protected static final String PACKET_ID = "nns2c";
+    public static final String PACKET_ID = "nns2c";
     public static final Map<String, Consumer<CompoundTag>> handlers = new HashMap<>();
 
     public static void sendToPlayer(Player player, CompoundTag nbt)
@@ -256,7 +253,7 @@ public class Networking
 
   public static class OverlayTextMessage
   {
-    protected static final String PACKET_ID = "otms2c";
+    public static final String PACKET_ID = "otms2c";
     protected static BiConsumer<Component, Integer> handler_ = null;
     public static final int DISPLAY_TIME_MS = 3000;
 
