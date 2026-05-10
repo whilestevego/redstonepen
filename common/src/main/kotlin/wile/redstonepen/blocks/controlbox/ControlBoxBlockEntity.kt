@@ -160,6 +160,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun onServerPacketReceived(nbt: CompoundTag) { readnbt(getLevel()!!.registryAccess(), nbt) }
+    override fun onClientPacketReceived(player: Player, nbt: CompoundTag) { readnbt(getLevel()!!.registryAccess(), nbt) }
 
     fun getEnabled(): Boolean =
         (blockState.getValue(CircuitComponents.DirectedComponentBlock.STATE) != 0) || (blockState.getValue(CircuitComponents.DirectedComponentBlock.POWERED))

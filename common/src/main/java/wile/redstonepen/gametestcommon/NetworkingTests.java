@@ -61,6 +61,8 @@ public final class NetworkingTests
       helper.getLevel(),
       helper.makeMockPlayer(GameType.SURVIVAL));
 
+    if(!"b=3".equals(te.getCode()))
+      helper.fail("expected code 'b=3' after C2S tile notify, got: " + te.getCode());
     helper.succeed();
   }
 
