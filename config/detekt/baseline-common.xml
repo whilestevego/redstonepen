@@ -22,15 +22,6 @@
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
     <ID>EmptyFunctionBlock:Registries.kt$Registries${}</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format( "%1s=%02d", Defs.PORT_NAMES[i].uppercase(), (io shr (4 * i)) and 0xf, )</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%1s=00", Defs.PORT_NAMES[i].uppercase())</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%s%s = %d", lf, k.uppercase(), v)</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format( "%016x", client_inputs_, )</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", client_outputs_)</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", server_outputs_)</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | %s [%d,%d,%d]", lookDir, pos.x, pos.y, pos.z)</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | flags: %016x, p: ", te.getStateFlags())</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format("%02d", p)</ID>
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s from %s (%s)", posstr(my_pos), posstr(fromPos), world.getBlockState(fromPos).block.descriptionId, )</ID>
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s updates: [%s]", posstr(blockPos), notifications.entries.joinToString(", ") { "${posstr(it.value)}>${posstr(it.key)}" }, )</ID>
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s changed (%s->%s).", posstr(blockPos), posstr(fromPos), bltv.descriptionId, facingState.block.descriptionId, )</ID>
@@ -45,7 +36,6 @@
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE NET OF %s", posstr(blockPos), posstr(te.blockPos), )</ID>
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE TRACK CHANGES TO %s.", posstr(blockPos), posstr(pos), )</ID>
     <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s adj:%s | ints:%s | pwrs:%s", poss, ss.joinToString(", "), int_sides, pwr_sides, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format("NBCH: %s net power %d->%d", posstr(my_pos), net.power, pmax)</ID>
     <ID>LargeClass:RelayTests.kt$RelayTests</ID>
     <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
     <ID>LargeClass:TrackTests.kt$TrackTests</ID>

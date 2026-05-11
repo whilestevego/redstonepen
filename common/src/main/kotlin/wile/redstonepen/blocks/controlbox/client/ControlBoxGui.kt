@@ -1,5 +1,6 @@
 package wile.redstonepen.blocks.controlbox.client
 
+import java.util.Locale
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.gui.GuiGraphics
@@ -149,7 +150,9 @@ class ControlBoxGui(
             tb.setBordered(false)
             tb.setTextColor(0xffdddddd.toInt())
             tb.setTextColorUneditable(0xffdddddd.toInt())
-            tb.setValue(String.format("%1s=00", Defs.PORT_NAMES[i].uppercase()))
+            tb.setValue(
+                String.format(Locale.ROOT, "%1s=00", Defs.PORT_NAMES[i].uppercase(Locale.ROOT))
+            )
             addRenderableWidget(tb)
             val imgI = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(78, 215))
             imgI.init(this, Guis.Coord2d.of(191, 56 + lineyMap[i]))
@@ -179,7 +182,15 @@ class ControlBoxGui(
                         }
                         val lf = if (c.siblings.isEmpty()) "" else "\n"
                         c.siblings.add(
-                            Component.literal(String.format("%s%s = %d", lf, k.uppercase(), v))
+                            Component.literal(
+                                String.format(
+                                    Locale.ROOT,
+                                    "%s%s = %d",
+                                    lf,
+                                    k.uppercase(Locale.ROOT),
+                                    v,
+                                )
+                            )
                         )
                     }
                 c
@@ -302,8 +313,9 @@ class ControlBoxGui(
                     if ((mask and (0xf shl (4 * i))) == 0) continue
                     port_stati[i].setValue(
                         String.format(
+                            Locale.ROOT,
                             "%1s=%02d",
-                            Defs.PORT_NAMES[i].uppercase(),
+                            Defs.PORT_NAMES[i].uppercase(Locale.ROOT),
                             (io shr (4 * i)) and 0xf,
                         )
                     )

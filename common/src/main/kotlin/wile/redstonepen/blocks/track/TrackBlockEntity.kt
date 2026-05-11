@@ -1,6 +1,7 @@
 package wile.redstonepen.blocks.track
 
 import java.util.LinkedList
+import java.util.Locale
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
@@ -691,7 +692,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (net.power != pmax) {
             if (trace_) {
                 Auxiliaries.logWarn(
-                    String.format("NBCH: %s net power %d->%d", posstr(my_pos), net.power, pmax)
+                    String.format(
+                        Locale.ROOT,
+                        "NBCH: %s net power %d->%d",
+                        posstr(my_pos),
+                        net.power,
+                        pmax,
+                    )
                 )
             }
             net.power = pmax
