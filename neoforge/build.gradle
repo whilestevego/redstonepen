@@ -80,8 +80,8 @@ dependencies {
   // environment, causing ClassNotFoundException on kotlin.jvm.internal.Intrinsics.
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
 
-  common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-  shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
+  common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
+  shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive = false }
 
   testImplementation platform('org.junit:junit-bom:5.10.2')
   testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -379,7 +379,7 @@ tasks.withType(ProcessResources).configureEach {
   ]
   inputs.properties property_replacements
   filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
-    expand property_replacements + [project: project]
+    expand property_replacements
   }
   outputs.upToDateWhen { false }
   doLast {
