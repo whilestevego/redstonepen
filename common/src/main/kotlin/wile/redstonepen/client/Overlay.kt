@@ -18,7 +18,7 @@ import java.util.Optional
 
 object Overlay {
 
-    @Environment(EnvType.CLIENT)
+    @JvmStatic @Environment(EnvType.CLIENT)
     fun register() {
         Networking.OverlayTextMessage.setHandler(TextOverlayGui::show)
     }
