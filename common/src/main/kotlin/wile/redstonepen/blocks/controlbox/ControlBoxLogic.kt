@@ -211,29 +211,29 @@ internal class ControlBoxLogic {
             if (inp <= 0) {
                 m.remove(".$sym.clk")
                 m["$sym.et"] = 0
-                return MathExpr.Expr.bool_false()
+                return MathExpr.Expr.bool_false
             } else if (pt <= 0) {
-                return MathExpr.Expr.bool_true()
+                return MathExpr.Expr.bool_true
             } else {
                 val now = m.getOrDefault(".clock", 0)
                 var et = m.getOrDefault("$sym.et", 0)
                 if (et >= pt) {
-                    return MathExpr.Expr.bool_true()
+                    return MathExpr.Expr.bool_true
                 } else if (et <= 0) {
                     m[".$sym.clk"] = now
                     m["$sym.et"] = 1
                     m["$sym.pt"] = pt
                     m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt)
-                    return MathExpr.Expr.bool_false()
+                    return MathExpr.Expr.bool_false
                 } else {
                     et = Math.min(now - m.getOrDefault(".$sym.clk", now), pt)
                     m["$sym.et"] = et
                     if (et >= pt) {
                         m.remove(".$sym.clk")
-                        return MathExpr.Expr.bool_true()
+                        return MathExpr.Expr.bool_true
                     } else {
                         m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt - et)
-                        return MathExpr.Expr.bool_false()
+                        return MathExpr.Expr.bool_false
                     }
                 }
             }
@@ -255,29 +255,29 @@ internal class ControlBoxLogic {
             if (inp > 0) {
                 m.remove(".$sym.clk")
                 m["$sym.et"] = 0
-                return MathExpr.Expr.bool_true()
+                return MathExpr.Expr.bool_true
             } else if (pt <= 0) {
-                return MathExpr.Expr.bool_true()
+                return MathExpr.Expr.bool_true
             } else {
                 val now = m.getOrDefault(".clock", 0)
                 var et = m.getOrDefault("$sym.et", 0)
                 if (et >= pt) {
-                    return MathExpr.Expr.bool_false()
+                    return MathExpr.Expr.bool_false
                 } else if (et <= 0) {
                     m[".$sym.clk"] = now
                     m["$sym.et"] = 1
                     m["$sym.pt"] = pt
                     m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt)
-                    return MathExpr.Expr.bool_true()
+                    return MathExpr.Expr.bool_true
                 } else {
                     et = Math.min(now - m.getOrDefault(".$sym.clk", now), pt)
                     m["$sym.et"] = et
                     if (et >= pt) {
                         m.remove(".$sym.clk")
-                        return MathExpr.Expr.bool_false()
+                        return MathExpr.Expr.bool_false
                     } else {
                         m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt - et)
-                        return MathExpr.Expr.bool_true()
+                        return MathExpr.Expr.bool_true
                     }
                 }
             }
@@ -297,23 +297,23 @@ internal class ControlBoxLogic {
             val inp = x[0].calc(m)
             val pt = x[1].calc(m)
             if (pt <= 0) {
-                return if (inp > 0) MathExpr.Expr.bool_true() else MathExpr.Expr.bool_false()
+                return if (inp > 0) MathExpr.Expr.bool_true else MathExpr.Expr.bool_false
             }
             var et = m.getOrDefault("$sym.et", 0)
             if (et > 0) {
                 if (et >= pt) {
                     if (inp <= 0) m["$sym.et"] = 0
-                    return MathExpr.Expr.bool_false()
+                    return MathExpr.Expr.bool_false
                 } else {
                     val now = m.getOrDefault(".clock", 0)
                     et = Math.min(now - m.getOrDefault(".$sym.clk", now), pt)
                     m["$sym.et"] = et
                     if (et >= pt) {
                         m.remove(".$sym.clk")
-                        return MathExpr.Expr.bool_false()
+                        return MathExpr.Expr.bool_false
                     } else {
                         m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt - et)
-                        return MathExpr.Expr.bool_true()
+                        return MathExpr.Expr.bool_true
                     }
                 }
             } else if (inp > 0) {
@@ -321,9 +321,9 @@ internal class ControlBoxLogic {
                 m["$sym.et"] = 1
                 m["$sym.pt"] = pt
                 m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), pt)
-                return MathExpr.Expr.bool_true()
+                return MathExpr.Expr.bool_true
             } else {
-                return MathExpr.Expr.bool_false()
+                return MathExpr.Expr.bool_false
             }
         }
 
@@ -342,16 +342,16 @@ internal class ControlBoxLogic {
                 return 0
             }
             val pt = x[0].calc(m)
-            if (pt <= 2) return MathExpr.Expr.bool_false()
+            if (pt <= 2) return MathExpr.Expr.bool_false
             val now = m.getOrDefault(".clock", 0)
             val clk = m.getOrDefault("$sym.clk", now - pt)
             if (Math.abs(now - clk) >= pt) {
                 m["$sym.clk"] = now
                 m[".deadline"] = 1
-                return MathExpr.Expr.bool_true()
+                return MathExpr.Expr.bool_true
             } else {
                 m[".deadline"] = Math.min(m.getOrDefault(".deadline", 20), clk - now + pt)
-                return MathExpr.Expr.bool_false()
+                return MathExpr.Expr.bool_false
             }
         }
 
@@ -584,9 +584,9 @@ internal class ControlBoxLogic {
             companion object {
                 @JvmField val EMPTY = Expr(ExprType.VOID, "<EMPTY>")
 
-                @JvmStatic fun bool_true(): Int = 15
+                @JvmField val bool_true: Int = 15
 
-                @JvmStatic fun bool_false(): Int = 0
+                @JvmField val bool_false: Int = 0
 
                 @JvmStatic fun assignment_sanitize(x: Int): Int = x
             }
@@ -648,7 +648,7 @@ internal class ControlBoxLogic {
 
         class ExprNot(args: List<Expr>) : ExprOp(ExprType.NOT, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) == 0) bool_true() else bool_false()
+                if (arguments[0].calc(mem) == 0) bool_true else bool_false
         }
 
         class ExprMpy(args: List<Expr>) : ExprOp(ExprType.MPY, args) {
@@ -683,58 +683,58 @@ internal class ControlBoxLogic {
         class ExprAnd(args: List<Expr>) : ExprOp(ExprType.AND, args) {
             override fun calc(mem: Map<String, Int>): Int =
                 if (arguments[0].calc(mem) > 0 && arguments[1].calc(mem) > 0) {
-                    bool_true()
+                    bool_true
                 } else {
-                    bool_false()
+                    bool_false
                 }
         }
 
         class ExprOr(args: List<Expr>) : ExprOp(ExprType.OR, args) {
             override fun calc(mem: Map<String, Int>): Int =
                 if (arguments[0].calc(mem) > 0 || arguments[1].calc(mem) > 0) {
-                    bool_true()
+                    bool_true
                 } else {
-                    bool_false()
+                    bool_false
                 }
         }
 
         class ExprXor(args: List<Expr>) : ExprOp(ExprType.XOR, args) {
             override fun calc(mem: Map<String, Int>): Int =
                 if ((arguments[0].calc(mem) > 0) xor (arguments[1].calc(mem) > 0)) {
-                    bool_true()
+                    bool_true
                 } else {
-                    bool_false()
+                    bool_false
                 }
         }
 
         class ExprNeq(args: List<Expr>) : ExprOp(ExprType.NEQ, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) != arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) != arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprEq(args: List<Expr>) : ExprOp(ExprType.EQ, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) == arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) == arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprGe(args: List<Expr>) : ExprOp(ExprType.GE, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) >= arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) >= arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprLe(args: List<Expr>) : ExprOp(ExprType.LE, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) <= arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) <= arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprGt(args: List<Expr>) : ExprOp(ExprType.GT, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) > arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) > arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprLt(args: List<Expr>) : ExprOp(ExprType.LT, args) {
             override fun calc(mem: Map<String, Int>): Int =
-                if (arguments[0].calc(mem) < arguments[1].calc(mem)) bool_true() else bool_false()
+                if (arguments[0].calc(mem) < arguments[1].calc(mem)) bool_true else bool_false
         }
 
         class ExprAssign(ref: String, private val value: Expr) : Expr(ExprType.ASSIGN, ref) {

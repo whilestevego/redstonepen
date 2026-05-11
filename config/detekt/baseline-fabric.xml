@@ -13,9 +13,6 @@
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests$Companion</ID>
     <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests$Companion</ID>
     <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests$Companion</ID>
-    <ID>UnusedParameter:GuiRenderingMixin.kt$GuiRenderingMixin$info: CallbackInfo</ID>
-    <ID>UnusedParameter:GuiRenderingMixin.kt$GuiRenderingMixin$partialTicks: net.minecraft.client.DeltaTracker</ID>
-    <ID>UnusedPrivateMember:GuiRenderingMixin.kt$GuiRenderingMixin$@Inject( at = [At(value = "TAIL")], method = ["render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"], ) private fun render( gg: net.minecraft.client.gui.GuiGraphics, partialTicks: net.minecraft.client.DeltaTracker, info: CallbackInfo, )</ID>
     <ID>UtilityClassWithPublicConstructor:AuxiliariesGameTests.kt$AuxiliariesGameTests</ID>
     <ID>UtilityClassWithPublicConstructor:BasicLeverButtonGameTests.kt$BasicLeverButtonGameTests</ID>
     <ID>UtilityClassWithPublicConstructor:ControlBoxGameTests.kt$ControlBoxGameTests</ID>

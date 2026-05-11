@@ -24,7 +24,7 @@ import wile.redstonepen.util.Auxiliaries
 object ModRenderers {
 
     @Environment(EnvType.CLIENT)
-    class TrackTer(private val renderer_: BlockEntityRendererProvider.Context?) :
+    class TrackTer(_ctx: BlockEntityRendererProvider.Context?) :
         BlockEntityRenderer<TrackBlockEntity> {
 
         companion object {

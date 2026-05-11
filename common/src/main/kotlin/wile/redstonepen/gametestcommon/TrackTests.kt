@@ -35,18 +35,14 @@ object TrackTests {
             val te = getTrack(helper)
             val nbt = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), false)
             val route = nbt.getList("nets", Tag.TAG_COMPOUND.toInt()).getCompound(0)
-            if (route.getInt("power") != 15) {
-                throw IllegalStateException(
-                    "expected seeded track route to keep its stored power value"
-                )
+            check(route.getInt("power") == 15) {
+                "expected seeded track route to keep its stored power value"
             }
-            if (
-                route.getIntArray("pfac").size != 1 ||
-                    route.getIntArray("pfac")[0] != Direction.WEST.get3DDataValue()
+            check(
+                route.getIntArray("pfac").size == 1 &&
+                    route.getIntArray("pfac")[0] == Direction.WEST.get3DDataValue()
             ) {
-                throw IllegalStateException(
-                    "expected seeded track route to keep its configured power side"
-                )
+                "expected seeded track route to keep its configured power side"
             }
         }
     }
@@ -60,8 +56,8 @@ object TrackTests {
             val te = getTrack(helper)
             val nbt = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), false)
             val route = nbt.getList("nets", Tag.TAG_COMPOUND.toInt()).getCompound(0)
-            if (route.getInt("power") != 0) {
-                throw IllegalStateException("expected seeded track route power to update to zero")
+            check(route.getInt("power") == 0) {
+                "expected seeded track route power to update to zero"
             }
         }
     }
@@ -814,7 +810,7 @@ object TrackTests {
 
     private fun seedTrackNet(helper: GameTestHelper, power: Int, vararg powerSides: Direction) {
         val te =
-            getTrack(helper) ?: throw IllegalStateException("expected track block entity to exist")
+            getTrack(helper) ?: error("expected track block entity to exist")
         val route = CompoundTag()
         route.putInt("power", power)
         route.put("npos", LongArrayTag(listOf()))

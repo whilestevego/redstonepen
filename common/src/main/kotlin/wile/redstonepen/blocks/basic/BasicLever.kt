@@ -90,7 +90,7 @@ object BasicLever {
                 pos: BlockPos,
                 f: Float,
             ) {
-                for (i in 0 until 2) {
+                repeat(2) {
                     val vpos =
                         Vec3.atCenterOf(pos)
                             .add(

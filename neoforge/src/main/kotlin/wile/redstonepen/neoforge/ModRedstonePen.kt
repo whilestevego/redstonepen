@@ -94,7 +94,7 @@ class ModRedstonePen(bus: IEventBus) {
     private class LiveCycleEvents {
         companion object {
             @JvmStatic
-            fun onConstruct(event: FMLConstructModEvent) {
+            fun onConstruct(_event: FMLConstructModEvent) {
                 RcaSync.CommonRca.init()
             }
 
@@ -124,7 +124,7 @@ class ModRedstonePen(bus: IEventBus) {
             @JvmStatic
             @SubscribeEvent
             @Suppress("UNCHECKED_CAST")
-            fun onClientSetup(event: FMLClientSetupEvent) {
+            fun onClientSetup(_event: FMLClientSetupEvent) {
                 Networking.OverlayTextMessage.setHandler(Overlay.TextOverlayGui::show)
                 Overlay.on_config(0.75, 0x00ffaa00, 0x55333333, 0x55333333, 0x55444444)
                 BlockEntityRenderers.register(

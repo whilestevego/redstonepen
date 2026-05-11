@@ -13,9 +13,9 @@ object RsSignals {
     @JvmStatic
     fun hasSignalConnector(
         state: BlockState,
-        world: BlockGetter,
-        pos: BlockPos,
-        realSide: Direction?,
+        _world: BlockGetter,
+        _pos: BlockPos,
+        _realSide: Direction?,
     ): Boolean = state.isSignalSource
 
     @JvmStatic
@@ -41,6 +41,6 @@ object RsSignals {
         state: BlockState,
         world: Level,
         pos: BlockPos,
-        redstoneSide: Direction,
+        _redstoneSide: Direction,
     ): Boolean = state.isRedstoneConductor(world, pos)
 }

@@ -453,8 +453,8 @@ object CircuitComponents {
 
         fun canConnectRedstone(
             state: BlockState,
-            world: BlockGetter,
-            pos: BlockPos,
+            _world: BlockGetter,
+            _pos: BlockPos,
             side: Direction?,
         ): Boolean = side == null || side != state.getValue(FACING)
 
@@ -553,11 +553,12 @@ object CircuitComponents {
             }
         }
 
+        @Suppress("FunctionOnlyReturningConstant")
         fun shouldCheckWeakPower(
-            state: BlockState,
-            level: SignalGetter,
-            pos: BlockPos,
-            side: Direction,
+            _state: BlockState,
+            _level: SignalGetter,
+            _pos: BlockPos,
+            _side: Direction,
         ): Boolean = false
 
         override fun neighborChanged(

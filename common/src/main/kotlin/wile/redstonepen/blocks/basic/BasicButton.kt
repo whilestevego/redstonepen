@@ -75,7 +75,7 @@ object BasicButton {
                 pos: BlockPos,
                 f: Float,
             ) {
-                for (i in 0 until 3) {
+                repeat(3) {
                     val vpos =
                         Vec3.atCenterOf(pos)
                             .add(

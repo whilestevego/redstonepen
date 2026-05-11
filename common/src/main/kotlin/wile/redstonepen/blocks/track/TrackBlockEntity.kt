@@ -141,6 +141,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     override fun getUpdatePacket(): Packet<ClientGamePacketListener> =
         ClientboundBlockEntityDataPacket.create(this)
 
+    @Suppress("FunctionOnlyReturningConstant")
     @Environment(EnvType.CLIENT) fun getViewDistance(): Double = 64.0
 
     fun sync(schedule: Boolean): Boolean {
@@ -215,7 +216,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         RedstoneTrackDefs.connections.hasVanillaWireConnection(getStateFlags(), side) ||
             (state_flags_ and RedstoneTrackDefs.connections.getBulkConnectorBit(side)) != 0L
 
-    fun getRedstonePower(redstone_side: Direction, weak: Boolean): Int {
+    fun getRedstonePower(redstone_side: Direction, _weak: Boolean): Int {
         if (isRemoved) return 0
         val own_side = redstone_side.opposite
         var p = 0
@@ -577,7 +578,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     private fun isNetConnectedTo(
-        pos: BlockPos,
+        _pos: BlockPos,
         net: TrackNet,
         otherPos: BlockPos,
         @Nullable otherSide: Direction?,

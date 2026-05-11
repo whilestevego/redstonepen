@@ -68,6 +68,7 @@ class TooltipDisplay {
         t = System.currentTimeMillis()
     }
 
+    @Suppress("UnusedParameter")
     fun <T : AbstractContainerMenu> render(
         gg: GuiGraphics,
         gui: AbstractContainerScreen<T>,
