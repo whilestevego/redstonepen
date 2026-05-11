@@ -30,6 +30,9 @@ jobs:
       - name: Check lint
         run: ./gradlew lint
 
+      - name: Static analysis
+        run: ./gradlew analyze
+
       - name: Build all modules
         run: ./gradlew build
 

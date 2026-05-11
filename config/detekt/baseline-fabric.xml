@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0.75</ID>
+    <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x00ffaa00</ID>
+    <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x55333333</ID>
+    <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x55444444</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$0.5</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$10</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$1000</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$14</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$27</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$3</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$4</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$5</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$6</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$64</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$7</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests.Companion$9</ID>
+    <ID>MagicNumber:RemoteItemGameTests.kt$RemoteItemGameTests.Companion$100f</ID>
+    <ID>SwallowedException:PlatformHelperFabric.kt$PlatformHelperFabric$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PlatformHelperFabric.kt$PlatformHelperFabric$e: Exception</ID>
+    <ID>TooManyFunctions:ControlBoxGameTests.kt$ControlBoxGameTests$Companion</ID>
+    <ID>TooManyFunctions:DemoGameTests.kt$DemoGameTests$Companion</ID>
+    <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests$Companion</ID>
+    <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests$Companion</ID>
+    <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests$Companion</ID>
+    <ID>UnusedParameter:GuiRenderingMixin.kt$GuiRenderingMixin$info: CallbackInfo</ID>
+    <ID>UnusedParameter:GuiRenderingMixin.kt$GuiRenderingMixin$partialTicks: net.minecraft.client.DeltaTracker</ID>
+    <ID>UnusedPrivateMember:GuiRenderingMixin.kt$GuiRenderingMixin$@Inject( at = [At(value = "TAIL")], method = ["render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"], ) private fun render( gg: net.minecraft.client.gui.GuiGraphics, partialTicks: net.minecraft.client.DeltaTracker, info: CallbackInfo, )</ID>
+    <ID>UtilityClassWithPublicConstructor:AuxiliariesGameTests.kt$AuxiliariesGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:BasicLeverButtonGameTests.kt$BasicLeverButtonGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:ControlBoxGameTests.kt$ControlBoxGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:DemoGameTests.kt$DemoGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:InventoriesGameTests.kt$InventoriesGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:PenItemGameTests.kt$PenItemGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:RecipeGameTests.kt$RecipeGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:RelayGameTests.kt$RelayGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:RemoteItemGameTests.kt$RemoteItemGameTests</ID>
+    <ID>UtilityClassWithPublicConstructor:TrackGameTests.kt$TrackGameTests</ID>
+  </CurrentIssues>
+</SmellBaseline>

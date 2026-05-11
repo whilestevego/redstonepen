@@ -1,0 +1,31 @@
+build:
+  maxIssues: 0
+
+# Naming conventions in this codebase follow Minecraft modding standards:
+# UPPER_CASE for block/item registrations, some snake_case in legacy code.
+# Naming rules are disabled here for the same reason they are in ktlint.
+naming:
+  active: false
+
+# KDoc enforcement is too noisy for an initial setup on a mod codebase.
+comments:
+  active: false
+
+complexity:
+  # Minecraft game logic methods are inherently longer than typical application
+  # code; loosen the defaults to avoid baseline noise on legitimate complexity.
+  CyclomaticComplexMethod:
+    threshold: 20
+  CognitiveComplexMethod:
+    threshold: 20
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 8
+  TooManyFunctions:
+    thresholdInFiles: 30
+    thresholdInClasses: 30
+    thresholdInInterfaces: 20
+    thresholdInObjects: 30
+    thresholdInEnums: 20
