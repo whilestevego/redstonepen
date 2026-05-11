@@ -134,4 +134,40 @@ object TrackGameTests {
 
     @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
     fun getRedstoneDustCountZeroForFreshTrack(helper: GameTestHelper) = TrackTests.getRedstoneDustCountZeroForFreshTrack(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun getRedstoneDustCountMatchesWireFlags(helper: GameTestHelper) = TrackTests.getRedstoneDustCountMatchesWireFlags(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackHasDynamicDropListTrue(helper: GameTestHelper) = TrackTests.trackHasDynamicDropListTrue(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackAsItemReturnsRedstone(helper: GameTestHelper) = TrackTests.trackAsItemReturnsRedstone(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackIsSignalSourceTrue(helper: GameTestHelper) = TrackTests.trackIsSignalSourceTrue(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackUseWithoutItemWithPlayerDoesNotThrow(helper: GameTestHelper) = TrackTests.trackUseWithoutItemWithPlayerDoesNotThrow(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackUseItemOnWithDebugStickTogglesTrace(helper: GameTestHelper) = TrackTests.trackUseItemOnWithDebugStickTogglesTrace(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 10)
+    fun trackCanBePlacedOnFaceOfPiston(helper: GameTestHelper) = TrackTests.trackCanBePlacedOnFaceOfPiston(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackCanBePlacedOnFaceOfHopper(helper: GameTestHelper) = TrackTests.trackCanBePlacedOnFaceOfHopper(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackNeighborChangedWithRedstoneBlockTriggersUpdate(helper: GameTestHelper) = TrackTests.trackNeighborChangedWithRedstoneBlockTriggersUpdate(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackGetRedstoneDustCountZeroWhenNoWiresLargeConfig(helper: GameTestHelper) = TrackTests.trackGetRedstoneDustCountZeroWhenNoWiresLargeConfig(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun trackReadnbtWithSflagsField(helper: GameTestHelper) = TrackTests.trackReadnbtWithSflagsField(helper)
+
+    @JvmStatic @GameTest(template = TEMPLATE, timeoutTicks = 10)
+    fun trackGetNonWireSignalFromRedstoneBlock(helper: GameTestHelper) = TrackTests.trackGetNonWireSignalFromRedstoneBlock(helper)
 }
