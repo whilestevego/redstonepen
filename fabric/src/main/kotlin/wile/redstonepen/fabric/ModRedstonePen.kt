@@ -40,8 +40,8 @@ class ModRedstonePen : ModInitializer {
             .title(Component.translatable("itemGroup.tab${ModConstants.MODID}"))
             .icon { ItemStack(Registries.getItem("pen")) }
             .displayItems { _, reg ->
-                Registries.getRegisteredItems().forEach { it ->
-                    if (it !is BlockItem || it.block != ModContent.references.TRACK_BLOCK) reg.accept(it)
+                Registries.getRegisteredItems().forEach {
+                    if (it !is BlockItem || it.block != ModContent.References.TRACK_BLOCK) reg.accept(it)
                 }
             }
             .build()

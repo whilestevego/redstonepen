@@ -499,9 +499,9 @@ object CircuitComponents {
                 p = when {
                     state.`is`(Blocks.REDSTONE_WIRE) ->
                         maxOf(0, state.getDirectSignal(world, pos, redstoneSide) - 2)
-                    state.`is`(ModContent.references.TRACK_BLOCK) ->
+                    state.`is`(ModContent.References.TRACK_BLOCK) ->
                         maxOf(0, RedstoneTrackBlock.tile(world, pos).map { te -> te.getRedstonePower(redstoneSide, true) }.orElse(0) - 2)
-                    state.`is`(ModContent.references.BRIDGE_RELAY_BLOCK) ->
+                    state.`is`(ModContent.References.BRIDGE_RELAY_BLOCK) ->
                         if (state.getValue(FACING) != world.getBlockState(relayPos).getValue(FACING)) 0
                         else if ((state.getValue(ROTATION) and 0x1) != (world.getBlockState(relayPos).getValue(ROTATION) and 0x1)) 0
                         else getInputPower(world, pos, redstoneSide)
@@ -524,7 +524,7 @@ object CircuitComponents {
 
         protected open fun isWireConnected(world: Level, relayPos: BlockPos, side: Direction): Boolean {
             val state = world.getBlockState(relayPos.relative(side))
-            return state.`is`(Blocks.REDSTONE_WIRE) || state.`is`(ModContent.references.TRACK_BLOCK)
+            return state.`is`(Blocks.REDSTONE_WIRE) || state.`is`(ModContent.References.TRACK_BLOCK)
         }
 
         protected open fun isSidePowered(world: Level, pos: BlockPos, side: Direction): Boolean =

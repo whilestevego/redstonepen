@@ -5,7 +5,6 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
-import net.minecraft.util.Tuple
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.flag.FeatureFlagSet
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -34,55 +33,55 @@ object Registries {
         fun create(containerId: Int, inventory: net.minecraft.world.entity.player.Inventory): T
     }
 
-    private val registeredBlockTagKeys = HashMap<String, TagKey<Block>>()
-    private val registeredItemTagKeys = HashMap<String, TagKey<Item>>()
+    private val registeredBlockTagKeys = mutableMapOf<String, TagKey<Block>>()
+    private val registeredItemTagKeys = mutableMapOf<String, TagKey<Item>>()
 
-    private val blockSuppliers = ArrayList<Tuple<String, Supplier<Block>>>()
-    private val itemSuppliers = ArrayList<Tuple<String, Supplier<Item>>>()
-    private val blockEntityTypeSuppliers = ArrayList<Tuple<String, Supplier<BlockEntityType<*>>>>()
-    private val entityTypeSuppliers = ArrayList<Tuple<String, Supplier<EntityType<*>>>>()
-    private val menuTypeSuppliers = ArrayList<Tuple<String, Supplier<MenuType<*>>>>()
-    private val recipeSerializersSuppliers = ArrayList<Tuple<String, Supplier<RecipeSerializer<*>>>>()
+    private val blockSuppliers = mutableListOf<Pair<String, Supplier<Block>>>()
+    private val itemSuppliers = mutableListOf<Pair<String, Supplier<Item>>>()
+    private val blockEntityTypeSuppliers = mutableListOf<Pair<String, Supplier<BlockEntityType<*>>>>()
+    private val entityTypeSuppliers = mutableListOf<Pair<String, Supplier<EntityType<*>>>>()
+    private val menuTypeSuppliers = mutableListOf<Pair<String, Supplier<MenuType<*>>>>()
+    private val recipeSerializersSuppliers = mutableListOf<Pair<String, Supplier<RecipeSerializer<*>>>>()
 
-    private val registeredBlocks = LinkedHashMap<String, Block>()
-    private val registeredItems = LinkedHashMap<String, Item>()
-    private val registeredBlockEntityTypes = HashMap<String, BlockEntityType<*>>()
-    private val registeredEntityTypes = HashMap<String, EntityType<*>>()
-    private val registeredMenuTypes = HashMap<String, MenuType<*>>()
-    private val registeredRecipeSerializers = HashMap<String, RecipeSerializer<*>>()
+    private val registeredBlocks = linkedMapOf<String, Block>()
+    private val registeredItems = linkedMapOf<String, Item>()
+    private val registeredBlockEntityTypes = mutableMapOf<String, BlockEntityType<*>>()
+    private val registeredEntityTypes = mutableMapOf<String, EntityType<*>>()
+    private val registeredMenuTypes = mutableMapOf<String, MenuType<*>>()
+    private val registeredRecipeSerializers = mutableMapOf<String, RecipeSerializer<*>>()
 
     @JvmStatic fun init() {}
 
     @JvmStatic fun instantiateAll() {
         registeredBlocks.clear()
-        blockSuppliers.forEach { reg ->
-            registeredBlocks[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredBlocks[reg.a]!!)
+        blockSuppliers.forEach { (name, supplier) ->
+            registeredBlocks[name] = supplier.get()
+            Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredBlocks[name]!!)
         }
         registeredItems.clear()
-        itemSuppliers.forEach { reg ->
-            registeredItems[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredItems[reg.a]!!)
+        itemSuppliers.forEach { (name, supplier) ->
+            registeredItems[name] = supplier.get()
+            Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredItems[name]!!)
         }
         registeredBlockEntityTypes.clear()
-        blockEntityTypeSuppliers.forEach { reg ->
-            registeredBlockEntityTypes[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredBlockEntityTypes[reg.a]!!)
+        blockEntityTypeSuppliers.forEach { (name, supplier) ->
+            registeredBlockEntityTypes[name] = supplier.get()
+            Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredBlockEntityTypes[name]!!)
         }
         registeredEntityTypes.clear()
-        entityTypeSuppliers.forEach { reg ->
-            registeredEntityTypes[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredEntityTypes[reg.a]!!)
+        entityTypeSuppliers.forEach { (name, supplier) ->
+            registeredEntityTypes[name] = supplier.get()
+            Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredEntityTypes[name]!!)
         }
         registeredMenuTypes.clear()
-        menuTypeSuppliers.forEach { reg ->
-            registeredMenuTypes[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredMenuTypes[reg.a]!!)
+        menuTypeSuppliers.forEach { (name, supplier) ->
+            registeredMenuTypes[name] = supplier.get()
+            Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredMenuTypes[name]!!)
         }
         registeredRecipeSerializers.clear()
-        recipeSerializersSuppliers.forEach { reg ->
-            registeredRecipeSerializers[reg.a] = reg.b.get()
-            Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, reg.a), registeredRecipeSerializers[reg.a]!!)
+        recipeSerializersSuppliers.forEach { (name, supplier) ->
+            registeredRecipeSerializers[name] = supplier.get()
+            Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name), registeredRecipeSerializers[name]!!)
         }
     }
 
@@ -108,21 +107,21 @@ object Registries {
     @JvmStatic fun getRegisteredEntityTypes(): List<EntityType<*>> = registeredEntityTypes.values.toList()
 
     @JvmStatic fun <T : Item> addItem(registryName: String, supplier: Supplier<T>) {
-        itemSuppliers.add(Tuple(registryName, supplier as Supplier<Item>))
+        itemSuppliers.add(Pair(registryName, supplier as Supplier<Item>))
     }
 
     @JvmStatic fun <T : Block> addBlock(registryName: String, blockSupplier: Supplier<T>) {
-        blockSuppliers.add(Tuple(registryName, blockSupplier as Supplier<Block>))
-        itemSuppliers.add(Tuple(registryName, Supplier { BlockItem(registeredBlocks[registryName]!!, Item.Properties()) }))
+        blockSuppliers.add(Pair(registryName, blockSupplier as Supplier<Block>))
+        itemSuppliers.add(Pair(registryName, Supplier { BlockItem(registeredBlocks[registryName]!!, Item.Properties()) }))
     }
 
     @JvmStatic fun <TB : Block, TI : Item> addBlock(registryName: String, blockSupplier: Supplier<TB>, itemSupplier: Supplier<TI>) {
-        blockSuppliers.add(Tuple(registryName, blockSupplier as Supplier<Block>))
-        itemSuppliers.add(Tuple(registryName, itemSupplier as Supplier<Item>))
+        blockSuppliers.add(Pair(registryName, blockSupplier as Supplier<Block>))
+        itemSuppliers.add(Pair(registryName, itemSupplier as Supplier<Item>))
     }
 
     @JvmStatic fun <T : BlockEntity> addBlockEntityType(registryName: String, ctor: BlockEntityFactory<T>, vararg blockNames: String) {
-        blockEntityTypeSuppliers.add(Tuple(registryName, Supplier {
+        blockEntityTypeSuppliers.add(Pair(registryName, Supplier {
             val blocks = blockNames.mapNotNull { s ->
                 registeredBlocks[s] ?: run {
                     Auxiliaries.logError("registered_blocks does not encompass '$s'")
@@ -134,15 +133,15 @@ object Registries {
     }
 
     @JvmStatic fun addEntityType(registryName: String, supplier: Supplier<EntityType<*>>) {
-        entityTypeSuppliers.add(Tuple(registryName, supplier))
+        entityTypeSuppliers.add(Pair(registryName, supplier))
     }
 
     @JvmStatic fun <T : AbstractContainerMenu> addMenuType(registryName: String, supplier: MenuFactory<T>) {
-        menuTypeSuppliers.add(Tuple(registryName, Supplier { MenuType(supplier::create, FeatureFlagSet.of()) as MenuType<*> }))
+        menuTypeSuppliers.add(Pair(registryName, Supplier { MenuType(supplier::create, FeatureFlagSet.of()) as MenuType<*> }))
     }
 
     @JvmStatic fun addRecipeSerializer(registryName: String, serializerSupplier: Supplier<out RecipeSerializer<*>>) {
-        recipeSerializersSuppliers.add(Tuple(registryName, serializerSupplier as Supplier<RecipeSerializer<*>>))
+        recipeSerializersSuppliers.add(Pair(registryName, serializerSupplier as Supplier<RecipeSerializer<*>>))
     }
 
     @JvmStatic fun <TB : Block> addBlock(registryName: String, blockSupplier: Supplier<TB>, itemBuilder: BiFunction<Block, Item.Properties, Item>) {

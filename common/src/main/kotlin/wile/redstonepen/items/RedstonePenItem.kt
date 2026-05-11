@@ -105,7 +105,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         } else {
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, targetPos, context.isInside)
             val ctx = BlockPlaceContext(player ?: return InteractionResult.FAIL, context.hand, ItemStack(Items.REDSTONE), rtr)
-            val rsState = ModContent.references.TRACK_BLOCK!!.getStateForPlacement(ctx) ?: return InteractionResult.FAIL
+            val rsState = ModContent.References.TRACK_BLOCK.getStateForPlacement(ctx) ?: return InteractionResult.FAIL
             if (!targetState.canBeReplaced(ctx)) return InteractionResult.FAIL
             if (!world.setBlock(targetPos, rsState, 1 or 2 or 16)) return InteractionResult.FAIL
             val placedState = world.getBlockState(targetPos)
@@ -135,7 +135,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         when {
             block == Blocks.REDSTONE_WIRE ->
                 tc = Auxiliaries.localizable("overlay.wire_power", powerFormatted(state.getValue(RedStoneWireBlock.POWER)))
-            block == ModContent.references.TRACK_BLOCK -> {
+            block == ModContent.References.TRACK_BLOCK -> {
                 val te: TrackBlockEntity = RedstoneTrackBlock.tile(world, pos).orElse(null) ?: return
                 tc = Auxiliaries.localizable("overlay.track_power", powerFormatted(te.getSidePower(rsSide)))
                 if (Auxiliaries.isDevelopmentMode()) {
@@ -195,7 +195,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
     private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean {
         val world = player.commandSenderWorld
         val state = world.getBlockState(pos)
-        if (state.`is`(ModContent.references.TRACK_BLOCK)) {
+        if (state.`is`(ModContent.References.TRACK_BLOCK)) {
             val rt = player.pick(10.0, 0f, false)
             if (rt.type != HitResult.Type.BLOCK) return false
             val hand = if (player.getItemInHand(InteractionHand.MAIN_HAND).item === this) InteractionHand.MAIN_HAND else InteractionHand.OFF_HAND
