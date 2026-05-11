@@ -405,12 +405,5 @@
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_pos: BlockPos</ID>
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_weak: Boolean</ID>
     <ID>UnusedPrivateProperty:ModRenderers.kt$ModRenderers.TrackTer$_ctx: BlockEntityRendererProvider.Context?</ID>
-    <ID>UtilityClassWithPublicConstructor:Defs.kt$Defs</ID>
-    <ID>WildcardImport:ControlBoxUiContainer.kt$import net.minecraft.world.inventory.*</ID>
-    <ID>WildcardImport:ExtendedShapelessRecipe.kt$import net.minecraft.world.item.crafting.*</ID>
-    <ID>WildcardImport:Inventories.kt$import net.minecraft.world.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.basic.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.controlbox.*</ID>
   </CurrentIssues>
 </SmellBaseline>

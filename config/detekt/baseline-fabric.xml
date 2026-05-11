@@ -13,15 +13,5 @@
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests$Companion</ID>
     <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests$Companion</ID>
     <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests$Companion</ID>
-    <ID>UtilityClassWithPublicConstructor:AuxiliariesGameTests.kt$AuxiliariesGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:BasicLeverButtonGameTests.kt$BasicLeverButtonGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:ControlBoxGameTests.kt$ControlBoxGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:DemoGameTests.kt$DemoGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:InventoriesGameTests.kt$InventoriesGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:PenItemGameTests.kt$PenItemGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:RecipeGameTests.kt$RecipeGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:RelayGameTests.kt$RelayGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:RemoteItemGameTests.kt$RemoteItemGameTests</ID>
-    <ID>UtilityClassWithPublicConstructor:TrackGameTests.kt$TrackGameTests</ID>
   </CurrentIssues>
 </SmellBaseline>
