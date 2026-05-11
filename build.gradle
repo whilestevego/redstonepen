@@ -131,7 +131,9 @@ subprojects {
     buildUponDefaultConfig = true
     parallel = true
     config.setFrom(rootProject.file('config/detekt/detekt.yml'))
-    baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+    if (!rootProject.hasProperty('noBaseline')) {
+      baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+    }
   }
 
   tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
