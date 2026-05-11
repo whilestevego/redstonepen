@@ -373,7 +373,7 @@ object PenItemGameTests {
     @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 15)
     fun penInventoryTickCoversTrackPath(helper: GameTestHelper) {
         val trackRel = BlockPos(2, 1, 2)
-        helper.setBlock(trackRel, ModContent.references.TRACK_BLOCK)
+        helper.setBlock(trackRel, ModContent.References.TRACK_BLOCK)
         val trackAbs = helper.absolutePos(trackRel)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
         fp.setPos(trackAbs.x - 1.0, trackAbs.y - 1.5, trackAbs.z + 0.5)
@@ -503,7 +503,7 @@ object PenItemGameTests {
     fun penInventoryTickCoversTrackBranchBody(helper: GameTestHelper) {
         val blockRel = BlockPos(2, 1, 2)
         helper.setBlock(blockRel.below(), Blocks.STONE)
-        helper.setBlock(blockRel, ModContent.references.TRACK_BLOCK)
+        helper.setBlock(blockRel, ModContent.References.TRACK_BLOCK)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
         val pen = ItemStack(Registries.getItem("pen"))
         setupFpLookingDown(fp, helper.absolutePos(blockRel), pen)
@@ -582,7 +582,7 @@ object PenItemGameTests {
     fun penAttackOnTrackWithFakePlayer(helper: GameTestHelper) {
         val blockRel = BlockPos(2, 1, 2)
         helper.setBlock(blockRel.below(), Blocks.STONE)
-        helper.setBlock(blockRel, ModContent.references.TRACK_BLOCK)
+        helper.setBlock(blockRel, ModContent.References.TRACK_BLOCK)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
         val pen = ItemStack(Registries.getItem("pen"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, pen)

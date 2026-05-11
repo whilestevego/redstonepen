@@ -126,8 +126,8 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     fun sync(schedule: Boolean): Boolean {
         if (level!!.isClientSide()) return true
         setChanged()
-        if (schedule && !getLevel()!!.getBlockTicks().hasScheduledTick(blockPos, ModContent.references.TRACK_BLOCK)) {
-            getLevel()!!.scheduleTick(blockPos, ModContent.references.TRACK_BLOCK, 1)
+        if (schedule && !getLevel()!!.getBlockTicks().hasScheduledTick(blockPos, ModContent.References.TRACK_BLOCK)) {
+            getLevel()!!.scheduleTick(blockPos, ModContent.References.TRACK_BLOCK, 1)
         } else {
             Networking.PacketTileNotifyServerToClient.sendToPlayers(this, writenbt(getLevel()!!.registryAccess(), CompoundTag(), true))
         }
@@ -339,7 +339,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         getLevel()!!.addFreshEntity(e)
     }
 
-    private fun getBlock(): RedstoneTrackBlock = ModContent.references.TRACK_BLOCK!!
+    private fun getBlock(): RedstoneTrackBlock = ModContent.References.TRACK_BLOCK
 
     fun handleShapeUpdate(facing: Direction, facingState: BlockState, fromPos: BlockPos, isMoving: Boolean): Boolean {
         var update_neighbours = false
@@ -439,7 +439,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     neighbors.add(Neighbor(ext_pos, ext_side, p_track, true, false))
                     pmax = maxOf(pmax, p_track - 1)
                 }
-            } else if (ext_state.`is`(ModContent.references.BRIDGE_RELAY_BLOCK)) {
+            } else if (ext_state.`is`(ModContent.References.BRIDGE_RELAY_BLOCK)) {
                 val p_nowire = getNonWireSignal(world, ext_pos, ext_side.opposite)
                 neighbors.add(Neighbor(ext_pos, ext_side, p_nowire, true, false))
                 pmax = maxOf(pmax, p_nowire)

@@ -88,10 +88,10 @@ object ModContent {
     }
 
     @JvmStatic fun initReferences() {
-        references.TRACK_BLOCK        = Registries.getBlock("track")        as RedstoneTrackBlock
-        references.BRIDGE_RELAY_BLOCK = Registries.getBlock("bridge_relay") as CircuitComponents.BridgeRelayBlock
-        references.CONTROLBOX_BLOCK   = Registries.getBlock("control_box")  as ControlBoxBlock
-        references.BASIC_GAUGE_BLOCK  = Registries.getBlock("basic_gauge")  as BasicGauge.BasicGaugeBlock
+        References.TRACK_BLOCK        = Registries.getBlock("track")        as RedstoneTrackBlock
+        References.BRIDGE_RELAY_BLOCK = Registries.getBlock("bridge_relay") as CircuitComponents.BridgeRelayBlock
+        References.CONTROLBOX_BLOCK   = Registries.getBlock("control_box")  as ControlBoxBlock
+        References.BASIC_GAUGE_BLOCK  = Registries.getBlock("basic_gauge")  as BasicGauge.BasicGaugeBlock
     }
 
     fun getMenuTypeOfBlock(block_name: String): MenuType<*>? = Registries.getMenuTypeOfBlock(block_name)
@@ -99,12 +99,10 @@ object ModContent {
     fun getBlockEntityTypeOfBlock(block_name: String): BlockEntityType<*>? = Registries.getBlockEntityTypeOfBlock(block_name)
     fun getBlockEntityTypeOfBlock(block: Block): BlockEntityType<*>? = Registries.getBlockEntityTypeOfBlock(block)
 
-    class references {
-        companion object {
-            @JvmField var TRACK_BLOCK: RedstoneTrackBlock? = null
-            @JvmField var BRIDGE_RELAY_BLOCK: CircuitComponents.BridgeRelayBlock? = null
-            @JvmField var CONTROLBOX_BLOCK: ControlBoxBlock? = null
-            @JvmField var BASIC_GAUGE_BLOCK: BasicGauge.BasicGaugeBlock? = null
-        }
+    object References {
+        lateinit var TRACK_BLOCK: RedstoneTrackBlock
+        lateinit var BRIDGE_RELAY_BLOCK: CircuitComponents.BridgeRelayBlock
+        lateinit var CONTROLBOX_BLOCK: ControlBoxBlock
+        lateinit var BASIC_GAUGE_BLOCK: BasicGauge.BasicGaugeBlock
     }
 }

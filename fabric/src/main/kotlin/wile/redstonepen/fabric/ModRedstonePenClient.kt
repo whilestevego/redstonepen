@@ -42,16 +42,18 @@ class ModRedstonePenClient : ClientModInitializer {
         BlockEntityRenderers.register(
             Registries.getBlockEntityTypeOfBlock("track") as BlockEntityType<TrackBlockEntity>
         ) { ctx -> ModRenderers.TrackTer(ctx) }
-        PlatformServices.getRendering().setRenderLayer(ModContent.references.TRACK_BLOCK!!, RenderType.cutout())
-        PlatformServices.getRendering().setRenderLayer(ModContent.references.BASIC_GAUGE_BLOCK!!, RenderType.translucent())
+        PlatformServices.getRendering().setRenderLayer(ModContent.References.TRACK_BLOCK, RenderType.cutout())
+        PlatformServices.getRendering().setRenderLayer(ModContent.References.BASIC_GAUGE_BLOCK, RenderType.translucent())
         Overlay.on_config(0.75, 0x00ffaa00, 0x55333333, 0x55333333, 0x55444444)
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, _ ->
-            Overlay.TextOverlayGui.INSTANCE.onRenderWorldOverlay(context.matrixStack()!!, context.tickCounter().realtimeDeltaTicks.toDouble())
+            val matrixStack = context.matrixStack() ?: return@register true
+            Overlay.TextOverlayGui.INSTANCE.onRenderWorldOverlay(matrixStack, context.tickCounter().realtimeDeltaTicks.toDouble())
             true
         }
         if (RcaSync.ClientRca.init()) {
             ClientTickEvents.END_CLIENT_TICK.register { mc ->
-                if (mc.level == null || mc.level!!.gameTime and 0x1L != 0L) return@register
+                val level = mc.level ?: return@register
+                if (level.gameTime and 0x1L != 0L) return@register
                 RcaSync.ClientRca.tick()
             }
         }
