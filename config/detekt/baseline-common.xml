@@ -105,7 +105,6 @@
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock$0.3f</ID>
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.1</ID>
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.2</ID>
-    <ID>MagicNumber:BasicLeverButtonTests.kt$BasicLeverButtonTests$20</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$15</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$16</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$15</ID>
@@ -200,14 +199,6 @@
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$4</ID>
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$5</ID>
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$127</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$12</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$15</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$3</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$4</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$42</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$5</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$6</ID>
-    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$7</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$18</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$183</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$28</ID>
@@ -215,25 +206,6 @@
     <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$15</ID>
     <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$3</ID>
     <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$4</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$3</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$4</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$5</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$6</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$7</ID>
-    <ID>MagicNumber:DemoSections.kt$DemoSections$8</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$15</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$16</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$20</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$3</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$30</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$35</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$4</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$45</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$5</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$50</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$6</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$7</ID>
-    <ID>MagicNumber:DemoTests.kt$DemoTests$70</ID>
     <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$100</ID>
     <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$1024</ID>
     <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$4096</ID>
@@ -271,13 +243,6 @@
     <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$36</ID>
     <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$4</ID>
     <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$9</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$10</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$15</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$20</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$3</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$5</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$60</ID>
-    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$64</ID>
     <ID>MagicNumber:ModContent.kt$ModContent$0.3f</ID>
     <ID>MagicNumber:ModContent.kt$ModContent$0.8f</ID>
     <ID>MagicNumber:ModContent.kt$ModContent$0.9f</ID>
@@ -301,7 +266,6 @@
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$0x00ffaa00</ID>
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$15</ID>
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$3</ID>
-    <ID>MagicNumber:RecipeTests.kt$RecipeTests$10</ID>
     <ID>MagicNumber:RedstoneClientAdapter.kt$RedstoneClientAdapter$4</ID>
     <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$0.5f</ID>
     <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$10.0</ID>
@@ -341,13 +305,6 @@
     <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x08</ID>
     <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x10</ID>
     <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x20</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$0.3</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$10</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$3</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$4</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$5</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$6</ID>
-    <ID>MagicNumber:RelayTests.kt$RelayTests$8</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$0.25f</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.3f</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.5f</ID>
@@ -372,19 +329,6 @@
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$4</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$5</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$6</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$0.3</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$0.5</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$0b10101L</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$0x03L</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$0x07L</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$11</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$15</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$3</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$4</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$5</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$7</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$9</ID>
-    <ID>MagicNumber:TrackTests.kt$TrackTests$99</ID>
     <ID>MaxLineLength:Auxiliaries.kt$Auxiliaries$// -------------------------------------------------------------------------------------------------------------------</ID>
     <ID>MaxLineLength:Inventories.kt$Inventories$// ------------------------------------------------------------------------------------------------------------------</ID>
     <ID>MaxLineLength:Inventories.kt$Inventories.InventoryRange$// ------------------------------------------------------------------------------------------------------------------</ID>

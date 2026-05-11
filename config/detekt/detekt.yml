@@ -37,6 +37,11 @@ style:
   ReturnCount:
     max: 4
   MagicNumber:
+    # Test fixture and coordinate-heavy builder paths are excluded wholesale;
+    # numbers there are structural, not domain magic numbers.
+    excludes:
+      - '**/gametestcommon/**'
+      - '**/commands/DemoSections.kt'
     # Ignore universally accepted non-magic literals.
     ignoreNumbers:
       - '-1'
