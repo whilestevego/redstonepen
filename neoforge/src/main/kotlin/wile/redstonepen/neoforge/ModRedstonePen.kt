@@ -59,7 +59,8 @@ class ModRedstonePen(bus: IEventBus) {
         @JvmField val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> =
             DeferredRegister.create(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB, ModConstants.MODID)
 
-        @JvmField val EXAMPLE_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> =
+        // java.util.function.Supplier explicit cast resolves ambiguity with DeferredRegister.register(String, Function<ResourceLocation, I>) overload
+        @JvmField val CREATIVE_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> =
             CREATIVE_MODE_TABS.register("tab_${ModConstants.MODID}", java.util.function.Supplier {
                 CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.tabredstonepen"))
@@ -67,7 +68,7 @@ class ModRedstonePen(bus: IEventBus) {
                     .icon { ItemStack(Registries.getItem("pen")) }
                     .displayItems { _, output ->
                         Registries.getRegisteredItems().forEach {
-                            if (it !is BlockItem || it.block != ModContent.references.TRACK_BLOCK) output.accept(it)
+                            if (it !is BlockItem || it.block != ModContent.References.TRACK_BLOCK) output.accept(it)
                         }
                     }
                     .build()
@@ -121,8 +122,8 @@ class ModRedstonePen(bus: IEventBus) {
 
             @JvmStatic @SubscribeEvent
             fun onRegisterModels(event: ModelEvent.RegisterAdditional) {
-                ModRenderers.TrackTer.registerModels().stream()
-                    .map { rl -> net.minecraft.client.resources.model.ModelResourceLocation(rl, "standalone") }
+                ModRenderers.TrackTer.registerModels()
+                    .map { net.minecraft.client.resources.model.ModelResourceLocation(it, "standalone") }
                     .forEach(event::register)
             }
         }

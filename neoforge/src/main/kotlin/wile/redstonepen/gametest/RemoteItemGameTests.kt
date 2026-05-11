@@ -166,7 +166,7 @@ object RemoteItemGameTests {
     @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedControlBoxTogglesEnabled(helper: GameTestHelper) {
         helper.setBlock(POS.below(), Blocks.STONE)
-        helper.setBlock(POS, ModContent.references.CONTROLBOX_BLOCK)
+        helper.setBlock(POS, ModContent.References.CONTROLBOX_BLOCK)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
         val remote = ItemStack(Registries.getItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)

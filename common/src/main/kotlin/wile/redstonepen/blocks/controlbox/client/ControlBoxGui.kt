@@ -25,7 +25,7 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
     : Guis.ContainerGui<ControlBoxUiContainer>(container, playerInventory, title, "textures/gui/control_box_gui.png", 238, 206) {
 
     private val VALUE_UPDATE_INTERVAL = 2
-    private val tooltip_prefix: String = ModContent.references.CONTROLBOX_BLOCK!!.descriptionId
+    private val tooltip_prefix: String = ModContent.References.CONTROLBOX_BLOCK.descriptionId
     private val textbox: GuiTextEditing.MultiLineTextBox
     private val start_stop: Guis.CheckBox
     private val cb_copy_all: Guis.ImageButton

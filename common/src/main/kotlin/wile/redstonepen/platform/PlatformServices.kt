@@ -7,8 +7,9 @@ object PlatformServices {
     @JvmField val PLATFORM: IPlatformHelper = load(IPlatformHelper::class.java)
 
     // Client-only — loaded lazily to avoid server-side class loading.
-    // Kotlin `by lazy` lambda bootstrap runs during <clinit> and triggers class loading;
-    // use nullable backing fields (null-init only) to match the original Java pattern.
+    // `by lazy {}` lambda type descriptors reference the client type at `<clinit>` time,
+    // triggering NeoForge's dist-cleaner check before the lazy is ever accessed. Use
+    // @Volatile backing fields instead to keep the reference out of class initialization.
     @Volatile private var networkingClient_: INetworkingClientPlatform? = null
     @Volatile private var rendering_: IRenderingPlatform? = null
 
