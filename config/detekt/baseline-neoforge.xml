@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyFunctionBlock:RenderingPlatformNeoForge.kt$RenderingPlatformNeoForge${}</ID>
+    <ID>LargeClass:PenItemGameTests.kt$PenItemGameTests</ID>
+    <ID>MagicNumber:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$0.75</ID>
+    <ID>MagicNumber:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$0x00ffaa00</ID>
+    <ID>MagicNumber:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$0x55333333</ID>
+    <ID>MagicNumber:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$0x55444444</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$0.5</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$1.5</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$10</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$1000</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$14</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$27</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$3</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$3.0</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$4</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$5</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$6</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$64</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$7</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$9</ID>
+    <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$90f</ID>
+    <ID>MagicNumber:RemoteItemGameTests.kt$RemoteItemGameTests$100f</ID>
+    <ID>SwallowedException:PlatformHelperNeoForge.kt$PlatformHelperNeoForge$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PlatformHelperNeoForge.kt$PlatformHelperNeoForge$e: Exception</ID>
+    <ID>TooManyFunctions:ControlBoxGameTests.kt$ControlBoxGameTests</ID>
+    <ID>TooManyFunctions:DemoGameTests.kt$DemoGameTests</ID>
+    <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests</ID>
+    <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests</ID>
+    <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests</ID>
+    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$event: FMLClientSetupEvent</ID>
+    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.LiveCycleEvents.Companion$event: FMLConstructModEvent</ID>
+    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$ClientEvents</ID>
+    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$ClientGameEvents</ID>
+    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$LiveCycleEvents</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,607 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:ControlBoxGui.kt$ControlBoxGui$!debug_enabled_ &amp;&amp; (k.startsWith(".") || Defs.PORT_NAMES.contains(k) || k.endsWith(".re") || k.endsWith(".fe"))</ID>
+    <ID>ComplexCondition:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'</ID>
+    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$!active || !visible || x &lt; getX() || y &lt; getY() || x > getX() + width || y > getY() + height</ID>
+    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$xy.x >= 0 &amp;&amp; xy.y >= 0 &amp;&amp; xy.x &lt; width &amp;&amp; xy.y &lt; height</ID>
+    <ID>ComplexCondition:RedstonePenItem.kt$RedstonePenItem$!isSelected || !entity.isShiftKeyDown || world.isClientSide || (world.gameTime and 0x1L) != 0L || entity !is ServerPlayer</ID>
+    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$ranges.stream().noneMatch { tip -> if (x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1) return@noneMatch false val tipComponent = tip.text.get() ?: return@noneMatch false if (tipComponent.string.isEmpty()) return@noneMatch false try { val lines = Auxiliaries.wrapText(tipComponent, 80) gg.renderTooltip(font, lines, Optional.empty(), x, y) } catch (ex: Exception) { hadRenderException = true Auxiliaries.logError( "Tooltip rendering disabled due to exception: '${ex.message}'" ) return@noneMatch false } true }</ID>
+    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1</ID>
+    <ID>ComplexCondition:TrackBlockEntity.kt$TrackBlockEntity$!no_bulk &amp;&amp; !face_is_empty &amp;&amp; hit.length() &lt; 0.10 &amp;&amp; (!no_add || getConnectionFlags() != 0)</ID>
+    <ID>CyclomaticComplexMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB>): VoxelShape</ID>
+    <ID>CyclomaticComplexMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
+    <ID>CyclomaticComplexMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
+    <ID>CyclomaticComplexMethod:ControlBoxLogic.kt$ControlBoxLogic$fun tick()</ID>
+    <ID>CyclomaticComplexMethod:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$private fun getRepaired(inv: CraftingInput): Tuple&lt;ItemStack, NonNullList&lt;ItemStack>></ID>
+    <ID>CyclomaticComplexMethod:Inventories.kt$Inventories.InventoryRange$fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack</ID>
+    <ID>CyclomaticComplexMethod:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
+    <ID>CyclomaticComplexMethod:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
+    <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos>?, )</ID>
+    <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
+    <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
+    <ID>EmptyFunctionBlock:CircuitComponents.kt$CircuitComponents.BistableRelayBlock${}</ID>
+    <ID>EmptyFunctionBlock:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock${}</ID>
+    <ID>EmptyFunctionBlock:ControlBoxGui.kt$ControlBoxGui${}</ID>
+    <ID>EmptyFunctionBlock:Guis.kt$Guis.ContainerGui${}</ID>
+    <ID>EmptyFunctionBlock:Guis.kt$Guis.Image${}</ID>
+    <ID>EmptyFunctionBlock:Guis.kt$Guis.UiWidget${}</ID>
+    <ID>EmptyFunctionBlock:Registries.kt$Registries${}</ID>
+    <ID>EmptyFunctionBlock:TrackBlockEntity.kt$TrackBlockEntity${}</ID>
+    <ID>FunctionOnlyReturningConstant:BasicGauge.kt$BasicGauge.BasicGaugeBlock$fun canConnectRedstone( state: BlockState, world: BlockGetter, pos: BlockPos, side: Direction?, ): Boolean</ID>
+    <ID>FunctionOnlyReturningConstant:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$fun shouldCheckWeakPower( state: BlockState, level: SignalGetter, pos: BlockPos, side: Direction, ): Boolean</ID>
+    <ID>FunctionOnlyReturningConstant:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmStatic fun bool_false(): Int</ID>
+    <ID>FunctionOnlyReturningConstant:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmStatic fun bool_true(): Int</ID>
+    <ID>FunctionOnlyReturningConstant:TrackBlockEntity.kt$TrackBlockEntity$@Environment(EnvType.CLIENT) fun getViewDistance(): Double</ID>
+    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format( "%1s=%02d", Defs.PORT_NAMES[i].uppercase(), (io shr (4 * i)) and 0xf, )</ID>
+    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%1s=00", Defs.PORT_NAMES[i].uppercase())</ID>
+    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%s%s = %d", lf, k.uppercase(), v)</ID>
+    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format( "%016x", client_inputs_, )</ID>
+    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", client_outputs_)</ID>
+    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", server_outputs_)</ID>
+    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | %s [%d,%d,%d]", lookDir, pos.x, pos.y, pos.z)</ID>
+    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | flags: %016x, p: ", te.getStateFlags())</ID>
+    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format("%02d", p)</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s from %s (%s)", posstr(my_pos), posstr(fromPos), world.getBlockState(fromPos).block.descriptionId, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s updates: [%s]", posstr(blockPos), notifications.entries.joinToString(", ") { "${posstr(it.value)}>${posstr(it.key)}" }, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s changed (%s->%s).", posstr(blockPos), posstr(fromPos), bltv.descriptionId, facingState.block.descriptionId, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s(=%s) removed.", posstr(blockPos), posstr(fromPos), facingState.block.descriptionId, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONFL: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONNECTED NEIGHBOURS: %s", posstr(blockPos), connected_neighbours.joinToString(",") { posstr(it) }, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONRT: ext:%08x | ext:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, external_connected_routes[0], external_connected_routes[1], external_connected_routes[2], external_connected_routes[3], external_connected_routes[4], external_connected_routes[5], )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONSD: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NEIGHBOURS: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NONTRACK: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s SIDPW: [%01x %01x %01x %01x %01x %01x]", posstr(blockPos), current_side_powers[0], current_side_powers[1], current_side_powers[2], current_side_powers[3], current_side_powers[4], current_side_powers[5], )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE NET OF %s", posstr(blockPos), posstr(te.blockPos), )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE TRACK CHANGES TO %s.", posstr(blockPos), posstr(pos), )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s adj:%s | ints:%s | pwrs:%s", poss, ss.joinToString(", "), int_sides, pwr_sides, )</ID>
+    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format("NBCH: %s net power %d->%d", posstr(my_pos), net.power, pmax)</ID>
+    <ID>LargeClass:RelayTests.kt$RelayTests</ID>
+    <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
+    <ID>LargeClass:TrackTests.kt$TrackTests</ID>
+    <ID>LongMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB>): VoxelShape</ID>
+    <ID>LongMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
+    <ID>LongMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
+    <ID>LongMethod:ControlBoxGui.kt$ControlBoxGui$override fun init()</ID>
+    <ID>LongMethod:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$private fun rebuildDisplayCache(): DisplayCache</ID>
+    <ID>LongMethod:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
+    <ID>LongMethod:ModContent.kt$ModContent$@JvmStatic fun initBlocks()</ID>
+    <ID>LongMethod:ModRenderers.kt$ModRenderers.TrackTer$@Suppress("DEPRECATION") override fun render( te: TrackBlockEntity, unused1: Float, mxs: PoseStack, buf: MultiBufferSource, combinedLightIn: Int, combinedOverlayIn: Int, )</ID>
+    <ID>LongMethod:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
+    <ID>LongMethod:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
+    <ID>LongMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos>?, )</ID>
+    <ID>LongMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
+    <ID>LongMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
+    <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, )</ID>
+    <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( world: Level, rand: RandomSource, pos: BlockPos, color: Vec3, from: Direction, to: Direction, minChance: Float, maxChance: Float, )</ID>
+    <ID>LongParameterList:TrackBlockEntity.kt$TrackBlockEntity$( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, )</ID>
+    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$for</ID>
+    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.RelayBlock$for</ID>
+    <ID>LoopWithTooManyJumpStatements:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$for</ID>
+    <ID>LoopWithTooManyJumpStatements:Inventories.kt$Inventories.InventoryRange$for</ID>
+    <ID>LoopWithTooManyJumpStatements:RedstonePenItem.kt$RedstonePenItem$for</ID>
+    <ID>LoopWithTooManyJumpStatements:RedstoneTrackBlock.kt$RedstoneTrackBlock$for</ID>
+    <ID>LoopWithTooManyJumpStatements:TrackBlockEntity.kt$TrackBlockEntity$for</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.1</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.2</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.4</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0x03</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$10</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$100</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$16.0</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$2e-2</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$3</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$4</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$4096</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$5</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries.BlockPosRange.Companion$0.0625</ID>
+    <ID>MagicNumber:Auxiliaries.kt$Auxiliaries.Tooltip$50</ID>
+    <ID>MagicNumber:BasicButton.kt$BasicButton.BasicButtonBlock$0.3f</ID>
+    <ID>MagicNumber:BasicButton.kt$BasicButton.BasicButtonBlock.Companion$0.1</ID>
+    <ID>MagicNumber:BasicButton.kt$BasicButton.BasicButtonBlock.Companion$0.4</ID>
+    <ID>MagicNumber:BasicButton.kt$BasicButton.BasicButtonBlock.Companion$3</ID>
+    <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock$0.3f</ID>
+    <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.1</ID>
+    <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.2</ID>
+    <ID>MagicNumber:BasicLeverButtonTests.kt$BasicLeverButtonTests$20</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents$11.0</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents$16.0</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents$5.0</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$15</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$16</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$15</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$16</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$32</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.1</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.3f</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.4</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.4f</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.5</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$0.6</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$16</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$0x3</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$3</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$4</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.InvertedRelayBlock$15</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.InvertedRelayBlock$16</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.PulseRelayBlock$15</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.PulseRelayBlock$16</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.RelayBlock$15</ID>
+    <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.RelayBlock$16</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$0x7fffffffL</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$1000L</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$16</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$200</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$24000L</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$4</ID>
+    <ID>MagicNumber:ControlBoxBlockEntity.kt$ControlBoxBlockEntity.TestHooks$4</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$0x303030</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$0x707070</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$0x999999</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$0xdddddd</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$0xeeeeee</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$10</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$12</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$14</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$15</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$156</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$16</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$17</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$170</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$18</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$189</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$191</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$194</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$196</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$200</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$205</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$206</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$212</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$213</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$215</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$22</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$230</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$238</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$27</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$28</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$29</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$3</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$30</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$34</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$36</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$4</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$40</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$41</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$49</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$5</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$50</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$54</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$55</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$56</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$6</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$62</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$67</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$68</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$7</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$76</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$78</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$8</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$84</ID>
+    <ID>MagicNumber:ControlBoxGui.kt$ControlBoxGui$90</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$15</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$16</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$3</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$4</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$40</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$0x7fffffff</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$15</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$16.0</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$20</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$3</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$4</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$5</ID>
+    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$127</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$12</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$15</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$3</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$4</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$42</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$5</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$6</ID>
+    <ID>MagicNumber:ControlBoxTests.kt$ControlBoxTests$7</ID>
+    <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$18</ID>
+    <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$183</ID>
+    <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$28</ID>
+    <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$9</ID>
+    <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$15</ID>
+    <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$3</ID>
+    <ID>MagicNumber:DemoBuilder.kt$DemoBuilder$4</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$3</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$4</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$5</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$6</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$7</ID>
+    <ID>MagicNumber:DemoSections.kt$DemoSections$8</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$15</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$16</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$20</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$3</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$30</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$35</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$4</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$45</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$5</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$50</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$6</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$7</ID>
+    <ID>MagicNumber:DemoTests.kt$DemoTests$70</ID>
+    <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$100</ID>
+    <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$1024</ID>
+    <ID>MagicNumber:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$4096</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter$15</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter$16</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter$4</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter.Companion$0x9</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter.Companion$10</ID>
+    <ID>MagicNumber:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.FileMemMap$4096</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$0x20</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$0x339999ff</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$0x3f</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$1024</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$250</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$257</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$259</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$261</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$262</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$263</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$264</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$265</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$266</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$267</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$268</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$269</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$335</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$6</ID>
+    <ID>MagicNumber:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$9f</ID>
+    <ID>MagicNumber:Guis.kt$Guis.ContainerGui$0.4f</ID>
+    <ID>MagicNumber:Guis.kt$Guis.ContainerGui$0.7f</ID>
+    <ID>MagicNumber:Guis.kt$Guis.ContainerGui$0.8f</ID>
+    <ID>MagicNumber:Guis.kt$Guis.ContainerGui$16</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange$64</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$27</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$3</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$36</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$4</ID>
+    <ID>MagicNumber:Inventories.kt$Inventories.InventoryRange.Companion$9</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$10</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$15</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$20</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$3</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$5</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$60</ID>
+    <ID>MagicNumber:InventoriesTests.kt$InventoriesTests$64</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$0.3f</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$0.8f</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$0.9f</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$13.0</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$16.0</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$20</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$256</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$3</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$3.0</ID>
+    <ID>MagicNumber:ModContent.kt$ModContent$3.9</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer$4</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$0.01f</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$0.2f</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$0.3f</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$0.4f</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$15</ID>
+    <ID>MagicNumber:ModRenderers.kt$ModRenderers.TrackTer.Companion$15.0f</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay$0.75</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay$0x00ffaa00</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay$100</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay$3000</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$0x00ffaa00</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$15</ID>
+    <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$3</ID>
+    <ID>MagicNumber:RecipeTests.kt$RecipeTests$10</ID>
+    <ID>MagicNumber:RedstoneClientAdapter.kt$RedstoneClientAdapter$4</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$0.5f</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$10.0</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$10000f</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$13</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$13f</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$15</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$16</ID>
+    <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$400</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$.4</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.3f</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.4375</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.4f</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.5</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.5f</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0.6</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x0000f0</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x000f00</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x00f000</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x04</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x08</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x0f0000</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x10</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x20</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$16</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$2.4f</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000001000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000002000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000004000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000008000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000010000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x0000000020000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000004L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000008L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000010L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000020L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000040L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000080L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000100L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000200L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000400L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000800L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00001000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00002000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00004000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00008000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00010000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00020000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00040000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00080000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00100000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00200000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00400000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00800000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x01222200L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x02111100L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x04440011L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x08880022L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x10004444L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x20008888L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$3</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$4</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$5</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000001000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000002000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000004000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000008000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000010000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x0000000020000000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000004L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000008L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000010L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000020L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000040L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000080L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000100L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000200L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000400L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00000800L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00001000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00002000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00004000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00008000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00010000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00020000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00040000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00080000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00100000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00200000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00400000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.models$0x00800000L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x04</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x08</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x10</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x20</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$16</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$16.0</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$64</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$8</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$0.3</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$10</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$3</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$4</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$5</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$6</ID>
+    <ID>MagicNumber:RelayTests.kt$RelayTests$8</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$0.25f</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.3f</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.5f</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.7f</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.8f</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$1500</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$8</ID>
+    <ID>MagicNumber:RemoteItem.kt$RemoteItem$99</ID>
+    <ID>MagicNumber:RsSignals.kt$RsSignals$14</ID>
+    <ID>MagicNumber:StandardBlocks.kt$StandardBlocks.Cutout$16.0</ID>
+    <ID>MagicNumber:TestHooks.kt$TestHooks$4</ID>
+    <ID>MagicNumber:TooltipDisplay.kt$TooltipDisplay$80</ID>
+    <ID>MagicNumber:TooltipDisplay.kt$TooltipDisplay.Companion$5</ID>
+    <ID>MagicNumber:TooltipDisplay.kt$TooltipDisplay.Companion$500</ID>
+    <ID>MagicNumber:TooltipDisplay.kt$TooltipDisplay.Companion$5000</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$.5</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$0.1</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$0.10</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$0.11</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$15</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$3</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$4</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$5</ID>
+    <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$6</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$0.3</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$0.5</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$0b10101L</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$0x03L</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$0x07L</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$11</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$15</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$3</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$4</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$5</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$7</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$9</ID>
+    <ID>MagicNumber:TrackTests.kt$TrackTests$99</ID>
+    <ID>MaxLineLength:Auxiliaries.kt$Auxiliaries$// -------------------------------------------------------------------------------------------------------------------</ID>
+    <ID>MaxLineLength:Inventories.kt$Inventories$// ------------------------------------------------------------------------------------------------------------------</ID>
+    <ID>MaxLineLength:Inventories.kt$Inventories.InventoryRange$// ------------------------------------------------------------------------------------------------------------------</ID>
+    <ID>NestedBlockDepth:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$protected open fun getInputPower( world: Level, relayPos: BlockPos, redstoneSide: Direction, ): Int</ID>
+    <ID>NestedBlockDepth:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
+    <ID>NestedBlockDepth:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
+    <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic$fun tick()</ID>
+    <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
+    <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic.MultiLineMathExpr.Companion$@JvmStatic fun of( code: String, assignment_variable: String, functions: Collection&lt;MathExpr.ExprFuncDef>, ): MultiLineMathExpr</ID>
+    <ID>NestedBlockDepth:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$override fun getRemainingItems(inv: CraftingInput): NonNullList&lt;ItemStack></ID>
+    <ID>NestedBlockDepth:Inventories.kt$Inventories.InventoryRange$fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack</ID>
+    <ID>NestedBlockDepth:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
+    <ID>NestedBlockDepth:ModRenderers.kt$ModRenderers.TrackTer$@Suppress("DEPRECATION") override fun render( te: TrackBlockEntity, unused1: Float, mxs: PoseStack, buf: MultiBufferSource, combinedLightIn: Int, combinedOverlayIn: Int, )</ID>
+    <ID>NestedBlockDepth:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
+    <ID>NestedBlockDepth:RelayTests.kt$RelayTests$@JvmStatic fun forwardThenReverseStateMappedFacingIsIdentity(helper: GameTestHelper)</ID>
+    <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos>?, )</ID>
+    <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
+    <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
+    <ID>ProtectedMemberInFinalClass:ControlBoxUiContainer.kt$ControlBoxUiContainer$protected val inventory_: Container = blockInventory</ID>
+    <ID>ProtectedMemberInFinalClass:ControlBoxUiContainer.kt$ControlBoxUiContainer$protected val player_: Player = playerInventory.player</ID>
+    <ID>ProtectedMemberInFinalClass:ControlBoxUiContainer.kt$ControlBoxUiContainer$protected val wpc_: ContainerLevelAccess = wpc</ID>
+    <ID>ReturnCount:Auxiliaries.kt$Auxiliaries$@JvmStatic fun getItemStackNbt(stack: ItemStack, key: String): CompoundTag</ID>
+    <ID>ReturnCount:Auxiliaries.kt$Auxiliaries.Tooltip$@JvmStatic @Environment(EnvType.CLIENT) fun addInformation( advancedTooltipTranslationKey: String?, helpTranslationKey: String?, tooltip: MutableList&lt;Component>, flag: TooltipFlag, addAdvancedTooltipHints: Boolean, ): Boolean</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$override fun getSignal( state: BlockState, world: BlockGetter, pos: BlockPos, redstoneSide: Direction, ): Int</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$override fun update( state: BlockState, world: Level, pos: BlockPos, fromPos: BlockPos?, ): BlockState</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$override fun getStateForPlacement(context: BlockPlaceContext): BlockState?</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.DirectedComponentBlockItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.InvertedRelayBlock$override fun update( state: BlockState, world: Level, pos: BlockPos, fromPos: BlockPos?, ): BlockState</ID>
+    <ID>ReturnCount:CircuitComponents.kt$CircuitComponents.RelayBlock$override fun update( state: BlockState, world: Level, pos: BlockPos, fromPos: BlockPos?, ): BlockState</ID>
+    <ID>ReturnCount:ControlBoxBlock.kt$ControlBoxBlock$override fun setPlacedBy( world: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, stack: ItemStack, )</ID>
+    <ID>ReturnCount:ControlBoxBlock.kt$ControlBoxBlock$override fun update( state: BlockState, world: Level, pos: BlockPos, fromPos: BlockPos?, ): BlockState</ID>
+    <ID>ReturnCount:ControlBoxBlock.kt$ControlBoxBlock$override fun useItemOn( stack: ItemStack, state: BlockState, world: Level, pos: BlockPos, player: Player, hand: InteractionHand, rtr: BlockHitResult, ): ItemInteractionResult</ID>
+    <ID>ReturnCount:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$fun signal_update(from_world_side: Direction, from_mapped_side: Direction)</ID>
+    <ID>ReturnCount:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
+    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_interval_function( sym: String, x: Array&lt;MathExpr.Expr>, m: MutableMap&lt;String, Int>, ): Int</ID>
+    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_off_function( sym: String, x: Array&lt;MathExpr.Expr>, m: MutableMap&lt;String, Int>, ): Int</ID>
+    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_on_function( sym: String, x: Array&lt;MathExpr.Expr>, m: MutableMap&lt;String, Int>, ): Int</ID>
+    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_pulse_function( sym: String, x: Array&lt;MathExpr.Expr>, m: MutableMap&lt;String, Int>, ): Int</ID>
+    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
+    <ID>ReturnCount:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$override fun assemble(inv: CraftingInput, ra: HolderLookup.Provider?): ItemStack</ID>
+    <ID>ReturnCount:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$private fun getRepaired(inv: CraftingInput): Tuple&lt;ItemStack, NonNullList&lt;ItemStack>></ID>
+    <ID>ReturnCount:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.Adapter.Companion$@JvmStatic fun instance(): Adapter?</ID>
+    <ID>ReturnCount:FmmRedstoneClientAdapter.kt$FmmRedstoneClientAdapter.FileMemMap$fun open(initialize: Boolean): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$fun getCoordinatesAtIndex(textIndex: Int): Guis.Coord2d</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$override fun charTyped(key: Char, code: Int): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$override fun keyPressed(key: Int, x: Int, y: Int): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$override fun mouseClicked(x: Double, y: Double, button: Int): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$override fun mouseDragged( x: Double, y: Double, button: Int, dx: Double, dy: Double, ): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$private fun specialKeyMatched(key: Int): Boolean</ID>
+    <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox.DisplayCache$fun getIndexAtPosition(font: Font, pos: Guis.Coord2d): Int</ID>
+    <ID>ReturnCount:Inventories.kt$Inventories$@JvmStatic fun areItemStacksIdenticalIgnoreDamage(a: ItemStack, b: ItemStack): Boolean</ID>
+    <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun extract(requestStack: ItemStack, simulate: Boolean): ItemStack</ID>
+    <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
+    <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun insert(inputStack: ItemStack, simulate: Boolean): ItemStack</ID>
+    <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun move( index: Int, targetRange: InventoryRange, allIdenticalStacks: Boolean, onlyFillup: Boolean, reverse: Boolean, forceGroupStacks: Boolean, ): Boolean</ID>
+    <ID>ReturnCount:Overlay.kt$Overlay.TextOverlayGui$@Environment(EnvType.CLIENT) fun onRenderGui(gg: net.minecraft.client.gui.GuiGraphics)</ID>
+    <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
+    <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
+    <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
+    <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem.Companion$@JvmStatic fun isFullRedstone(stack: ItemStack): Boolean</ID>
+    <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem.Companion$@JvmStatic fun popRedstone(stack: ItemStack, amount: Int, player: Player, hand: InteractionHand): Int</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$@Environment(EnvType.CLIENT) override fun animateTick(state: BlockState, world: Level, pos: BlockPos, rand: RandomSource)</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun modifySegments( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$override fun dropList( state: BlockState, world: Level, @Nullable te: BlockEntity?, explosion: Boolean, ): List&lt;ItemStack></ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$override fun useItemOn( stack: ItemStack, state: BlockState, world: Level, pos: BlockPos, player: Player, hand: InteractionHand, rtr: BlockHitResult, ): ItemInteractionResult</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock.Companion$@JvmStatic fun canBePlacedOnFace( state: BlockState, world: Level, pos: BlockPos, face: Direction, ): Boolean</ID>
+    <ID>ReturnCount:RemoteItem.kt$RemoteItem$override fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult</ID>
+    <ID>ReturnCount:RemoteItem.kt$RemoteItem$override fun use( world: Level, player: Player, hand: InteractionHand, ): InteractionResultHolder&lt;ItemStack></ID>
+    <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
+    <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun getRemoteData(stack: ItemStack): RemoteData?</ID>
+    <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack)</ID>
+    <ID>ReturnCount:RsSignals.kt$RsSignals$@JvmStatic fun fromContainer(container: Container?): Int</ID>
+    <ID>ReturnCount:StandardBlocks.kt$StandardBlocks.Directed$override fun getStateForPlacement(context: BlockPlaceContext): BlockState?</ID>
+    <ID>ReturnCount:StandardEntityBlocks.kt$StandardEntityBlocks.IStandardEntityBlock$fun useOpenGui( state: BlockState, world: Level, pos: BlockPos, player: Player, ): InteractionResult</ID>
+    <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$fun &lt;T : AbstractContainerMenu> render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T>, x: Int, y: Int, ): Boolean</ID>
+    <ID>ReturnCount:TrackBlockEntity.kt$TrackBlockEntity$private fun isAdjacentWireSegmentAddable(face: Direction, dir: Direction): Boolean</ID>
+    <ID>ReturnCount:TrackBlockEntity.kt$TrackBlockEntity$private fun isNetConnectedTo( pos: BlockPos, net: TrackNet, otherPos: BlockPos, @Nullable otherSide: Direction?, @Nullable otherNet: TrackNet?, ): Boolean</ID>
+    <ID>SafeCast:ControlBoxUiContainer.kt$ControlBoxUiContainer$if (te is ControlBoxBlockEntity) te else null</ID>
+    <ID>SpreadOperator:Auxiliaries.kt$Auxiliaries$(modtrkey, *emptyArray&lt;Any>())</ID>
+    <ID>SpreadOperator:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe.Serializer.Companion$(Ingredient.EMPTY, *ingredients)</ID>
+    <ID>SpreadOperator:Registries.kt$Registries$(ctor::create, *blocks)</ID>
+    <ID>SwallowedException:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
+    <ID>SwallowedException:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
+    <ID>SwallowedException:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
+    <ID>SwallowedException:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
+    <ID>ThrowsCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
+    <ID>ThrowsCount:ControlBoxTests.kt$ControlBoxTests$@JvmStatic fun controlBoxEvaluatesConstantProgram(helper: GameTestHelper)</ID>
+    <ID>TooGenericExceptionCaught:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
+    <ID>TooGenericExceptionCaught:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$ex: Throwable</ID>
+    <ID>TooGenericExceptionCaught:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ModRenderers.kt$ModRenderers.TrackTer$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
+    <ID>TooGenericExceptionCaught:TooltipDisplay.kt$TooltipDisplay$ex: Exception</ID>
+    <ID>TooGenericExceptionCaught:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ExprFunc$throw RuntimeException("invalid_number_of_arguments")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("expected_assignment")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("invalid_character")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_function_parenthesis")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_parenthesis")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_function_arguments")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("symbol_readonly")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unexpected_character")</ID>
+    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unknown_function")</ID>
+    <ID>TooManyFunctions:Auxiliaries.kt$Auxiliaries</ID>
+    <ID>TooManyFunctions:ControlBoxTests.kt$ControlBoxTests</ID>
+    <ID>TooManyFunctions:DemoTests.kt$DemoTests</ID>
+    <ID>TooManyFunctions:GuiTextEditing.kt$GuiTextEditing$MultiLineTextBox : UiWidgetGuiEventListener</ID>
+    <ID>TooManyFunctions:Inventories.kt$Inventories$InventoryRange : ContainerIterable</ID>
+    <ID>TooManyFunctions:RedstoneTrackBlock.kt$RedstoneTrackBlock : WaterLoggableEntityBlock</ID>
+    <ID>TooManyFunctions:RelayTests.kt$RelayTests</ID>
+    <ID>TooManyFunctions:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
+    <ID>TooManyFunctions:TrackTests.kt$TrackTests</ID>
+    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$ctx: Item.TooltipContext</ID>
+    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$flag: TooltipFlag</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$pos: BlockPos</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$side: Direction?</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$state: BlockState</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$world: BlockGetter</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$level: SignalGetter</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$pos: BlockPos</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$side: Direction</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$state: BlockState</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$world: BlockGetter</ID>
+    <ID>UnusedParameter:Inventories.kt$Inventories.InventoryRange$random: Boolean</ID>
+    <ID>UnusedParameter:RedstoneTrackBlock.kt$RedstoneTrackBlock$state: BlockState</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$pos: BlockPos</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$realSide: Direction?</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$redstoneSide: Direction</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$world: BlockGetter</ID>
+    <ID>UnusedParameter:TooltipDisplay.kt$TooltipDisplay$gui: AbstractContainerScreen&lt;T></ID>
+    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$pos: BlockPos</ID>
+    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$weak: Boolean</ID>
+    <ID>UnusedPrivateProperty:BasicButton.kt$BasicButton.BasicButtonBlock.Companion$i</ID>
+    <ID>UnusedPrivateProperty:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$i</ID>
+    <ID>UnusedPrivateProperty:ModRenderers.kt$ModRenderers.TrackTer$private val renderer_: BlockEntityRendererProvider.Context?</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException( "expected control box to compute a constant east-side output of 7" )</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException( "expected invalid control box code to expose parse errors" )</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException("expected control box block entity to be created")</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException("expected control box block entity to exist")</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException("expected control box code to remain applied")</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException("expected control box to be enabled")</ID>
+    <ID>UseCheckOrError:ControlBoxTests.kt$ControlBoxTests$throw IllegalStateException("expected invalid control box code to remain invalid")</ID>
+    <ID>UseCheckOrError:TrackTests.kt$TrackTests$throw IllegalStateException( "expected seeded track route to keep its configured power side" )</ID>
+    <ID>UseCheckOrError:TrackTests.kt$TrackTests$throw IllegalStateException( "expected seeded track route to keep its stored power value" )</ID>
+    <ID>UseCheckOrError:TrackTests.kt$TrackTests$throw IllegalStateException("expected seeded track route power to update to zero")</ID>
+    <ID>UseCheckOrError:TrackTests.kt$TrackTests$throw IllegalStateException("expected track block entity to exist")</ID>
+    <ID>UtilityClassWithPublicConstructor:Defs.kt$Defs</ID>
+    <ID>WildcardImport:ControlBoxUiContainer.kt$import net.minecraft.world.inventory.*</ID>
+    <ID>WildcardImport:ExtendedShapelessRecipe.kt$import net.minecraft.world.item.crafting.*</ID>
+    <ID>WildcardImport:Inventories.kt$import net.minecraft.world.*</ID>
+    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.*</ID>
+    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.basic.*</ID>
+    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.controlbox.*</ID>
+  </CurrentIssues>
+</SmellBaseline>
