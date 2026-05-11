@@ -17,7 +17,7 @@ class PlatformHelperNeoForge : IPlatformHelper {
     override fun getFakePlayer(world: ServerLevel): Optional<out Player> =
         try {
             Optional.of(FakePlayerFactory.getMinecraft(world))
-        } catch (e: Exception) {
+        } catch (_e: Exception) {
             Optional.empty()
         }
 }

@@ -91,7 +91,9 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 }
             } catch (ex: Throwable) {
                 nets_.clear()
-                Auxiliaries.logError("Dropped invalid NBT for Redstone Track at pos $blockPos")
+                Auxiliaries.logError(
+                    "Dropped invalid NBT for Redstone Track at pos $blockPos ($ex)"
+                )
             }
         }
         return nbt

@@ -6,8 +6,7 @@
     <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x00ffaa00</ID>
     <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x55333333</ID>
     <ID>MagicNumber:ModRedstonePenClient.kt$ModRedstonePenClient$0x55444444</ID>
-    <ID>SwallowedException:PlatformHelperFabric.kt$PlatformHelperFabric$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:PlatformHelperFabric.kt$PlatformHelperFabric$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PlatformHelperFabric.kt$PlatformHelperFabric$_e: Exception</ID>
     <ID>TooManyFunctions:ControlBoxGameTests.kt$ControlBoxGameTests$Companion</ID>
     <ID>TooManyFunctions:DemoGameTests.kt$DemoGameTests$Companion</ID>
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests$Companion</ID>

@@ -355,14 +355,10 @@
     <ID>SpreadOperator:Auxiliaries.kt$Auxiliaries$(modtrkey, *emptyArray&lt;Any>())</ID>
     <ID>SpreadOperator:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe.Serializer.Companion$(Ingredient.EMPTY, *ingredients)</ID>
     <ID>SpreadOperator:Registries.kt$Registries$(ctor::create, *blocks)</ID>
-    <ID>SwallowedException:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
-    <ID>SwallowedException:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
-    <ID>SwallowedException:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
-    <ID>SwallowedException:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
     <ID>ThrowsCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
     <ID>TooGenericExceptionCaught:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
     <ID>TooGenericExceptionCaught:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$_e: Exception</ID>
     <ID>TooGenericExceptionCaught:ModRenderers.kt$ModRenderers.TrackTer$e: Throwable</ID>
     <ID>TooGenericExceptionCaught:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
     <ID>TooGenericExceptionCaught:TooltipDisplay.kt$TooltipDisplay$ex: Exception</ID>

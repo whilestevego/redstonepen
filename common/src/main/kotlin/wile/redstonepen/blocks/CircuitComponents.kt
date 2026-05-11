@@ -639,7 +639,7 @@ object CircuitComponents {
                     )
                 }
             } catch (ex: Throwable) {
-                Auxiliaries.logError("Curcuit neighborChanged recursion detected, dropping!")
+                Auxiliaries.logError("Curcuit neighborChanged recursion detected, dropping! ($ex)")
                 val p = Vec3.atCenterOf(pos)
                 world.addFreshEntity(ItemEntity(world, p.x, p.y, p.z, ItemStack(this, 1)))
                 world.setBlock(

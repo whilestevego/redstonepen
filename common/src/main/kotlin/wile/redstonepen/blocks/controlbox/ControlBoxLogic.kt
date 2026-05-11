@@ -785,7 +785,7 @@ internal class ControlBoxLogic {
                         } else {
                             assign = exp.name.lowercase()
                         }
-                    } catch (e: Exception) {
+                    } catch (_e: Exception) {
                         err = "parse_error"
                     }
                 }
