@@ -59,6 +59,12 @@ tasks.register('analyze') {
   dependsOn ':common:detekt', ':neoforge:detekt', ':fabric:detekt'
 }
 
+tasks.register('analyzeFull') {
+  group = 'verification'
+  description = 'Run detekt static analysis on all subprojects ignoring the baseline.'
+  dependsOn ':common:detektFull', ':neoforge:detektFull', ':fabric:detektFull'
+}
+
 tasks.register('analyzeBaseline') {
   group = 'verification'
   description = 'Regenerate detekt baselines for all subprojects.'
@@ -131,8 +137,21 @@ subprojects {
     buildUponDefaultConfig = true
     parallel = true
     config.setFrom(rootProject.file('config/detekt/detekt.yml'))
-    if (!rootProject.hasProperty('noBaseline')) {
-      baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+    baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+  }
+
+  tasks.register('detektFull', io.gitlab.arturbosch.detekt.Detekt) {
+    description = 'Run detekt static analysis ignoring the baseline.'
+    buildUponDefaultConfig = true
+    parallel = true
+    config.setFrom(rootProject.file('config/detekt/detekt.yml'))
+    setSource(fileTree('src').include('**/*.kt'))
+    jvmTarget = '21'
+    reports {
+      html.required.set(true)
+      sarif.required.set(false)
+      xml.required.set(false)
+      txt.required.set(false)
     }
   }
 
