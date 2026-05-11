@@ -29,3 +29,31 @@ complexity:
     thresholdInInterfaces: 20
     thresholdInObjects: 30
     thresholdInEnums: 20
+
+style:
+  # Early-return guard clauses are idiomatic Kotlin; the default of 2 flags
+  # almost every non-trivial function. Raise to a level that catches genuine
+  # spaghetti logic without penalising normal guard-clause style.
+  ReturnCount:
+    max: 4
+  MagicNumber:
+    # Ignore universally accepted non-magic literals.
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+    # Numbers inside declarations that are already named constants need no
+    # further extraction.
+    ignoreConstantDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignorePropertyDeclaration: true
+    ignoreEnums: true
+    # Named arguments carry their own documentation at the call site.
+    ignoreNamedArgument: true
+    # Extension functions on numeric types (e.g. 16.toFloat()) are self-evident.
+    ignoreExtensionFunctions: true
+    # Functions/classes annotated with @GameTest are test fixtures; coordinate
+    # literals there are structural, not domain magic numbers.
+    ignoreAnnotated:
+      - 'GameTest'
