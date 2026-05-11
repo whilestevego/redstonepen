@@ -151,7 +151,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
 
     @Deprecated("Deprecated in favour of canConnectRedstone in IForgeBlockState")
     fun canConnectRedstone(
-        state: BlockState,
+        _state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
         @Nullable side: Direction?,

@@ -392,7 +392,7 @@ object Inventories {
          */
         fun extract(amount: Int): ItemStack = extract(amount, false)
 
-        fun extract(amount: Int, random: Boolean): ItemStack = extract(amount, false, false)
+        fun extract(amount: Int, _random: Boolean): ItemStack = extract(amount, false, false)
 
         fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack {
             var outStack = ItemStack.EMPTY

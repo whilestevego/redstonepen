@@ -37,9 +37,9 @@ class ControlBoxUiContainer(
         SimpleContainerData(1),
     )
 
-    protected val player_: Player = playerInventory.player
-    protected val inventory_: Container = blockInventory
-    protected val wpc_: ContainerLevelAccess = wpc
+    private val player_: Player = playerInventory.player
+    private val inventory_: Container = blockInventory
+    private val wpc_: ContainerLevelAccess = wpc
     private val fields_: ContainerData = fields
 
     @Volatile private var received_server_data_: CompoundTag = CompoundTag()
@@ -59,12 +59,7 @@ class ControlBoxUiContainer(
     fun world(): Level = player_.level()
 
     fun te(): ControlBoxBlockEntity? =
-        wpc_
-            .evaluate { w, p ->
-                val te = w.getBlockEntity(p)
-                if (te is ControlBoxBlockEntity) te else null
-            }
-            .orElse(null)
+        wpc_.evaluate { w, p -> w.getBlockEntity(p) as? ControlBoxBlockEntity }.orElse(null)
 
     override fun stillValid(player: Player): Boolean = inventory_.stillValid(player)
 

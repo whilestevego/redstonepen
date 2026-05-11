@@ -84,11 +84,12 @@ object BasicGauge {
             return state.setValue(POWER, worldAccessor.getBestNeighborSignal(pos))
         }
 
+        @Suppress("FunctionOnlyReturningConstant")
         fun canConnectRedstone(
-            state: BlockState,
-            world: BlockGetter,
-            pos: BlockPos,
-            side: Direction?,
+            _state: BlockState,
+            _world: BlockGetter,
+            _pos: BlockPos,
+            _side: Direction?,
         ): Boolean = true
 
         override fun shouldCheckWeakPower(

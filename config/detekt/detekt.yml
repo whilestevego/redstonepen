@@ -30,6 +30,12 @@ complexity:
     thresholdInObjects: 30
     thresholdInEnums: 20
 
+empty-blocks:
+  EmptyFunctionBlock:
+    # Interface stubs and Minecraft API no-op overrides intentionally have empty
+    # bodies; penalising them adds noise without improving the code.
+    ignoreOverridden: true
+
 style:
   # Early-return guard clauses are idiomatic Kotlin; the default of 2 flags
   # almost every non-trivial function. Raise to a level that catches genuine

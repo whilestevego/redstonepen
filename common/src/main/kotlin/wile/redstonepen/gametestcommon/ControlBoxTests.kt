@@ -30,21 +30,15 @@ object ControlBoxTests {
         controlBox.setEnabled(true)
         controlBox.tick()
         helper.succeedWhen {
-            val te =
-                getControlBox(helper)
-                    ?: throw IllegalStateException("expected control box block entity to exist")
-            if (!te.getEnabled()) throw IllegalStateException("expected control box to be enabled")
-            if ("b=7" != te.getCode()) {
-                throw IllegalStateException("expected control box code to remain applied")
-            }
+            val te = getControlBox(helper) ?: error("expected control box block entity to exist")
+            check(te.getEnabled()) { "expected control box to be enabled" }
+            check("b=7" == te.getCode()) { "expected control box code to remain applied" }
             val output =
                 te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
                     .getCompound("logic")
                     .getInt("output")
-            if ((output shr (4 * Direction.EAST.ordinal)) and 0xf != 7) {
-                throw IllegalStateException(
-                    "expected control box to compute a constant east-side output of 7"
-                )
+            check((output shr (4 * Direction.EAST.ordinal)) and 0xf == 7) {
+                "expected control box to compute a constant east-side output of 7"
             }
         }
     }
@@ -55,13 +49,11 @@ object ControlBoxTests {
         controlBox.setCode("b=d.bad")
         helper.succeedWhen {
             val hooks = ControlBoxBlockEntity.TestHooks()
-            if (hooks.setCode(controlBox.getCode())) {
-                throw IllegalStateException("expected invalid control box code to remain invalid")
+            check(!hooks.setCode(controlBox.getCode())) {
+                "expected invalid control box code to remain invalid"
             }
-            if (hooks.errors().isEmpty()) {
-                throw IllegalStateException(
-                    "expected invalid control box code to expose parse errors"
-                )
+            check(hooks.errors().isNotEmpty()) {
+                "expected invalid control box code to expose parse errors"
             }
         }
     }
@@ -613,8 +605,7 @@ object ControlBoxTests {
 
     private fun placeControlBox(helper: GameTestHelper): ControlBoxBlockEntity {
         helper.setBlock(CONTROL_BOX_POS, Registries.getBlock("control_box")!!.defaultBlockState())
-        return getControlBox(helper)
-            ?: throw IllegalStateException("expected control box block entity to be created")
+        return getControlBox(helper) ?: error("expected control box block entity to be created")
     }
 
     private fun getControlBox(helper: GameTestHelper): ControlBoxBlockEntity? =
