@@ -18,6 +18,7 @@ import wile.redstonepen.items.StandardItems
 import wile.redstonepen.registry.Registries
 import wile.redstonepen.util.Inventories
 
+@Suppress("UtilityClassWithPublicConstructor")
 class PenItemGameTests {
     companion object {
         private const val EMPTY = "redstonepen:relay_activates_from_redstone"

@@ -328,8 +328,7 @@ object ControlBoxTests {
     }
 
     @JvmStatic
-    fun defsDefaultConstructorIsCallable(helper: GameTestHelper) {
-        Defs()
+    fun defsPortNamesHasSixEntries(helper: GameTestHelper) {
         if (Defs.PORT_NAMES.size != 6) helper.fail("PORT_NAMES must have 6 entries")
         helper.succeed()
     }

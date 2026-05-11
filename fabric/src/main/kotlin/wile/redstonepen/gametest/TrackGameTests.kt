@@ -4,6 +4,7 @@ import net.minecraft.gametest.framework.GameTest
 import net.minecraft.gametest.framework.GameTestHelper
 import wile.redstonepen.gametestcommon.TrackTests
 
+@Suppress("UtilityClassWithPublicConstructor")
 class TrackGameTests {
     companion object {
         private const val TEMPLATE = "redstonepen:relay_activates_from_redstone"

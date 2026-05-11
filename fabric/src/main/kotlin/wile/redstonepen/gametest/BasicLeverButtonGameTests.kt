@@ -4,6 +4,7 @@ import net.minecraft.gametest.framework.GameTest
 import net.minecraft.gametest.framework.GameTestHelper
 import wile.redstonepen.gametestcommon.BasicLeverButtonTests
 
+@Suppress("UtilityClassWithPublicConstructor")
 class BasicLeverButtonGameTests {
     companion object {
         private const val EMPTY = "redstonepen:relay_activates_from_redstone"

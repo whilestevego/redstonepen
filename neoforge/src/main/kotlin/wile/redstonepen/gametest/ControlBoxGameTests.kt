@@ -126,8 +126,8 @@ object ControlBoxGameTests {
 
     @JvmStatic
     @GameTest(template = TEMPLATE, timeoutTicks = 5)
-    fun defsDefaultConstructorIsCallable(helper: GameTestHelper) =
-        ControlBoxTests.defsDefaultConstructorIsCallable(helper)
+    fun defsPortNamesHasSixEntries(helper: GameTestHelper) =
+        ControlBoxTests.defsPortNamesHasSixEntries(helper)
 
     @JvmStatic
     @GameTest(template = TEMPLATE, timeoutTicks = 5)

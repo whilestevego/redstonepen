@@ -4,6 +4,7 @@ import net.minecraft.gametest.framework.GameTest
 import net.minecraft.gametest.framework.GameTestHelper
 import wile.redstonepen.gametestcommon.DemoTests
 
+@Suppress("UtilityClassWithPublicConstructor")
 class DemoGameTests {
     companion object {
         private const val EMPTY_PAD = "redstonepen:empty_demo_pad"

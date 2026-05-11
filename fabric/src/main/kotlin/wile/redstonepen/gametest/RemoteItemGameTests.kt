@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Blocks
 import wile.redstonepen.items.StandardItems
 import wile.redstonepen.registry.Registries
 
+@Suppress("UtilityClassWithPublicConstructor")
 class RemoteItemGameTests {
     companion object {
         private const val EMPTY = "redstonepen:relay_activates_from_redstone"
