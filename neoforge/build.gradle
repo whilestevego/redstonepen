@@ -210,17 +210,23 @@ tasks.register('restoreOriginalClasses') {
 }
 
 afterEvaluate {
+  // kotlin-stdlib must be on the bootstrap classpath for all NeoForge run tasks so
+  // SecureModuleClassLoader can resolve Kotlin runtime classes from :common
+  // (e.g. NoWhenBranchMatchedException, Intrinsics). The implementation-scope jar is
+  // not visible to that classloader at runtime.
+  def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
+  ['runClient', 'runServer', 'runGameTestServer'].each { taskName ->
+    tasks.named(taskName).configure { task ->
+      if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
+    }
+  }
+
   tasks.named('runGameTestServer').configure { task ->
     dependsOn tasks.named('prepareGameTestStructures')
     dependsOn tasks.named('swapInInstrumentedClasses')
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
-    // kotlin-stdlib must be on the bootstrap classpath so NeoForge's SecureModuleClassLoader
-    // can resolve Kotlin runtime classes loaded from :common (e.g. NoWhenBranchMatchedException).
-    // The system classpath (implementation scope) is not visible to that classloader.
-    def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
-    if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
     // Kill the server process if it hangs after an error instead of exiting cleanly.
     timeout.set(Duration.ofSeconds(90)) // 2× observed max (44 s); tighter bound surfaces failures faster
   }

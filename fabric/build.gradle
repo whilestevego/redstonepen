@@ -15,6 +15,15 @@ architectury {
 loom {
   accessWidenerPath = project(':common').file("src/main/resources/redstonepen_common.accesswidener")
   runs {
+    client {
+      client()
+      runDir 'run'
+    }
+    server {
+      server()
+      runDir 'run'
+      programArgs '--nogui'
+    }
     gameTestServer {
       server()
       property 'fabric-api.gametest'
@@ -141,15 +150,20 @@ tasks.register('restoreOriginalClasses') {
 }
 
 afterEvaluate {
+  // Fabric's Knot classloader does not see the system classpath, so kotlin-stdlib must
+  // be on the bootstrap classpath for all run tasks.
+  def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
+  ['runClient', 'runServer', 'runGameTestServer'].each { taskName ->
+    tasks.named(taskName).configure { task ->
+      if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
+    }
+  }
+
   tasks.named('runGameTestServer').configure { task ->
     dependsOn tasks.named('swapInInstrumentedClasses')
     finalizedBy tasks.named('restoreOriginalClasses')
     def jacocoRtJar = configurations.jacocoOfflineRuntime.singleFile
     task.jvmArgs("-Xbootclasspath/a:${jacocoRtJar.absolutePath}")
-    // Fabric's Knot classloader does not see the system classpath, so stdlib must be on
-    // the bootstrap classpath — same pattern as JaCoCo above.
-    def kotlinStdlibJar = configurations.runtimeClasspath.find { it.name.startsWith('kotlin-stdlib-') }
-    if (kotlinStdlibJar) task.jvmArgs("-Xbootclasspath/a:${kotlinStdlibJar.absolutePath}")
     timeout.set(Duration.ofSeconds(90)) // 2.5× observed max (33 s); tighter bound surfaces failures faster
   }
 }
