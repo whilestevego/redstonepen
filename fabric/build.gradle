@@ -3,8 +3,7 @@ plugins {
   id 'dev.architectury.loom'
   id 'com.gradleup.shadow'
   id 'jacoco'
-  // Kotlin plugin deferred to Phase 14: applying it triggers Loom's Kotlin metadata
-  // remapping for all mod deps; deferred until Fabric sources are ready to migrate.
+  id 'org.jetbrains.kotlin.jvm'
 }
 
 architectury {
@@ -61,15 +60,18 @@ dependencies {
   common(project(path: ':common', configuration: 'namedElements')) { transitive false }
   shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 
-  // kotlin-stdlib: Kotlin plugin deferred to Phase 14, so stdlib is not auto-added.
-  // implementation (not compileOnly) so the JAR is on runtimeClasspath and can be
-  // appended to the bootstrap classpath for the GameTest server (see afterEvaluate below).
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${project.kotlin_version}"
 
   jacocoOfflineRuntime "org.jacoco:org.jacoco.agent:0.8.12:runtime"
 }
 
 jacoco { toolVersion = '0.8.12' }
+
+kotlin {
+  compilerOptions {
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+  }
+}
 
 // --- GameTest structures ----------------------------------------------------
 tasks.register('prepareGameTestStructures', Copy) {
