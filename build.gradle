@@ -5,6 +5,8 @@ plugins {
   id 'com.gradleup.shadow' version '9.4.1' apply false
   id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}" apply false
   id 'org.jetbrains.kotlin.plugin.power-assert' version "${kotlin_version}" apply false
+  id 'com.diffplug.spotless' version '8.4.0' apply false
+  id 'org.jlleitschuh.gradle.ktlint' version '12.2.0' apply false
 }
 
 // Root-level platform-specific run aliases.
@@ -24,6 +26,30 @@ gradle.projectsEvaluated {
       }
     }
   }
+}
+
+tasks.register('format') {
+  group = 'verification'
+  description = 'Check Kotlin formatting (ktfmt via Spotless). Use formatFix to apply.'
+  dependsOn ':common:spotlessCheck', ':neoforge:spotlessCheck', ':fabric:spotlessCheck'
+}
+
+tasks.register('formatFix') {
+  group = 'formatting'
+  description = 'Apply ktfmt formatting to all Kotlin source files.'
+  dependsOn ':common:spotlessApply', ':neoforge:spotlessApply', ':fabric:spotlessApply'
+}
+
+tasks.register('lint') {
+  group = 'verification'
+  description = 'Check Kotlin lint rules (ktlint). Use lintFix to auto-correct.'
+  dependsOn ':common:ktlintCheck', ':neoforge:ktlintCheck', ':fabric:ktlintCheck'
+}
+
+tasks.register('lintFix') {
+  group = 'formatting'
+  description = 'Auto-correct ktlint violations across all Kotlin source files.'
+  dependsOn ':common:ktlintFormat', ':neoforge:ktlintFormat', ':fabric:ktlintFormat'
 }
 
 tasks.register('coverage') {
@@ -54,8 +80,23 @@ gradle.projectsEvaluated {
 subprojects {
   apply plugin: 'java'
   apply plugin: 'architectury-plugin'
+  apply plugin: 'com.diffplug.spotless'
+  apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
   java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+  spotless {
+    kotlin {
+      ktfmt('0.62').kotlinlangStyle()
+      target 'src/**/*.kt'
+    }
+  }
+
+  ktlint {
+    version = '1.5.0'
+    android = false
+    outputToConsole = true
+  }
 
   repositories {
     mavenLocal()
