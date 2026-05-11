@@ -1,0 +1,22 @@
+package wile.redstonepen.neoforge
+
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.player.Player
+import net.neoforged.fml.ModList
+import net.neoforged.fml.loading.FMLLoader
+import net.neoforged.neoforge.common.util.FakePlayerFactory
+import wile.redstonepen.platform.IPlatformHelper
+import java.nio.file.Path
+import java.util.Optional
+
+class PlatformHelperNeoForge : IPlatformHelper {
+    override fun getGameDirectory(): Path = FMLLoader.getGamePath()
+
+    override fun isModLoaded(modId: String): Boolean = ModList.get().isLoaded(modId)
+
+    override fun getFakePlayer(world: ServerLevel): Optional<out Player> = try {
+        Optional.of(FakePlayerFactory.getMinecraft(world))
+    } catch (e: Exception) {
+        Optional.empty()
+    }
+}
