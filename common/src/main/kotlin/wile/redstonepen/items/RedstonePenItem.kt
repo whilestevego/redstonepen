@@ -105,7 +105,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         } else {
             val rtr = BlockHitResult(context.clickLocation, context.clickedFace, targetPos, context.isInside)
             val ctx = BlockPlaceContext(player ?: return InteractionResult.FAIL, context.hand, ItemStack(Items.REDSTONE), rtr)
-            val rsState = ModContent.references.TRACK_BLOCK.getStateForPlacement(ctx) ?: return InteractionResult.FAIL
+            val rsState = ModContent.references.TRACK_BLOCK!!.getStateForPlacement(ctx) ?: return InteractionResult.FAIL
             if (!targetState.canBeReplaced(ctx)) return InteractionResult.FAIL
             if (!world.setBlock(targetPos, rsState, 1 or 2 or 16)) return InteractionResult.FAIL
             val placedState = world.getBlockState(targetPos)

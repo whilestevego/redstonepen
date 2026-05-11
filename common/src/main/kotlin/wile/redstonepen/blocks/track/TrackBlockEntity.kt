@@ -339,7 +339,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         getLevel()!!.addFreshEntity(e)
     }
 
-    private fun getBlock(): RedstoneTrackBlock = ModContent.references.TRACK_BLOCK
+    private fun getBlock(): RedstoneTrackBlock = ModContent.references.TRACK_BLOCK!!
 
     fun handleShapeUpdate(facing: Direction, facingState: BlockState, fromPos: BlockPos, isMoving: Boolean): Boolean {
         var update_neighbours = false
