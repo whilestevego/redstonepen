@@ -11,8 +11,16 @@ import wile.redstonepen.client.Overlay
 @Environment(EnvType.CLIENT)
 @Mixin(net.minecraft.client.gui.Gui::class)
 abstract class GuiRenderingMixin {
-    @Inject(at = [At(value = "TAIL")], method = ["render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"])
-    private fun render(gg: net.minecraft.client.gui.GuiGraphics, partialTicks: net.minecraft.client.DeltaTracker, info: CallbackInfo) {
+    @Inject(
+        at = [At(value = "TAIL")],
+        method =
+            ["render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"],
+    )
+    private fun render(
+        gg: net.minecraft.client.gui.GuiGraphics,
+        partialTicks: net.minecraft.client.DeltaTracker,
+        info: CallbackInfo,
+    ) {
         if (Overlay.TextOverlayGui.deadline() < System.currentTimeMillis()) return
         if (Overlay.TextOverlayGui.text() === Overlay.TextOverlayGui.EMPTY_TEXT) return
         Overlay.TextOverlayGui.INSTANCE.onRenderGui(gg)

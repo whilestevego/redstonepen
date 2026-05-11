@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Block
 @Environment(EnvType.CLIENT)
 interface IRenderingPlatform {
     fun setRenderLayer(block: Block, renderType: RenderType)
+
     fun registerAdditionalModels(models: List<ResourceLocation>)
+
     fun getBakedModel(modelManager: ModelManager, location: ResourceLocation): BakedModel
 }

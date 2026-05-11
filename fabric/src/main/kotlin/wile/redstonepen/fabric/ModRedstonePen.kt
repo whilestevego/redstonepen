@@ -28,22 +28,28 @@ class ModRedstonePen : ModInitializer {
         ModContent.initReferences()
         Networking.init()
         RcaSync.CommonRca.init()
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, "creative_tab"), CREATIVE_TAB)
+        Registry.register(
+            BuiltInRegistries.CREATIVE_MODE_TAB,
+            ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, "creative_tab"),
+            CREATIVE_TAB,
+        )
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             DemoCommand.register(dispatcher)
         }
     }
 
     companion object {
-        private val CREATIVE_TAB: CreativeModeTab = FabricItemGroup.builder()
-            .title(Component.translatable("itemGroup.tab${ModConstants.MODID}"))
-            .icon { ItemStack(Registries.getItem("pen")) }
-            .displayItems { _, reg ->
-                Registries.getRegisteredItems().forEach {
-                    if (it !is BlockItem || it.block != ModContent.References.TRACK_BLOCK) reg.accept(it)
+        private val CREATIVE_TAB: CreativeModeTab =
+            FabricItemGroup.builder()
+                .title(Component.translatable("itemGroup.tab${ModConstants.MODID}"))
+                .icon { ItemStack(Registries.getItem("pen")) }
+                .displayItems { _, reg ->
+                    Registries.getRegisteredItems().forEach {
+                        if (it !is BlockItem || it.block != ModContent.References.TRACK_BLOCK) {
+                            reg.accept(it)
+                        }
+                    }
                 }
-            }
-            .build()
+                .build()
     }
 }

@@ -38,16 +38,24 @@ class ModRedstonePenClient : ClientModInitializer {
         Overlay.register()
         MenuScreens.register(
             Registries.getMenuTypeOfBlock("control_box") as MenuType<ControlBoxUiContainer>,
-            ::ControlBoxGui)
+            ::ControlBoxGui,
+        )
         BlockEntityRenderers.register(
             Registries.getBlockEntityTypeOfBlock("track") as BlockEntityType<TrackBlockEntity>
-        ) { ctx -> ModRenderers.TrackTer(ctx) }
-        PlatformServices.getRendering().setRenderLayer(ModContent.References.TRACK_BLOCK, RenderType.cutout())
-        PlatformServices.getRendering().setRenderLayer(ModContent.References.BASIC_GAUGE_BLOCK, RenderType.translucent())
+        ) { ctx ->
+            ModRenderers.TrackTer(ctx)
+        }
+        PlatformServices.getRendering()
+            .setRenderLayer(ModContent.References.TRACK_BLOCK, RenderType.cutout())
+        PlatformServices.getRendering()
+            .setRenderLayer(ModContent.References.BASIC_GAUGE_BLOCK, RenderType.translucent())
         Overlay.on_config(0.75, 0x00ffaa00, 0x55333333, 0x55333333, 0x55444444)
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, _ ->
             val matrixStack = context.matrixStack() ?: return@register true
-            Overlay.TextOverlayGui.INSTANCE.onRenderWorldOverlay(matrixStack, context.tickCounter().realtimeDeltaTicks.toDouble())
+            Overlay.TextOverlayGui.INSTANCE.onRenderWorldOverlay(
+                matrixStack,
+                context.tickCounter().realtimeDeltaTicks.toDouble(),
+            )
             true
         }
         if (RcaSync.ClientRca.init()) {

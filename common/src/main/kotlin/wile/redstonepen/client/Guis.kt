@@ -2,6 +2,9 @@ package wile.redstonepen.client
 
 import com.mojang.blaze3d.platform.Window
 import com.mojang.blaze3d.systems.RenderSystem
+import java.util.Arrays
+import java.util.function.Consumer
+import java.util.function.Function
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
@@ -11,7 +14,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.renderer.GameRenderer
-import net.minecraft.client.sounds.SoundManager
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
@@ -20,9 +22,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
 import wile.redstonepen.util.Auxiliaries
-import java.util.Arrays
-import java.util.function.Consumer
-import java.util.function.Function
 
 @Suppress("DEPRECATION")
 object Guis {
@@ -34,10 +33,11 @@ object Guis {
         title: Component,
         backgroundImage: String,
         width: Int,
-        height: Int
+        height: Int,
     ) : AbstractContainerScreen<T>(menu, playerInv, title) {
 
-        protected val background_image_: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Auxiliaries.modid(), backgroundImage)
+        protected val background_image_: ResourceLocation =
+            ResourceLocation.fromNamespaceAndPath(Auxiliaries.modid(), backgroundImage)
         protected val player_: Player = playerInv.player
         protected val tooltip_: TooltipDisplay = TooltipDisplay()
 
@@ -46,9 +46,16 @@ object Guis {
             imageHeight = height
         }
 
-        constructor(menu: T, playerInv: Inventory, title: Component, backgroundImage: String) : this(menu, playerInv, title, backgroundImage, 0, 0)
+        constructor(
+            menu: T,
+            playerInv: Inventory,
+            title: Component,
+            backgroundImage: String,
+        ) : this(menu, playerInv, title, backgroundImage, 0, 0)
 
-        override fun init() { super.init() }
+        override fun init() {
+            super.init()
+        }
 
         override fun render(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             renderBackground(gg, mouseX, mouseY, partialTicks)
@@ -71,10 +78,17 @@ object Guis {
         }
 
         fun getBackgroundImage(): ResourceLocation = background_image_
+
         fun getGuiLeft(): Int = leftPos
+
         fun getGuiTop(): Int = topPos
 
-        protected open fun renderBgWidgets(gg: GuiGraphics, partialTicks: Float, mouseX: Int, mouseY: Int) {}
+        protected open fun renderBgWidgets(
+            gg: GuiGraphics,
+            partialTicks: Float,
+            mouseX: Int,
+            mouseY: Int,
+        ) {}
 
         protected fun renderItemTemplate(gg: GuiGraphics, stack: ItemStack, x: Int, y: Int) {
             val x0 = getGuiLeft()
@@ -97,15 +111,17 @@ object Guis {
     @Environment(EnvType.CLIENT)
     class Coord2d(@JvmField val x: Int, @JvmField val y: Int) {
         override fun toString(): String = "[$x,$y]"
+
         companion object {
             @JvmField val ORIGIN: Coord2d = Coord2d(0, 0)
+
             @JvmStatic fun of(x: Int, y: Int): Coord2d = Coord2d(x, y)
         }
     }
 
     @Environment(EnvType.CLIENT)
-    open class UiWidget(x: Int, y: Int, width: Int, height: Int, title: Component)
-        : net.minecraft.client.gui.components.AbstractWidget(x, y, width, height, title) {
+    open class UiWidget(x: Int, y: Int, width: Int, height: Int, title: Component) :
+        net.minecraft.client.gui.components.AbstractWidget(x, y, width, height, title) {
 
         private val mc_: Minecraft = Minecraft.getInstance()
         private var tooltip_: Function<UiWidget, Component> = NO_TOOLTIP
@@ -125,26 +141,54 @@ object Guis {
             return this
         }
 
-        fun tooltip(tip: Function<UiWidget, Component>): UiWidget { tooltip_ = tip; return this }
-        fun tooltip(tip: Component): UiWidget { tooltip_ = Function { tip }; return this }
+        fun tooltip(tip: Function<UiWidget, Component>): UiWidget {
+            tooltip_ = tip
+            return this
+        }
+
+        fun tooltip(tip: Component): UiWidget {
+            tooltip_ = Function { tip }
+            return this
+        }
 
         override fun getWidth(): Int = width
+
         override fun getHeight(): Int = height
 
         fun getMousePosition(): Coord2d {
             val win: Window = mc_.window
             return Coord2d.of(
-                Mth.clamp((mc_.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() - getX(), -1, width + 1),
-                Mth.clamp((mc_.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() - getY(), -1, height + 1)
+                Mth.clamp(
+                    (mc_.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() -
+                        getX(),
+                    -1,
+                    width + 1,
+                ),
+                Mth.clamp(
+                    (mc_.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() -
+                        getY(),
+                    -1,
+                    height + 1,
+                ),
             )
         }
 
         protected fun screenCoordinates(xy: Coord2d, reverse: Boolean): Coord2d =
-            if (reverse) Coord2d.of(xy.x + getX(), xy.y + getY())
-            else Coord2d.of(xy.x - getX(), xy.y - getY())
+            if (reverse) {
+                Coord2d.of(xy.x + getX(), xy.y + getY())
+            } else {
+                Coord2d.of(xy.x - getX(), xy.y - getY())
+            }
 
-        fun show(): UiWidget { visible = true; return this }
-        fun hide(): UiWidget { visible = false; return this }
+        fun show(): UiWidget {
+            visible = true
+            return this
+        }
+
+        fun hide(): UiWidget {
+            visible = false
+            return this
+        }
 
         override fun updateWidgetNarration(neo: NarrationElementOutput) {}
 
@@ -169,8 +213,11 @@ object Guis {
 
     @Environment(EnvType.CLIENT)
     class CheckBox(
-        atlas: ResourceLocation, width: Int, height: Int,
-        atlasTexturePositionOff: Coord2d, atlasTexturePositionOn: Coord2d
+        atlas: ResourceLocation,
+        width: Int,
+        height: Int,
+        atlasTexturePositionOff: Coord2d,
+        atlasTexturePositionOn: Coord2d,
     ) : UiWidget(0, 0, width, height, EMPTY_TEXT) {
 
         private val texture_position_off_: Coord2d = atlasTexturePositionOff
@@ -180,10 +227,21 @@ object Guis {
         private var on_click_: Consumer<CheckBox> = Consumer {}
 
         fun checked(): Boolean = checked_
-        fun checked(on: Boolean): CheckBox { checked_ = on; return this }
-        fun onclick(action: Consumer<CheckBox>): CheckBox { on_click_ = action; return this }
 
-        override fun onClick(mouseX: Double, mouseY: Double) { checked_ = !checked_; on_click_.accept(this) }
+        fun checked(on: Boolean): CheckBox {
+            checked_ = on
+            return this
+        }
+
+        fun onclick(action: Consumer<CheckBox>): CheckBox {
+            on_click_ = action
+            return this
+        }
+
+        override fun onClick(mouseX: Double, mouseY: Double) {
+            checked_ = !checked_
+            on_click_.accept(this)
+        }
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
@@ -200,17 +258,24 @@ object Guis {
 
     @Environment(EnvType.CLIENT)
     class ImageButton(
-        atlas: ResourceLocation, width: Int, height: Int,
-        atlasTexturePosition: Coord2d
+        atlas: ResourceLocation,
+        width: Int,
+        height: Int,
+        atlasTexturePosition: Coord2d,
     ) : UiWidget(0, 0, width, height, Component.empty()) {
 
         private val texture_position_: Coord2d = atlasTexturePosition
         private val atlas_: ResourceLocation = atlas
         private var on_click_: Consumer<ImageButton> = Consumer {}
 
-        fun onclick(action: Consumer<ImageButton>): ImageButton { on_click_ = action; return this }
+        fun onclick(action: Consumer<ImageButton>): ImageButton {
+            on_click_ = action
+            return this
+        }
 
-        override fun onClick(mouseX: Double, mouseY: Double) { on_click_.accept(this) }
+        override fun onClick(mouseX: Double, mouseY: Double) {
+            on_click_.accept(this)
+        }
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
@@ -225,10 +290,8 @@ object Guis {
     }
 
     @Environment(EnvType.CLIENT)
-    class Image(
-        atlas: ResourceLocation, width: Int, height: Int,
-        atlasTexturePosition: Coord2d
-    ) : UiWidget(0, 0, width, height, Component.empty()) {
+    class Image(atlas: ResourceLocation, width: Int, height: Int, atlasTexturePosition: Coord2d) :
+        UiWidget(0, 0, width, height, Component.empty()) {
 
         private val texture_position_: Coord2d = atlasTexturePosition
         private val atlas_: ResourceLocation = atlas
@@ -248,15 +311,36 @@ object Guis {
     }
 
     @Environment(EnvType.CLIENT)
-    class TextBox(x: Int, y: Int, width: Int, height: Int, title: Component, font: Font)
-        : net.minecraft.client.gui.components.EditBox(font, x, y, width, height, title) {
+    class TextBox(x: Int, y: Int, width: Int, height: Int, title: Component, font: Font) :
+        net.minecraft.client.gui.components.EditBox(font, x, y, width, height, title) {
 
-        init { setBordered(false) }
+        init {
+            setBordered(false)
+        }
 
-        fun withMaxLength(len: Int): TextBox { super.setMaxLength(len); return this }
-        fun withBordered(b: Boolean): TextBox { super.setBordered(b); return this }
-        fun withValue(s: String): TextBox { super.setValue(s); return this }
-        fun withEditable(e: Boolean): TextBox { super.setEditable(e); return this }
-        fun withResponder(r: Consumer<String>): TextBox { super.setResponder(r); return this }
+        fun withMaxLength(len: Int): TextBox {
+            super.setMaxLength(len)
+            return this
+        }
+
+        fun withBordered(b: Boolean): TextBox {
+            super.setBordered(b)
+            return this
+        }
+
+        fun withValue(s: String): TextBox {
+            super.setValue(s)
+            return this
+        }
+
+        fun withEditable(e: Boolean): TextBox {
+            super.setEditable(e)
+            return this
+        }
+
+        fun withResponder(r: Consumer<String>): TextBox {
+            super.setResponder(r)
+            return this
+        }
     }
 }

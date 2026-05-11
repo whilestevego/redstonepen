@@ -7,7 +7,8 @@ class TestHooks {
     var state: Long = 0L
 
     fun getWireFlags(): Int =
-        ((state and RedstoneTrackDefs.STATE_FLAG_WIR_MASK) shr RedstoneTrackDefs.STATE_FLAG_WIR_POS).toInt()
+        ((state and RedstoneTrackDefs.STATE_FLAG_WIR_MASK) shr RedstoneTrackDefs.STATE_FLAG_WIR_POS)
+            .toInt()
 
     fun getWireFlag(index: Int): Boolean =
         (state and (1L shl (RedstoneTrackDefs.STATE_FLAG_WIR_POS + index))) != 0L
@@ -15,7 +16,8 @@ class TestHooks {
     fun getWireFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_WIR_COUNT
 
     fun getConnectionFlags(): Int =
-        ((state and RedstoneTrackDefs.STATE_FLAG_CON_MASK) shr RedstoneTrackDefs.STATE_FLAG_CON_POS).toInt()
+        ((state and RedstoneTrackDefs.STATE_FLAG_CON_MASK) shr RedstoneTrackDefs.STATE_FLAG_CON_POS)
+            .toInt()
 
     fun getConnectionFlag(index: Int): Boolean =
         (state and (1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + index))) != 0L
@@ -23,12 +25,16 @@ class TestHooks {
     fun getConnectionFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_CON_COUNT
 
     fun getSidePower(side: Direction): Int {
-        val shift = RedstoneTrackDefs.STATE_FLAG_PWR_POS + 4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
+        val shift =
+            RedstoneTrackDefs.STATE_FLAG_PWR_POS +
+                4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
         return ((state shr shift) and 0xfL).toInt()
     }
 
     fun setSidePower(side: Direction, p: Int) {
-        val shift = RedstoneTrackDefs.STATE_FLAG_PWR_POS + 4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
+        val shift =
+            RedstoneTrackDefs.STATE_FLAG_PWR_POS +
+                4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
         state = (state and (0xfL shl shift).inv()) or ((p.toLong() and 0xfL) shl shift)
     }
 

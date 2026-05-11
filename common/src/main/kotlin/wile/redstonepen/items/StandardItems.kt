@@ -21,15 +21,31 @@ object StandardItems {
     interface IStandardItem
 
     open class BaseItem(properties: Properties) : Item(properties), IStandardItem {
-        open fun doesSneakBypassUse(stack: ItemStack, world: LevelReader, pos: BlockPos, player: Player): Boolean = false
+        open fun doesSneakBypassUse(
+            stack: ItemStack,
+            world: LevelReader,
+            pos: BlockPos,
+            player: Player,
+        ): Boolean = false
+
         open fun onBlockStartBreak(stack: ItemStack, pos: BlockPos, player: Player): Boolean = false
-        override fun useOn(context: UseOnContext): InteractionResult = onItemUseFirst(context.itemInHand, context)
-        open fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult = InteractionResult.PASS
+
+        override fun useOn(context: UseOnContext): InteractionResult =
+            onItemUseFirst(context.itemInHand, context)
+
+        open fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult =
+            InteractionResult.PASS
     }
 
-    open class BaseBlockItem(block: Block, properties: Item.Properties) : BlockItem(block, properties) {
+    open class BaseBlockItem(block: Block, properties: Item.Properties) :
+        BlockItem(block, properties) {
         @Environment(EnvType.CLIENT)
-        override fun appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag) {
+        override fun appendHoverText(
+            stack: ItemStack,
+            ctx: Item.TooltipContext,
+            tooltip: MutableList<Component>,
+            flag: TooltipFlag,
+        ) {
             Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
         }
 
@@ -39,6 +55,7 @@ object StandardItems {
             return super.useOn(context)
         }
 
-        open fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult = InteractionResult.PASS
+        open fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult =
+            InteractionResult.PASS
     }
 }

@@ -1,7 +1,6 @@
 package wile.redstonepen.blocks.controlbox
 
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
@@ -18,20 +17,31 @@ class ControlBoxUiContainer(
     playerInventory: Inventory,
     blockInventory: Container,
     wpc: ContainerLevelAccess,
-    fields: ContainerData
-) : AbstractContainerMenu(Registries.getMenuTypeOfBlock("control_box"), cid), Networking.INetworkSynchronisableContainer {
+    fields: ContainerData,
+) :
+    AbstractContainerMenu(Registries.getMenuTypeOfBlock("control_box"), cid),
+    Networking.INetworkSynchronisableContainer {
 
     companion object {
         protected const val NUM_OF_SLOTS = 1
     }
 
-    constructor(cid: Int, playerInventory: Inventory) :
-        this(cid, playerInventory, SimpleContainer(NUM_OF_SLOTS), ContainerLevelAccess.NULL, SimpleContainerData(1))
+    constructor(
+        cid: Int,
+        playerInventory: Inventory,
+    ) : this(
+        cid,
+        playerInventory,
+        SimpleContainer(NUM_OF_SLOTS),
+        ContainerLevelAccess.NULL,
+        SimpleContainerData(1),
+    )
 
     protected val player_: Player = playerInventory.player
     protected val inventory_: Container = blockInventory
     protected val wpc_: ContainerLevelAccess = wpc
     private val fields_: ContainerData = fields
+
     @Volatile private var received_server_data_: CompoundTag = CompoundTag()
 
     init {
@@ -41,27 +51,42 @@ class ControlBoxUiContainer(
     }
 
     fun field(index: Int): Int = fields_.get(index)
+
     fun player(): Player = player_
+
     fun inventory(): Container = inventory_
+
     fun world(): Level = player_.level()
-    fun te(): ControlBoxBlockEntity? = wpc_.evaluate { w, p ->
-        val te = w.getBlockEntity(p)
-        if (te is ControlBoxBlockEntity) te else null
-    }.orElse(null)
+
+    fun te(): ControlBoxBlockEntity? =
+        wpc_
+            .evaluate { w, p ->
+                val te = w.getBlockEntity(p)
+                if (te is ControlBoxBlockEntity) te else null
+            }
+            .orElse(null)
 
     override fun stillValid(player: Player): Boolean = inventory_.stillValid(player)
 
-    override fun removed(player: Player) { super.removed(player); inventory_.stopOpen(player) }
+    override fun removed(player: Player) {
+        super.removed(player)
+        inventory_.stopOpen(player)
+    }
 
     override fun sendAllDataToRemote() {
         super.sendAllDataToRemote()
         if (world().isClientSide || te() == null) return
-        Networking.PacketContainerSyncServerToClient.sendToListeners(world(), this, composeServerData(te()!!, true))
+        Networking.PacketContainerSyncServerToClient.sendToListeners(
+            world(),
+            this,
+            composeServerData(te()!!, true),
+        )
     }
 
     override fun quickMoveStack(player: Player, slot: Int): ItemStack = ItemStack.EMPTY
 
-    fun composeServerData(te: ControlBoxBlockEntity, full: Boolean): CompoundTag = te.collectSyncData(full)
+    fun composeServerData(te: ControlBoxBlockEntity, full: Boolean): CompoundTag =
+        te.collectSyncData(full)
 
     fun fetchReceivedServerData(): CompoundTag {
         val received = received_server_data_
@@ -71,7 +96,9 @@ class ControlBoxUiContainer(
 
     override fun onServerPacketReceived(windowId: Int, nbt: CompoundTag) {
         when (nbt.getString("action")) {
-            "serverdata" -> { received_server_data_ = nbt }
+            "serverdata" -> {
+                received_server_data_ = nbt
+            }
         }
     }
 
@@ -79,15 +106,29 @@ class ControlBoxUiContainer(
         val te = te() ?: return
         var sync = 0
         when (nbt.getString("action")) {
-            "codeupdate" -> { te.setCode(nbt.getString("code")) }
-            "serverdata" -> { sync = 2 }
-            "servervalues" -> { sync = 1 }
+            "codeupdate" -> {
+                te.setCode(nbt.getString("code"))
+            }
+            "serverdata" -> {
+                sync = 2
+            }
+            "servervalues" -> {
+                sync = 1
+            }
             "enabled" -> {
                 te.setEnabled(!te.getEnabled())
-                te.setRcaPlayerUUID(if (te.getEnabled() && nbt.getBoolean("withrca")) player.uuid else null)
+                te.setRcaPlayerUUID(
+                    if (te.getEnabled() && nbt.getBoolean("withrca")) player.uuid else null
+                )
                 sync = 2
             }
         }
-        if (sync > 0) Networking.PacketContainerSyncServerToClient.sendToListeners(world(), this, composeServerData(te, sync > 1))
+        if (sync > 0) {
+            Networking.PacketContainerSyncServerToClient.sendToListeners(
+                world(),
+                this,
+                composeServerData(te, sync > 1),
+            )
+        }
     }
 }

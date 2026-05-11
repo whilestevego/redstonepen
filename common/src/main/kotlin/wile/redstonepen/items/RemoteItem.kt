@@ -32,21 +32,48 @@ import wile.redstonepen.util.Auxiliaries
 class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(properties) {
 
     @Environment(EnvType.CLIENT)
-    override fun appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag) {
+    override fun appendHoverText(
+        stack: ItemStack,
+        ctx: Item.TooltipContext,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag,
+    ) {
         val data = getRemoteData(stack)
         if (data != null) {
-            tooltip.add(Auxiliaries.localizable("item.${ModConstants.MODID}.remote.tooltip.linkedto", data.pos.x, data.pos.y, data.pos.z, Component.translatable(data.name)))
+            tooltip.add(
+                Auxiliaries.localizable(
+                    "item.${ModConstants.MODID}.remote.tooltip.linkedto",
+                    data.pos.x,
+                    data.pos.y,
+                    data.pos.z,
+                    Component.translatable(data.name),
+                )
+            )
         } else {
-            tooltip.add(Auxiliaries.localizable("item.${ModConstants.MODID}.remote.tooltip.notlinked"))
+            tooltip.add(
+                Auxiliaries.localizable("item.${ModConstants.MODID}.remote.tooltip.notlinked")
+            )
         }
         Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
     }
 
-    override fun doesSneakBypassUse(stack: ItemStack, world: LevelReader, pos: BlockPos, player: Player): Boolean = false
+    override fun doesSneakBypassUse(
+        stack: ItemStack,
+        world: LevelReader,
+        pos: BlockPos,
+        player: Player,
+    ): Boolean = false
+
     override fun isBarVisible(stack: ItemStack): Boolean = false
 
-    override fun canAttackBlock(state: net.minecraft.world.level.block.state.BlockState, world: Level, pos: BlockPos, player: Player): Boolean {
-        val stack = if (player.mainHandItem.item is RemoteItem) player.mainHandItem else player.offhandItem
+    override fun canAttackBlock(
+        state: net.minecraft.world.level.block.state.BlockState,
+        world: Level,
+        pos: BlockPos,
+        player: Player,
+    ): Boolean {
+        val stack =
+            if (player.mainHandItem.item is RemoteItem) player.mainHandItem else player.offhandItem
         attack(stack, pos, player)
         return false
     }
@@ -56,10 +83,19 @@ class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(propertie
         return false
     }
 
-    override fun getDestroySpeed(stack: ItemStack, state: net.minecraft.world.level.block.state.BlockState): Float = 10000f
+    override fun getDestroySpeed(
+        stack: ItemStack,
+        state: net.minecraft.world.level.block.state.BlockState,
+    ): Float = 10000f
 
-    override fun use(world: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
-        if (world !is ServerLevel) return InteractionResultHolder.success(player.getItemInHand(hand))
+    override fun use(
+        world: Level,
+        player: Player,
+        hand: InteractionHand,
+    ): InteractionResultHolder<ItemStack> {
+        if (world !is ServerLevel) {
+            return InteractionResultHolder.success(player.getItemInHand(hand))
+        }
         if (player !is ServerPlayer) return InteractionResultHolder.fail(player.getItemInHand(hand))
         onTriggerRemoteLink(world, player, player.getItemInHand(hand))
         return InteractionResultHolder.fail(player.getItemInHand(hand))
@@ -74,12 +110,20 @@ class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(propertie
 
     private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack) {
         val data = getRemoteData(stack) ?: return
-        val sound = { event: SoundEvent, pitch: Float -> world.playSound(null, player.blockPosition(), event, SoundSource.PLAYERS, 0.25f, pitch) }
+        val sound = { event: SoundEvent, pitch: Float ->
+            world.playSound(null, player.blockPosition(), event, SoundSource.PLAYERS, 0.25f, pitch)
+        }
         val fail = { sound(SoundEvents.ENDERMAN_HURT, 1.8f) }
         val pos = data.pos
-        if (!world.isLoaded(pos)) { fail(); return }
+        if (!world.isLoaded(pos)) {
+            fail()
+            return
+        }
         val state = world.getBlockState(pos)
-        if (!state.hasProperty(BlockStateProperties.POWERED)) { fail(); return }
+        if (!state.hasProperty(BlockStateProperties.POWERED)) {
+            fail()
+            return
+        }
         val block = state.block
         val powered = state.getValue(BlockStateProperties.POWERED)
         when (block) {
@@ -94,7 +138,10 @@ class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(propertie
             }
             is ControlBoxBlock -> {
                 val te = world.getBlockEntity(pos)
-                if (te !is ControlBoxBlockEntity) { fail(); return }
+                if (te !is ControlBoxBlockEntity) {
+                    fail()
+                    return
+                }
                 te.setEnabled(!te.getEnabled())
                 sound(SoundEvents.LEVER_CLICK, if (te.getEnabled()) 1.5f else 1.3f)
             }
@@ -121,10 +168,24 @@ class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(propertie
         if (stack.item !is RemoteItem) return false
         if (player !is ServerPlayer) return false
         val state = player.serverLevel().getBlockState(pos)
-        if (state.block is LeverBlock || state.block is ButtonBlock || state.block is ControlBoxBlock) {
+        if (
+            state.block is LeverBlock ||
+                state.block is ButtonBlock ||
+                state.block is ControlBoxBlock
+        ) {
             val name = state.block.descriptionId
             setRemoteData(stack, pos, name)
-            Overlay.show(player, Auxiliaries.localizable("overlay.remote_saved", pos.x, pos.y, pos.z, Component.translatable(name)), 1500)
+            Overlay.show(
+                player,
+                Auxiliaries.localizable(
+                    "overlay.remote_saved",
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    Component.translatable(name),
+                ),
+                1500,
+            )
         }
         return true
     }

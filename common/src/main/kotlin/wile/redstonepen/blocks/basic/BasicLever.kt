@@ -30,11 +30,22 @@ object BasicLever {
         val config: BasicLeverConfig = conf
 
         @Environment(EnvType.CLIENT)
-        override fun appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag) {
+        override fun appendHoverText(
+            stack: ItemStack,
+            ctx: Item.TooltipContext,
+            tooltip: MutableList<Component>,
+            flag: TooltipFlag,
+        ) {
             Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
         }
 
-        override fun useWithoutItem(state: BlockState, world: Level, pos: BlockPos, player: Player?, brh: BlockHitResult): InteractionResult {
+        override fun useWithoutItem(
+            state: BlockState,
+            world: Level,
+            pos: BlockPos,
+            player: Player?,
+            brh: BlockHitResult,
+        ): InteractionResult {
             if (world.isClientSide) {
                 val newState = state.cycle(POWERED)
                 if (newState.getValue(POWERED)) makeParticle(newState, world, pos, 1.0f)
@@ -43,21 +54,64 @@ object BasicLever {
                 val newState = state.cycle(POWERED)
                 world.setBlock(pos, newState, 1 or 2)
                 world.updateNeighborsAt(pos, this)
-                world.updateNeighborsAt(pos.relative(LeverBlock.getConnectedDirection(newState).opposite), this)
-                world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f,
-                    if (newState.getValue(POWERED)) config.soundPitchPowered else config.soundPitchUnpowered)
-                world.gameEvent(player, if (newState.getValue(POWERED)) GameEvent.BLOCK_ACTIVATE else GameEvent.BLOCK_DEACTIVATE, pos)
+                world.updateNeighborsAt(
+                    pos.relative(LeverBlock.getConnectedDirection(newState).opposite),
+                    this,
+                )
+                world.playSound(
+                    null,
+                    pos,
+                    SoundEvents.LEVER_CLICK,
+                    SoundSource.BLOCKS,
+                    0.3f,
+                    if (newState.getValue(POWERED)) {
+                        config.soundPitchPowered
+                    } else {
+                        config.soundPitchUnpowered
+                    },
+                )
+                world.gameEvent(
+                    player,
+                    if (newState.getValue(POWERED)) {
+                        GameEvent.BLOCK_ACTIVATE
+                    } else {
+                        GameEvent.BLOCK_DEACTIVATE
+                    },
+                    pos,
+                )
                 return InteractionResult.CONSUME
             }
         }
 
         companion object {
-            private fun makeParticle(state: BlockState, world: LevelAccessor, pos: BlockPos, f: Float) {
+            private fun makeParticle(
+                state: BlockState,
+                world: LevelAccessor,
+                pos: BlockPos,
+                f: Float,
+            ) {
                 for (i in 0 until 2) {
-                    val vpos = Vec3.atCenterOf(pos)
-                        .add(Vec3.atBottomCenterOf(state.getValue(FACING).opposite.normal).scale(0.1))
-                        .add(Vec3.atLowerCornerOf(LeverBlock.getConnectedDirection(state).opposite.normal).scale(0.2))
-                    world.addParticle(DustParticleOptions(DustParticleOptions.REDSTONE_PARTICLE_COLOR, f), vpos.x(), vpos.y(), vpos.z(), 0.0, 0.0, 0.0)
+                    val vpos =
+                        Vec3.atCenterOf(pos)
+                            .add(
+                                Vec3.atBottomCenterOf(state.getValue(FACING).opposite.normal)
+                                    .scale(0.1)
+                            )
+                            .add(
+                                Vec3.atLowerCornerOf(
+                                        LeverBlock.getConnectedDirection(state).opposite.normal
+                                    )
+                                    .scale(0.2)
+                            )
+                    world.addParticle(
+                        DustParticleOptions(DustParticleOptions.REDSTONE_PARTICLE_COLOR, f),
+                        vpos.x(),
+                        vpos.y(),
+                        vpos.z(),
+                        0.0,
+                        0.0,
+                        0.0,
+                    )
                 }
             }
         }

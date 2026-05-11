@@ -7,5 +7,6 @@ import wile.redstonepen.net.Networking.UnifiedPayload
 @Environment(EnvType.CLIENT)
 interface INetworkingClientPlatform {
     fun registerClientReceiver()
+
     fun sendToServer(payload: UnifiedPayload)
 }

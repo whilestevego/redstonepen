@@ -35,14 +35,16 @@ object RemoteItemGameTests {
         helper.setBlock(leverPos, Blocks.LEVER)
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteBarNotVisible(helper: GameTestHelper) {
         val remote = ItemStack(Registries.getItem("remote"))
         if (remote.item.isBarVisible(remote)) helper.fail("remote item must hide damage bar")
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteHasHighDestroySpeed(helper: GameTestHelper) {
         val remote = ItemStack(Registries.getItem("remote"))
         val speed = remote.item.getDestroySpeed(remote, Blocks.STONE.defaultBlockState())
@@ -50,17 +52,21 @@ object RemoteItemGameTests {
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteUseUnlinkedReturnsFail(helper: GameTestHelper) {
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
         val remote = ItemStack(Registries.getItem("remote"))
         player.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val result = remote.item.use(helper.level, player, InteractionHand.MAIN_HAND)
-        if (result.result != InteractionResult.FAIL) helper.fail("unlinked remote use must return fail, got ${result.result}")
+        if (result.result != InteractionResult.FAIL) {
+            helper.fail("unlinked remote use must return fail, got ${result.result}")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteCanAttackBlockAlwaysReturnsFalse(helper: GameTestHelper) {
         placeLever(helper, POS)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
@@ -73,28 +79,33 @@ object RemoteItemGameTests {
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteOnBlockStartBreakDoesNotThrow(helper: GameTestHelper) {
         placeLever(helper, POS)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
         val remote = ItemStack(Registries.getItem("remote"))
         player.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
-        val result = (remote.item as StandardItems.BaseItem).onBlockStartBreak(remote, leverAbs, player)
+        val result =
+            (remote.item as StandardItems.BaseItem).onBlockStartBreak(remote, leverAbs, player)
         if (result) helper.fail("onBlockStartBreak must return false")
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteDoesNotSneakBypassUse(helper: GameTestHelper) {
         val remote = ItemStack(Registries.getItem("remote"))
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        if (remote.item.doesSneakBypassUse(remote, helper.level, helper.absolutePos(POS), player))
+        if (remote.item.doesSneakBypassUse(remote, helper.level, helper.absolutePos(POS), player)) {
             helper.fail("remote must not bypass sneak use")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteAttackLinksToLeverWithServerPlayer(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
@@ -102,12 +113,14 @@ object RemoteItemGameTests {
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
-        if (Auxiliaries.getItemStackNbt(remote, "remote") == null)
+        if (Auxiliaries.getItemStackNbt(remote, "remote") == null) {
             helper.fail("remote must have link data after attack on lever")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedLeverViaUse(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
@@ -116,12 +129,14 @@ object RemoteItemGameTests {
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
         remote.item.use(helper.level, fp, InteractionHand.MAIN_HAND)
-        if (!helper.level.getBlockState(leverAbs).getValue(BlockStateProperties.POWERED))
+        if (!helper.level.getBlockState(leverAbs).getValue(BlockStateProperties.POWERED)) {
             helper.fail("lever must be powered after remote trigger")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteOnItemUseFirstConsumeWhenLinked(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
@@ -132,12 +147,14 @@ object RemoteItemGameTests {
         val hit = BlockHitResult(Vec3.atCenterOf(leverAbs), Direction.UP, leverAbs, false)
         val ctx = UseOnContext(helper.level, fp, InteractionHand.MAIN_HAND, remote, hit)
         val result = (remote.item as RemoteItem).onItemUseFirst(remote, ctx)
-        if (result != InteractionResult.CONSUME && result != InteractionResult.CONSUME_PARTIAL)
+        if (result != InteractionResult.CONSUME && result != InteractionResult.CONSUME_PARTIAL) {
             helper.fail("onItemUseFirst with linked remote must CONSUME, got $result")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedButRemovedBlockTakesFailPath(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
@@ -150,7 +167,8 @@ object RemoteItemGameTests {
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedButtonActivatesButton(helper: GameTestHelper) {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, Blocks.STONE_BUTTON)
@@ -158,12 +176,18 @@ object RemoteItemGameTests {
         val remote = ItemStack(Registries.getItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val buttonAbs = helper.absolutePos(POS)
-        remote.item.canAttackBlock(helper.level.getBlockState(buttonAbs), helper.level, buttonAbs, fp)
+        remote.item.canAttackBlock(
+            helper.level.getBlockState(buttonAbs),
+            helper.level,
+            buttonAbs,
+            fp,
+        )
         remote.item.use(helper.level, fp, InteractionHand.MAIN_HAND)
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedControlBoxTogglesEnabled(helper: GameTestHelper) {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, ModContent.References.CONTROLBOX_BLOCK)
@@ -175,11 +199,14 @@ object RemoteItemGameTests {
         val wasEnabled = helper.level.getBlockState(cbAbs).getValue(BlockStateProperties.POWERED)
         remote.item.use(helper.level, fp, InteractionHand.MAIN_HAND)
         val nowEnabled = helper.level.getBlockState(cbAbs).getValue(BlockStateProperties.POWERED)
-        if (nowEnabled == wasEnabled) helper.fail("control box enabled state must change after remote trigger")
+        if (nowEnabled == wasEnabled) {
+            helper.fail("control box enabled state must change after remote trigger")
+        }
         helper.succeed()
     }
 
-    @JvmStatic @GameTest(template = EMPTY, timeoutTicks = 10)
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedObserverHitsElseFail(helper: GameTestHelper) {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, Blocks.OBSERVER)
