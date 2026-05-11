@@ -11,8 +11,12 @@ import net.minecraft.world.level.block.state.BlockState
 object RsSignals {
 
     @JvmStatic
-    fun hasSignalConnector(state: BlockState, world: BlockGetter, pos: BlockPos, realSide: Direction?): Boolean =
-        state.isSignalSource
+    fun hasSignalConnector(
+        state: BlockState,
+        world: BlockGetter,
+        pos: BlockPos,
+        realSide: Direction?,
+    ): Boolean = state.isSignalSource
 
     @JvmStatic
     fun fromContainer(container: Container?): Int {
@@ -28,10 +32,15 @@ object RsSignals {
             nonempty = true
         }
         fillLevel /= container.containerSize
-        return (Math.floor(fillLevel * 14) + if (nonempty) 1 else 0).toInt() // vanilla compliant calculation.
+        return (Math.floor(fillLevel * 14) + if (nonempty) 1 else 0)
+            .toInt() // vanilla compliant calculation.
     }
 
     @JvmStatic
-    fun canEmitWeakPower(state: BlockState, world: Level, pos: BlockPos, redstoneSide: Direction): Boolean =
-        state.isRedstoneConductor(world, pos)
+    fun canEmitWeakPower(
+        state: BlockState,
+        world: Level,
+        pos: BlockPos,
+        redstoneSide: Direction,
+    ): Boolean = state.isRedstoneConductor(world, pos)
 }

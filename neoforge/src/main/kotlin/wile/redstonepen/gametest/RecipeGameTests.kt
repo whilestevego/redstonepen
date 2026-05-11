@@ -12,7 +12,8 @@ import wile.redstonepen.gametestcommon.RecipeTests
 object RecipeGameTests {
     private const val RELAY_TEMPLATE = "relay_activates_from_redstone"
 
-    @JvmStatic @GameTest(template = RELAY_TEMPLATE, timeoutTicks = 5)
+    @JvmStatic
+    @GameTest(template = RELAY_TEMPLATE, timeoutTicks = 5)
     fun extendedShapelessRecipeSerializerRoundTrip(helper: GameTestHelper) =
         RecipeTests.extendedShapelessRecipeSerializerRoundTrip(helper)
 }

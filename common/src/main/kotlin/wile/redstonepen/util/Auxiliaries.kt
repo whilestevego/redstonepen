@@ -1,7 +1,17 @@
-@file:Suppress("DEPRECATION") // CompoundTag.unsafe is deprecated in Java but has no replacement for direct NBT access
+@file:Suppress(
+    "DEPRECATION"
+) // CompoundTag.unsafe is deprecated in Java but has no replacement for direct NBT access
+
 package wile.redstonepen.util
 
 import com.mojang.blaze3d.platform.InputConstants
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
+import java.util.*
+import java.util.function.Function
+import java.util.stream.Collectors
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
@@ -40,13 +50,6 @@ import org.lwjgl.glfw.GLFW
 import org.slf4j.Logger
 import wile.redstonepen.ModConstants
 import wile.redstonepen.platform.PlatformServices
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
-import java.util.*
-import java.util.function.Function
-import java.util.stream.Collectors
 
 object Auxiliaries {
 
@@ -57,7 +60,10 @@ object Auxiliaries {
     @JvmStatic
     fun init() {
         try {
-            developmentMode = java.io.File(getGameDirectory().resolve(DEVELOPMENT_MODE_CONTROL_FILE).toString()).isFile()
+            developmentMode =
+                java.io
+                    .File(getGameDirectory().resolve(DEVELOPMENT_MODE_CONTROL_FILE).toString())
+                    .isFile()
         } catch (_: Throwable) {}
     }
 
@@ -66,6 +72,7 @@ object Auxiliaries {
     // -------------------------------------------------------------------------------------------------------------------
 
     @JvmStatic fun modid(): String = ModConstants.MODID
+
     @JvmStatic fun logger(): Logger = logger
 
     // -------------------------------------------------------------------------------------------------------------------
@@ -74,8 +81,13 @@ object Auxiliaries {
 
     interface IExperimentalFeature
 
-    @JvmStatic fun getGameDirectory(): java.nio.file.Path = PlatformServices.PLATFORM.getGameDirectory()
-    @JvmStatic fun isModLoaded(registryName: String): Boolean = PlatformServices.PLATFORM.isModLoaded(registryName)
+    @JvmStatic
+    fun getGameDirectory(): java.nio.file.Path = PlatformServices.PLATFORM.getGameDirectory()
+
+    @JvmStatic
+    fun isModLoaded(registryName: String): Boolean =
+        PlatformServices.PLATFORM.isModLoaded(registryName)
+
     @JvmStatic fun isDevelopmentMode(): Boolean = developmentMode
 
     @JvmStatic
@@ -83,24 +95,40 @@ object Auxiliaries {
     @Suppress("all")
     fun isShiftDown(): Boolean =
         InputConstants.isKeyDown(Minecraft.getInstance().window.window, GLFW.GLFW_KEY_LEFT_SHIFT) ||
-        InputConstants.isKeyDown(Minecraft.getInstance().window.window, GLFW.GLFW_KEY_RIGHT_SHIFT)
+            InputConstants.isKeyDown(
+                Minecraft.getInstance().window.window,
+                GLFW.GLFW_KEY_RIGHT_SHIFT,
+            )
 
     @JvmStatic
     @Environment(EnvType.CLIENT)
     @Suppress("all")
     fun isCtrlDown(): Boolean =
-        InputConstants.isKeyDown(Minecraft.getInstance().window.window, GLFW.GLFW_KEY_LEFT_CONTROL) ||
-        InputConstants.isKeyDown(Minecraft.getInstance().window.window, GLFW.GLFW_KEY_RIGHT_CONTROL)
+        InputConstants.isKeyDown(
+            Minecraft.getInstance().window.window,
+            GLFW.GLFW_KEY_LEFT_CONTROL,
+        ) ||
+            InputConstants.isKeyDown(
+                Minecraft.getInstance().window.window,
+                GLFW.GLFW_KEY_RIGHT_CONTROL,
+            )
 
     @JvmStatic
     @Environment(EnvType.CLIENT)
     fun getClipboard(): Optional<String> =
-        Optional.of(net.minecraft.client.gui.font.TextFieldHelper.getClipboardContents(Minecraft.getInstance()))
+        Optional.of(
+            net.minecraft.client.gui.font.TextFieldHelper.getClipboardContents(
+                Minecraft.getInstance()
+            )
+        )
 
     @JvmStatic
     @Environment(EnvType.CLIENT)
     fun setClipboard(text: String): Boolean {
-        net.minecraft.client.gui.font.TextFieldHelper.setClipboardContents(Minecraft.getInstance(), text)
+        net.minecraft.client.gui.font.TextFieldHelper.setClipboardContents(
+            Minecraft.getInstance(),
+            text,
+        )
         return true
     }
 
@@ -109,7 +137,9 @@ object Auxiliaries {
     // -------------------------------------------------------------------------------------------------------------------
 
     @JvmStatic fun logInfo(msg: String) = logger.info(msg)
+
     @JvmStatic fun logWarn(msg: String) = logger.warn(msg)
+
     @JvmStatic fun logError(msg: String) = logger.error(msg)
 
     // -------------------------------------------------------------------------------------------------------------------
@@ -117,12 +147,19 @@ object Auxiliaries {
     // -------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Text localization wrapper, implicitly prepends `MODID` to the
-     * translation keys. Forces formatting argument, nullable if no special formatting shall be applied.
+     * Text localization wrapper, implicitly prepends `MODID` to the translation keys. Forces
+     * formatting argument, nullable if no special formatting shall be applied.
      */
     @JvmStatic
     fun localizable(modtrkey: String, vararg args: Any): MutableComponent =
-        Component.translatable(if (modtrkey.startsWith("block.") || modtrkey.startsWith("item.")) modtrkey else "${modid()}.$modtrkey", *args)
+        Component.translatable(
+            if (modtrkey.startsWith("block.") || modtrkey.startsWith("item.")) {
+                modtrkey
+            } else {
+                "${modid()}.$modtrkey"
+            },
+            *args,
+        )
 
     @JvmStatic
     fun localizable(modtrkey: String, color: ChatFormatting?, vararg args: Any): MutableComponent {
@@ -147,7 +184,11 @@ object Auxiliaries {
     @Environment(EnvType.CLIENT)
     fun wrapText(text: Component, maxWidthPercent: Int): List<Component> {
         val maxWidth = (Minecraft.getInstance().window.guiScaledWidth - 10) * maxWidthPercent / 100
-        return Minecraft.getInstance().font.splitter.splitLines(text, maxWidth, Style.EMPTY).stream()
+        return Minecraft.getInstance()
+            .font
+            .splitter
+            .splitLines(text, maxWidth, Style.EMPTY)
+            .stream()
             .map { ft -> Component.literal(ft.string) }
             .collect(Collectors.toList())
     }
@@ -178,17 +219,41 @@ object Auxiliaries {
 
         @JvmStatic
         @Environment(EnvType.CLIENT)
-        fun addInformation(advancedTooltipTranslationKey: String?, helpTranslationKey: String?, tooltip: MutableList<Component>, flag: TooltipFlag, addAdvancedTooltipHints: Boolean): Boolean {
-            val helpAvailable = helpTranslationKey != null && net.minecraft.client.resources.language.I18n.exists("$helpTranslationKey.help")
-            val tipAvailable = advancedTooltipTranslationKey != null && net.minecraft.client.resources.language.I18n.exists("$helpTranslationKey.tip")
+        fun addInformation(
+            advancedTooltipTranslationKey: String?,
+            helpTranslationKey: String?,
+            tooltip: MutableList<Component>,
+            flag: TooltipFlag,
+            addAdvancedTooltipHints: Boolean,
+        ): Boolean {
+            val helpAvailable =
+                helpTranslationKey != null &&
+                    net.minecraft.client.resources.language.I18n.exists("$helpTranslationKey.help")
+            val tipAvailable =
+                advancedTooltipTranslationKey != null &&
+                    net.minecraft.client.resources.language.I18n.exists("$helpTranslationKey.tip")
             if (!helpAvailable && !tipAvailable) return false
             var tipText: MutableComponent = Component.empty()
             when {
-                helpCondition() -> if (helpAvailable) tipText = Component.literal(localize("$helpTranslationKey.help"))
-                extendedTipCondition() -> if (tipAvailable) tipText = Component.literal(localize("$advancedTooltipTranslationKey.tip"))
+                helpCondition() ->
+                    if (helpAvailable) {
+                        tipText = Component.literal(localize("$helpTranslationKey.help"))
+                    }
+                extendedTipCondition() ->
+                    if (tipAvailable) {
+                        tipText = Component.literal(localize("$advancedTooltipTranslationKey.tip"))
+                    }
                 addAdvancedTooltipHints -> {
-                    if (tipAvailable) tipText = Component.literal(localize("${modid()}.tooltip.hint.extended") + if (helpAvailable) " " else "")
-                    if (helpAvailable) tipText.append(Component.literal(localize("${modid()}.tooltip.hint.help")))
+                    if (tipAvailable) {
+                        tipText =
+                            Component.literal(
+                                localize("${modid()}.tooltip.hint.extended") +
+                                    if (helpAvailable) " " else ""
+                            )
+                    }
+                    if (helpAvailable) {
+                        tipText.append(Component.literal(localize("${modid()}.tooltip.hint.help")))
+                    }
                 }
             }
             if (isEmpty(tipText)) return false
@@ -198,8 +263,20 @@ object Auxiliaries {
 
         @JvmStatic
         @Environment(EnvType.CLIENT)
-        fun addInformation(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag, addAdvancedTooltipHints: Boolean): Boolean =
-            addInformation(stack.descriptionId, stack.descriptionId, tooltip, flag, addAdvancedTooltipHints)
+        fun addInformation(
+            stack: ItemStack,
+            ctx: Item.TooltipContext,
+            tooltip: MutableList<Component>,
+            flag: TooltipFlag,
+            addAdvancedTooltipHints: Boolean,
+        ): Boolean =
+            addInformation(
+                stack.descriptionId,
+                stack.descriptionId,
+                tooltip,
+                flag,
+                addAdvancedTooltipHints,
+            )
     }
 
     @JvmStatic
@@ -218,8 +295,11 @@ object Auxiliaries {
     // Tag Handling
     // -------------------------------------------------------------------------------------------------------------------
 
-    @JvmStatic fun getResourceLocation(item: Item): ResourceLocation = BuiltInRegistries.ITEM.getKey(item)
-    @JvmStatic fun getResourceLocation(block: Block): ResourceLocation = BuiltInRegistries.BLOCK.getKey(block)
+    @JvmStatic
+    fun getResourceLocation(item: Item): ResourceLocation = BuiltInRegistries.ITEM.getKey(item)
+
+    @JvmStatic
+    fun getResourceLocation(block: Block): ResourceLocation = BuiltInRegistries.BLOCK.getKey(block)
 
     // -------------------------------------------------------------------------------------------------------------------
     // Item NBT data
@@ -232,14 +312,18 @@ object Auxiliaries {
     }
 
     /**
-     * Returns a *copy* of the custom data compound NBT entry selected via `key`,
-     * or an empty CompoundTag if not existing.
+     * Returns a *copy* of the custom data compound NBT entry selected via `key`, or an empty
+     * CompoundTag if not existing.
      */
     @JvmStatic
     fun getItemStackNbt(stack: ItemStack, key: String): CompoundTag {
-        val nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).unsafe ?: return CompoundTag()
+        val nbt =
+            stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).unsafe
+                ?: return CompoundTag()
         val data: Tag? = nbt.get(key)
-        if (data == null || data.id.toInt() != CompoundTag.TAG_COMPOUND.toInt()) return CompoundTag()
+        if (data == null || data.id.toInt() != CompoundTag.TAG_COMPOUND.toInt()) {
+            return CompoundTag()
+        }
         return data.copy() as CompoundTag
     }
 
@@ -252,9 +336,7 @@ object Auxiliaries {
         CustomData.set(DataComponents.CUSTOM_DATA, stack, cdt)
     }
 
-    /**
-     * Equivalent to getDisplayName(), returns null if no custom name is set.
-     */
+    /** Equivalent to getDisplayName(), returns null if no custom name is set. */
     @JvmStatic
     fun getItemLabel(stack: ItemStack): Component? =
         stack.components.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty())
@@ -275,40 +357,64 @@ object Auxiliaries {
 
     @JvmStatic
     fun isWaterLogged(state: BlockState): Boolean =
-        state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)
+        state.hasProperty(BlockStateProperties.WATERLOGGED) &&
+            state.getValue(BlockStateProperties.WATERLOGGED)
 
     @JvmStatic
-    fun getPixeledAABB(x0: Double, y0: Double, z0: Double, x1: Double, y1: Double, z1: Double): AABB =
-        AABB(x0 / 16.0, y0 / 16.0, z0 / 16.0, x1 / 16.0, y1 / 16.0, z1 / 16.0)
+    fun getPixeledAABB(
+        x0: Double,
+        y0: Double,
+        z0: Double,
+        x1: Double,
+        y1: Double,
+        z1: Double,
+    ): AABB = AABB(x0 / 16.0, y0 / 16.0, z0 / 16.0, x1 / 16.0, y1 / 16.0, z1 / 16.0)
 
-    @JvmStatic fun getRotatedAABB(bb: AABB, newFacing: Direction): AABB = getRotatedAABB(bb, newFacing, false)
-    @JvmStatic fun getRotatedAABB(bb: Array<AABB>, newFacing: Direction): Array<AABB> = getRotatedAABB(bb, newFacing, false)
+    @JvmStatic
+    fun getRotatedAABB(bb: AABB, newFacing: Direction): AABB = getRotatedAABB(bb, newFacing, false)
+
+    @JvmStatic
+    fun getRotatedAABB(bb: Array<AABB>, newFacing: Direction): Array<AABB> =
+        getRotatedAABB(bb, newFacing, false)
 
     @JvmStatic
     fun getRotatedAABB(bb: AABB, newFacing: Direction, horizontalRotation: Boolean): AABB {
-        if (!horizontalRotation) return when (newFacing.get3DDataValue()) {
-            0 -> AABB(1-bb.maxX,   bb.minZ,   bb.minY, 1-bb.minX,   bb.maxZ,   bb.maxY) // D
-            1 -> AABB(1-bb.maxX, 1-bb.maxZ, 1-bb.maxY, 1-bb.minX, 1-bb.minZ, 1-bb.minY) // U
-            2 -> AABB(  bb.minX,   bb.minY,   bb.minZ,   bb.maxX,   bb.maxY,   bb.maxZ)  // N --> bb
-            3 -> AABB(1-bb.maxX,   bb.minY, 1-bb.maxZ, 1-bb.minX,   bb.maxY, 1-bb.minZ) // S
-            4 -> AABB(  bb.minZ,   bb.minY, 1-bb.maxX,   bb.maxZ,   bb.maxY, 1-bb.minX) // W
-            5 -> AABB(1-bb.maxZ,   bb.minY,   bb.minX, 1-bb.minZ,   bb.maxY,   bb.maxX) // E
-            else -> bb
+        if (!horizontalRotation) {
+            return when (newFacing.get3DDataValue()) {
+                0 -> AABB(1 - bb.maxX, bb.minZ, bb.minY, 1 - bb.minX, bb.maxZ, bb.maxY) // D
+                1 ->
+                    AABB(
+                        1 - bb.maxX,
+                        1 - bb.maxZ,
+                        1 - bb.maxY,
+                        1 - bb.minX,
+                        1 - bb.minZ,
+                        1 - bb.minY,
+                    ) // U
+                2 -> AABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ) // N --> bb
+                3 -> AABB(1 - bb.maxX, bb.minY, 1 - bb.maxZ, 1 - bb.minX, bb.maxY, 1 - bb.minZ) // S
+                4 -> AABB(bb.minZ, bb.minY, 1 - bb.maxX, bb.maxZ, bb.maxY, 1 - bb.minX) // W
+                5 -> AABB(1 - bb.maxZ, bb.minY, bb.minX, 1 - bb.minZ, bb.maxY, bb.maxX) // E
+                else -> bb
+            }
         }
         return when (newFacing.get3DDataValue()) {
-            0 -> AABB(  bb.minX, bb.minY,   bb.minZ,   bb.maxX, bb.maxY,   bb.maxZ) // D --> bb
-            1 -> AABB(  bb.minX, bb.minY,   bb.minZ,   bb.maxX, bb.maxY,   bb.maxZ) // U --> bb
-            2 -> AABB(  bb.minX, bb.minY,   bb.minZ,   bb.maxX, bb.maxY,   bb.maxZ) // N --> bb
-            3 -> AABB(1-bb.maxX, bb.minY, 1-bb.maxZ, 1-bb.minX, bb.maxY, 1-bb.minZ) // S
-            4 -> AABB(  bb.minZ, bb.minY, 1-bb.maxX,   bb.maxZ, bb.maxY, 1-bb.minX) // W
-            5 -> AABB(1-bb.maxZ, bb.minY,   bb.minX, 1-bb.minZ, bb.maxY,   bb.maxX) // E
+            0 -> AABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ) // D --> bb
+            1 -> AABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ) // U --> bb
+            2 -> AABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ) // N --> bb
+            3 -> AABB(1 - bb.maxX, bb.minY, 1 - bb.maxZ, 1 - bb.minX, bb.maxY, 1 - bb.minZ) // S
+            4 -> AABB(bb.minZ, bb.minY, 1 - bb.maxX, bb.maxZ, bb.maxY, 1 - bb.minX) // W
+            5 -> AABB(1 - bb.maxZ, bb.minY, bb.minX, 1 - bb.minZ, bb.maxY, bb.maxX) // E
             else -> bb
         }
     }
 
     @JvmStatic
-    fun getRotatedAABB(bbs: Array<AABB>, newFacing: Direction, horizontalRotation: Boolean): Array<AABB> =
-        Array(bbs.size) { i -> getRotatedAABB(bbs[i], newFacing, horizontalRotation) }
+    fun getRotatedAABB(
+        bbs: Array<AABB>,
+        newFacing: Direction,
+        horizontalRotation: Boolean,
+    ): Array<AABB> = Array(bbs.size) { i -> getRotatedAABB(bbs[i], newFacing, horizontalRotation) }
 
     @JvmStatic
     fun getYRotatedAABB(bb: AABB, clockwise90degSteps: Int): AABB {
@@ -321,11 +427,12 @@ object Auxiliaries {
         Array(bbs.size) { i -> getYRotatedAABB(bbs[i], clockwise90degSteps) }
 
     @JvmStatic
-    fun getMirroredAABB(bb: AABB, axis: Direction.Axis): AABB = when (axis) {
-        Direction.Axis.X -> AABB(1 - bb.maxX, bb.minY, bb.minZ, 1 - bb.minX, bb.maxY, bb.maxZ)
-        Direction.Axis.Y -> AABB(bb.minX, 1 - bb.maxY, bb.minZ, bb.maxX, 1 - bb.minY, bb.maxZ)
-        Direction.Axis.Z -> AABB(bb.minX, bb.minY, 1 - bb.maxZ, bb.maxX, bb.maxY, 1 - bb.minZ)
-    }
+    fun getMirroredAABB(bb: AABB, axis: Direction.Axis): AABB =
+        when (axis) {
+            Direction.Axis.X -> AABB(1 - bb.maxX, bb.minY, bb.minZ, 1 - bb.minX, bb.maxY, bb.maxZ)
+            Direction.Axis.Y -> AABB(bb.minX, 1 - bb.maxY, bb.minZ, bb.maxX, 1 - bb.minY, bb.maxZ)
+            Direction.Axis.Z -> AABB(bb.minX, bb.minY, 1 - bb.maxZ, bb.maxX, bb.maxY, 1 - bb.minZ)
+        }
 
     @JvmStatic
     fun getMirroredAABB(bbs: Array<AABB>, axis: Direction.Axis): Array<AABB> =
@@ -341,7 +448,11 @@ object Auxiliaries {
     @JvmStatic
     fun getUnionShape(vararg aabbList: Array<AABB>): VoxelShape {
         var shape = Shapes.empty()
-        for (aabbs in aabbList) for (aabb in aabbs) shape = Shapes.joinUnoptimized(shape, Shapes.create(aabb), BooleanOp.OR)
+        for (aabbs in aabbList) {
+            for (aabb in aabbs) {
+                shape = Shapes.joinUnoptimized(shape, Shapes.create(aabb), BooleanOp.OR)
+            }
+        }
         return shape
     }
 
@@ -350,48 +461,72 @@ object Auxiliaries {
         Array(bbs.size) { i -> mapper.apply(bbs[i]) }
 
     class BlockPosRange(x0: Int, y0: Int, z0: Int, x1: Int, y1: Int, z1: Int) : Iterable<BlockPos> {
-        internal val x0: Int; internal val x1: Int
-        internal val y0: Int; internal val y1: Int
-        internal val z0: Int; internal val z1: Int
+        internal val x0: Int
+        internal val x1: Int
+        internal val y0: Int
+        internal val y1: Int
+        internal val z0: Int
+        internal val z1: Int
 
         init {
-            this.x0 = minOf(x0, x1); this.x1 = maxOf(x0, x1)
-            this.y0 = minOf(y0, y1); this.y1 = maxOf(y0, y1)
-            this.z0 = minOf(z0, z1); this.z1 = maxOf(z0, z1)
+            this.x0 = minOf(x0, x1)
+            this.x1 = maxOf(x0, x1)
+            this.y0 = minOf(y0, y1)
+            this.y1 = maxOf(y0, y1)
+            this.z0 = minOf(z0, z1)
+            this.z1 = maxOf(z0, z1)
         }
 
         companion object {
             @JvmStatic
-            fun of(range: AABB): BlockPosRange = BlockPosRange(
-                Math.floor(range.minX).toInt(), Math.floor(range.minY).toInt(), Math.floor(range.minZ).toInt(),
-                Math.floor(range.maxX - 0.0625).toInt(), Math.floor(range.maxY - 0.0625).toInt(), Math.floor(range.maxZ - 0.0625).toInt()
-            )
+            fun of(range: AABB): BlockPosRange =
+                BlockPosRange(
+                    Math.floor(range.minX).toInt(),
+                    Math.floor(range.minY).toInt(),
+                    Math.floor(range.minZ).toInt(),
+                    Math.floor(range.maxX - 0.0625).toInt(),
+                    Math.floor(range.maxY - 0.0625).toInt(),
+                    Math.floor(range.maxZ - 0.0625).toInt(),
+                )
         }
 
         fun getXSize(): Int = x1 - x0 + 1
+
         fun getYSize(): Int = y1 - y0 + 1
+
         fun getZSize(): Int = z1 - z0 + 1
+
         fun getArea(): Int = getXSize() * getZSize()
+
         fun getHeight(): Int = getYSize()
+
         fun getVolume(): Int = getXSize() * getYSize() * getZSize()
 
         fun byXZYIndex(xyzIndex: Int): BlockPos {
-            val xsz = getXSize(); val ysz = getYSize(); val zsz = getZSize()
+            val xsz = getXSize()
+            val ysz = getYSize()
+            val zsz = getZSize()
             var idx = xyzIndex % (xsz * ysz * zsz)
-            val y = idx / (xsz * zsz); idx -= y * (xsz * zsz)
-            val z = idx / xsz; idx -= z * xsz
+            val y = idx / (xsz * zsz)
+            idx -= y * (xsz * zsz)
+            val z = idx / xsz
+            idx -= z * xsz
             return BlockPos(x0 + idx, y0 + y, z0 + z)
         }
 
         fun byXZIndex(xzIndex: Int, yOffset: Int): BlockPos {
-            val xsz = getXSize(); val zsz = getZSize()
+            val xsz = getXSize()
+            val zsz = getZSize()
             var idx = xzIndex % (xsz * zsz)
-            val z = idx / xsz; idx -= z * xsz
+            val z = idx / xsz
+            idx -= z * xsz
             return BlockPos(x0 + idx, y0 + yOffset, z0 + z)
         }
 
         class BlockRangeIterator(private val range: BlockPosRange) : Iterator<BlockPos> {
-            private var x = range.x0; private var y = range.y0; private var z = range.z0
+            private var x = range.x0
+            private var y = range.y0
+            private var z = range.z0
 
             override fun hasNext(): Boolean = z <= range.z1
 
@@ -400,14 +535,19 @@ object Auxiliaries {
                 val pos = BlockPos(x, y, z)
                 if (++x > range.x1) {
                     x = range.x0
-                    if (++y > range.y1) { y = range.y0; ++z }
+                    if (++y > range.y1) {
+                        y = range.y0
+                        ++z
+                    }
                 }
                 return pos
             }
         }
 
         override fun iterator(): BlockRangeIterator = BlockRangeIterator(this)
-        fun stream(): java.util.stream.Stream<BlockPos> = java.util.stream.StreamSupport.stream(spliterator(), false)
+
+        fun stream(): java.util.stream.Stream<BlockPos> =
+            java.util.stream.StreamSupport.stream(spliterator(), false)
     }
 
     // -------------------------------------------------------------------------------------------------------------------
@@ -415,19 +555,32 @@ object Auxiliaries {
     // -------------------------------------------------------------------------------------------------------------------
 
     @JvmStatic
-    fun loadResourceText(stream: InputStream?): String = try {
-        if (stream == null) ""
-        else BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"))
-    } catch (_: Throwable) { "" }
+    fun loadResourceText(stream: InputStream?): String =
+        try {
+            if (stream == null) {
+                ""
+            } else {
+                BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"))
+            }
+        } catch (_: Throwable) {
+            ""
+        }
 
     @JvmStatic
-    fun loadResourceText(path: String): String = loadResourceText(Auxiliaries::class.java.getResourceAsStream(path))
+    fun loadResourceText(path: String): String =
+        loadResourceText(Auxiliaries::class.java.getResourceAsStream(path))
 
     @JvmStatic
     fun logGitVersion() {
         try {
             val version = loadResourceText("/.gitversion-${ModConstants.MODID}").trim()
-            logInfo(ModConstants.MODNAME + (if (version.isEmpty()) " (dev build)" else " GIT id #$version") + ".")
+            logInfo(
+                ModConstants.MODNAME +
+                    (if (version.isEmpty()) " (dev build)" else " GIT id #$version") +
+                    "."
+            )
         } catch (_: Throwable) {}
     }
 
@@ -443,11 +596,16 @@ object Auxiliaries {
     fun particles(world: Level, pos: Vec3, type: ParticleOptions, velocity: Float) {
         val rand: RandomSource = world.random
         val sl = world as? ServerLevel ?: return
-        sl.sendParticles(type,
-            pos.x + rand.nextGaussian() * 0.2, pos.y + rand.nextGaussian() * 0.2, pos.z + rand.nextGaussian() * 0.2,
+        sl.sendParticles(
+            type,
+            pos.x + rand.nextGaussian() * 0.2,
+            pos.y + rand.nextGaussian() * 0.2,
+            pos.z + rand.nextGaussian() * 0.2,
             1,
-            rand.nextDouble() * 2e-2, rand.nextDouble() * 2e-2, rand.nextDouble() * 2e-2,
-            velocity * 0.1
+            rand.nextDouble() * 2e-2,
+            rand.nextDouble() * 2e-2,
+            rand.nextDouble() * 2e-2,
+            velocity * 0.1,
         )
     }
 

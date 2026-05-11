@@ -1,10 +1,12 @@
 @file:Suppress("DEPRECATION")
+
 package wile.redstonepen.registry
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import java.util.HashMap
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
@@ -18,7 +20,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.*
 import net.minecraft.world.level.Level
 import wile.redstonepen.util.Auxiliaries
-import java.util.HashMap
 
 class ExtendedShapelessRecipe(
     private val group: String,
@@ -29,19 +30,28 @@ class ExtendedShapelessRecipe(
 ) : CraftingRecipe {
 
     fun interface IRepairableToolItem {
-        fun onShapelessRecipeRepaired(toolStack: ItemStack, previousDamage: Int, repairedDamage: Int): ItemStack
+        fun onShapelessRecipeRepaired(
+            toolStack: ItemStack,
+            previousDamage: Int,
+            repairedDamage: Int,
+        ): ItemStack
     }
 
     override fun getSerializer(): RecipeSerializer<*> = SERIALIZER
+
     override fun getGroup(): String = group
+
     override fun category(): CraftingBookCategory = category
+
     fun getAspects(): CompoundTag = aspects.copy()
+
     override fun isSpecial(): Boolean = isRepair() || aspects.getBoolean("dynamic")
 
     override fun getResultItem(ra: HolderLookup.Provider?): ItemStack =
         if (isSpecial()) ItemStack.EMPTY else result
 
     override fun getIngredients(): NonNullList<Ingredient> = ingredients
+
     override fun canCraftInDimensions(i: Int, j: Int): Boolean = i * j >= ingredients.size
 
     override fun getRemainingItems(inv: CraftingInput): NonNullList<ItemStack> {
@@ -105,11 +115,12 @@ class ExtendedShapelessRecipe(
         return rstack
     }
 
-    private fun getToolDamage(): Int = when {
-        aspects.contains("tool_repair") -> -Mth.clamp(aspects.getInt("tool_repair"), 0, 4096)
-        aspects.contains("tool_damage") -> Mth.clamp(aspects.getInt("tool_damage"), 1, 1024)
-        else -> 0
-    }
+    private fun getToolDamage(): Int =
+        when {
+            aspects.contains("tool_repair") -> -Mth.clamp(aspects.getInt("tool_repair"), 0, 4096)
+            aspects.contains("tool_damage") -> Mth.clamp(aspects.getInt("tool_damage"), 1, 1024)
+            else -> 0
+        }
 
     private fun isRepair(): Boolean = getToolDamage() < 0
 
@@ -122,7 +133,8 @@ class ExtendedShapelessRecipe(
             val stack = inv.getItem(i)
             when {
                 stack.isEmpty -> continue
-                Auxiliaries.getResourceLocation(stack.item).toString() == toolName -> toolItem = stack.copy()
+                Auxiliaries.getResourceLocation(stack.item).toString() == toolName ->
+                    toolItem = stack.copy()
                 else -> {
                     remaining[i] = stack.copy()
                     repairItems[stack.item] = stack.count + (repairItems[stack.item] ?: 0)
@@ -131,17 +143,23 @@ class ExtendedShapelessRecipe(
         }
         if (toolItem.isEmpty) return Tuple(ItemStack.EMPTY, remaining)
         if (!toolItem.isDamageableItem) {
-            Auxiliaries.logWarn("Repairing '${Auxiliaries.getResourceLocation(toolItem.item)}' can't work, the item is not damageable.")
+            Auxiliaries.logWarn(
+                "Repairing '${Auxiliaries.getResourceLocation(toolItem.item)}' can't work, the item is not damageable."
+            )
             return Tuple(ItemStack.EMPTY, remaining)
         }
         val dmg = toolItem.damageValue
-        if ((dmg <= 0) && (!aspects.getBoolean("over_repair"))) return Tuple(ItemStack.EMPTY, remaining)
+        if ((dmg <= 0) && (!aspects.getBoolean("over_repair"))) {
+            return Tuple(ItemStack.EMPTY, remaining)
+        }
         val minRepairItemCount = repairItems.values.minOrNull() ?: 0
         if (minRepairItemCount <= 0) return Tuple(ItemStack.EMPTY, remaining)
-        val singleRepairDur = if (aspects.getBoolean("relative_repair_damage"))
-            maxOf(1, -getToolDamage() * toolItem.maxDamage / 100)
-        else
-            maxOf(1, -getToolDamage())
+        val singleRepairDur =
+            if (aspects.getBoolean("relative_repair_damage")) {
+                maxOf(1, -getToolDamage() * toolItem.maxDamage / 100)
+            } else {
+                maxOf(1, -getToolDamage())
+            }
         var numRepairs = dmg / singleRepairDur
         if (numRepairs * singleRepairDur < dmg) ++numRepairs
         numRepairs = minOf(numRepairs, minRepairItemCount)
@@ -151,10 +169,12 @@ class ExtendedShapelessRecipe(
             val stack = inv.getItem(i)
             if (stack.isEmpty) continue
             if (Auxiliaries.getResourceLocation(stack.item).toString() == toolName) continue
-            remaining[i] = if (stack.item.hasCraftingRemainingItem())
-                ItemStack(stack.item.craftingRemainingItem, stack.count)
-            else
-                stack.copy()
+            remaining[i] =
+                if (stack.item.hasCraftingRemainingItem()) {
+                    ItemStack(stack.item.craftingRemainingItem, stack.count)
+                } else {
+                    stack.copy()
+                }
         }
         for (i in 0 until remaining.size) {
             val stack = remaining[i]
@@ -170,7 +190,12 @@ class ExtendedShapelessRecipe(
             }
         }
         if (toolItem.item is IRepairableToolItem) {
-            toolItem = (toolItem.item as IRepairableToolItem).onShapelessRecipeRepaired(toolItem, dmg, toolItem.damageValue)
+            toolItem =
+                (toolItem.item as IRepairableToolItem).onShapelessRecipeRepaired(
+                    toolItem,
+                    dmg,
+                    toolItem.damageValue,
+                )
         }
         return Tuple(toolItem, remaining)
     }
@@ -181,38 +206,51 @@ class ExtendedShapelessRecipe(
 
     class Serializer : RecipeSerializer<ExtendedShapelessRecipe> {
         override fun codec(): MapCodec<ExtendedShapelessRecipe> = CODEC
-        override fun streamCodec(): StreamCodec<RegistryFriendlyByteBuf, ExtendedShapelessRecipe> = STREAM_CODEC
+
+        override fun streamCodec(): StreamCodec<RegistryFriendlyByteBuf, ExtendedShapelessRecipe> =
+            STREAM_CODEC
 
         companion object {
             @Suppress("UNCHECKED_CAST")
-            private val CODEC: MapCodec<ExtendedShapelessRecipe> = RecordCodecBuilder.mapCodec { instance ->
-                instance.group(
-                    Codec.STRING.optionalFieldOf("group", "")
-                        .forGetter { it.group },
-                    CraftingBookCategory.CODEC
-                        .fieldOf("category")
-                        .orElse(CraftingBookCategory.MISC)
-                        .forGetter { it.category },
-                    ItemStack.CODEC
-                        .fieldOf("result")
-                        .forGetter { it.result },
-                    Ingredient.CODEC_NONEMPTY
-                        .listOf().fieldOf("ingredients").flatXmap({ list ->
-                            val ingredients = list.filter { !it.isEmpty }.toTypedArray()
-                            when {
-                                ingredients.isEmpty() -> DataResult.error { "no ingredients" }
-                                ingredients.size > 9 -> DataResult.error { "too many ingredients" }
-                                else -> DataResult.success(NonNullList.of(Ingredient.EMPTY, *ingredients))
-                            }
-                        }, { v -> DataResult.success(v) })
-                        .forGetter { it.ingredients },
-                    CompoundTag.CODEC
-                        .optionalFieldOf("aspects", CompoundTag())
-                        .forGetter { it.aspects },
-                ).apply(instance) { g, cat, res, ing, asp -> ExtendedShapelessRecipe(g, cat, res, ing, asp) }
-            }
+            private val CODEC: MapCodec<ExtendedShapelessRecipe> =
+                RecordCodecBuilder.mapCodec { instance ->
+                    instance
+                        .group(
+                            Codec.STRING.optionalFieldOf("group", "").forGetter { it.group },
+                            CraftingBookCategory.CODEC.fieldOf("category")
+                                .orElse(CraftingBookCategory.MISC)
+                                .forGetter { it.category },
+                            ItemStack.CODEC.fieldOf("result").forGetter { it.result },
+                            Ingredient.CODEC_NONEMPTY.listOf()
+                                .fieldOf("ingredients")
+                                .flatXmap(
+                                    { list ->
+                                        val ingredients = list.filter { !it.isEmpty }.toTypedArray()
+                                        when {
+                                            ingredients.isEmpty() ->
+                                                DataResult.error { "no ingredients" }
+                                            ingredients.size > 9 ->
+                                                DataResult.error { "too many ingredients" }
+                                            else ->
+                                                DataResult.success(
+                                                    NonNullList.of(Ingredient.EMPTY, *ingredients)
+                                                )
+                                        }
+                                    },
+                                    { v -> DataResult.success(v) },
+                                )
+                                .forGetter { it.ingredients },
+                            CompoundTag.CODEC.optionalFieldOf("aspects", CompoundTag()).forGetter {
+                                it.aspects
+                            },
+                        )
+                        .apply(instance) { g, cat, res, ing, asp ->
+                            ExtendedShapelessRecipe(g, cat, res, ing, asp)
+                        }
+                }
 
-            @JvmField val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, ExtendedShapelessRecipe> =
+            @JvmField
+            val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, ExtendedShapelessRecipe> =
                 StreamCodec.of(::toNetwork, ::fromNetwork)
 
             private fun fromNetwork(buf: RegistryFriendlyByteBuf): ExtendedShapelessRecipe {
@@ -230,7 +268,9 @@ class ExtendedShapelessRecipe(
                 buf.writeUtf(recipe.group)
                 buf.writeEnum(recipe.category)
                 buf.writeVarInt(recipe.ingredients.size)
-                for (ingredient in recipe.ingredients) Ingredient.CONTENTS_STREAM_CODEC.encode(buf, ingredient)
+                for (ingredient in recipe.ingredients) {
+                    Ingredient.CONTENTS_STREAM_CODEC.encode(buf, ingredient)
+                }
                 ItemStack.STREAM_CODEC.encode(buf, recipe.result)
                 buf.writeNbt(recipe.getAspects())
             }

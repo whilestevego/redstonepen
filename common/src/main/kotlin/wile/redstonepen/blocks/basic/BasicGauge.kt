@@ -32,34 +32,70 @@ object BasicGauge {
             registerDefaultState(defaultBlockState().setValue(POWER, 0))
         }
 
-        override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        override fun createBlockStateDefinition(
+            builder: StateDefinition.Builder<Block, BlockState>
+        ) {
             super.createBlockStateDefinition(builder)
             builder.add(POWER)
         }
 
-        override fun getShape(state: BlockState, source: BlockGetter, pos: BlockPos, selectionContext: CollisionContext): VoxelShape = Shapes.block()
+        override fun getShape(
+            state: BlockState,
+            source: BlockGetter,
+            pos: BlockPos,
+            selectionContext: CollisionContext,
+        ): VoxelShape = Shapes.block()
 
-        override fun getCollisionShape(state: BlockState, world: BlockGetter, pos: BlockPos, selectionContext: CollisionContext): VoxelShape = Shapes.block()
+        override fun getCollisionShape(
+            state: BlockState,
+            world: BlockGetter,
+            pos: BlockPos,
+            selectionContext: CollisionContext,
+        ): VoxelShape = Shapes.block()
 
         override fun getStateForPlacement(context: BlockPlaceContext): BlockState? {
             val state = super.getStateForPlacement(context) ?: return null
             return state.setValue(POWER, context.level.getBestNeighborSignal(context.clickedPos))
         }
 
-        override fun neighborChanged(state: BlockState, world: Level, pos: BlockPos, block: Block, fromPos: BlockPos, isMoving: Boolean) {
+        override fun neighborChanged(
+            state: BlockState,
+            world: Level,
+            pos: BlockPos,
+            block: Block,
+            fromPos: BlockPos,
+            isMoving: Boolean,
+        ) {
             if (world.isClientSide) return
             val p = world.getBestNeighborSignal(pos)
             if (p == state.getValue(POWER)) return
             world.setBlock(pos, state.setValue(POWER, p), 2)
         }
 
-        override fun updateShape(state: BlockState, dir: Direction, fromState: BlockState, worldAccessor: LevelAccessor, pos: BlockPos, fromPos: BlockPos): BlockState {
+        override fun updateShape(
+            state: BlockState,
+            dir: Direction,
+            fromState: BlockState,
+            worldAccessor: LevelAccessor,
+            pos: BlockPos,
+            fromPos: BlockPos,
+        ): BlockState {
             if (worldAccessor !is ServerLevel) return state
             return state.setValue(POWER, worldAccessor.getBestNeighborSignal(pos))
         }
 
-        fun canConnectRedstone(state: BlockState, world: BlockGetter, pos: BlockPos, side: Direction?): Boolean = true
+        fun canConnectRedstone(
+            state: BlockState,
+            world: BlockGetter,
+            pos: BlockPos,
+            side: Direction?,
+        ): Boolean = true
 
-        override fun shouldCheckWeakPower(state: BlockState, world: LevelReader, pos: BlockPos, side: Direction): Boolean = false
+        override fun shouldCheckWeakPower(
+            state: BlockState,
+            world: LevelReader,
+            pos: BlockPos,
+            side: Direction,
+        ): Boolean = false
     }
 }

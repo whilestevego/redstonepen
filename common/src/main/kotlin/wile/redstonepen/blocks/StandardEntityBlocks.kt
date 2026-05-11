@@ -22,7 +22,12 @@ object StandardEntityBlocks {
 
         fun isBlockEntityTicking(world: Level, state: BlockState): Boolean = false
 
-        fun useOpenGui(state: BlockState, world: Level, pos: BlockPos, player: Player): InteractionResult {
+        fun useOpenGui(
+            state: BlockState,
+            world: Level,
+            pos: BlockPos,
+            player: Player,
+        ): InteractionResult {
             if (world.isClientSide()) return InteractionResult.SUCCESS
             val te = world.getBlockEntity(pos)
             if (te !is MenuProvider) return InteractionResult.FAIL
@@ -35,23 +40,46 @@ object StandardEntityBlocks {
             return tet?.create(pos, state)
         }
 
-        override fun <T : BlockEntity> getTicker(world: Level, state: BlockState, teType: BlockEntityType<T>): BlockEntityTicker<T>? =
-            if (world.isClientSide || !isBlockEntityTicking(world, state)) null
-            else BlockEntityTicker { _, _, _, te -> (te as StandardBlockEntity).tick() }
+        override fun <T : BlockEntity> getTicker(
+            world: Level,
+            state: BlockState,
+            teType: BlockEntityType<T>,
+        ): BlockEntityTicker<T>? =
+            if (world.isClientSide || !isBlockEntityTicking(world, state)) {
+                null
+            } else {
+                BlockEntityTicker { _, _, _, te -> (te as StandardBlockEntity).tick() }
+            }
 
-        override fun <T : BlockEntity> getListener(world: ServerLevel, te: T): GameEventListener? = null
+        override fun <T : BlockEntity> getListener(world: ServerLevel, te: T): GameEventListener? =
+            null
     }
 
-    abstract class StandardBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : BlockEntity(type, pos, state) {
+    abstract class StandardBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
+        BlockEntity(type, pos, state) {
 
         open fun tick() {}
 
-        open fun writenbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag = writenbt(hlp, nbt, false)
-        open fun writenbt(hlp: HolderLookup.Provider, nbt: CompoundTag, syncPacket: Boolean): CompoundTag = nbt
+        open fun writenbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag =
+            writenbt(hlp, nbt, false)
+
+        open fun writenbt(
+            hlp: HolderLookup.Provider,
+            nbt: CompoundTag,
+            syncPacket: Boolean,
+        ): CompoundTag = nbt
+
         open fun readnbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag = nbt
 
-        override fun loadAdditional(nbt: CompoundTag, hlp: HolderLookup.Provider) { readnbt(hlp, nbt) }
-        override fun saveAdditional(nbt: CompoundTag, hlp: HolderLookup.Provider) { super.saveAdditional(writenbt(hlp, nbt, false), hlp) }
-        override fun getUpdateTag(hlp: HolderLookup.Provider): CompoundTag = writenbt(hlp, super.getUpdateTag(hlp), true)
+        override fun loadAdditional(nbt: CompoundTag, hlp: HolderLookup.Provider) {
+            readnbt(hlp, nbt)
+        }
+
+        override fun saveAdditional(nbt: CompoundTag, hlp: HolderLookup.Provider) {
+            super.saveAdditional(writenbt(hlp, nbt, false), hlp)
+        }
+
+        override fun getUpdateTag(hlp: HolderLookup.Provider): CompoundTag =
+            writenbt(hlp, super.getUpdateTag(hlp), true)
     }
 }

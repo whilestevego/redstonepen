@@ -1,12 +1,12 @@
 package wile.redstonepen.detail
 
-import net.minecraft.nbt.CompoundTag
-import wile.redstonepen.util.Auxiliaries
-import wile.redstonepen.net.Networking
-import wile.redstonepen.net.NetworkingClient
 import java.util.UUID
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import net.minecraft.nbt.CompoundTag
+import wile.redstonepen.net.Networking
+import wile.redstonepen.net.NetworkingClient
+import wile.redstonepen.util.Auxiliaries
 
 object RcaSync {
     private const val MESSAGE_HANDLER_ID = "rcadata"
@@ -19,12 +19,24 @@ object RcaSync {
         fun isValid(): Boolean = puid.leastSignificantBits != 0L || puid.mostSignificantBits != 0L
 
         @Synchronized fun client_inputs(): Long = client_inputs_
-        @Synchronized fun client_inputs(value: Long) { client_inputs_ = value }
+
+        @Synchronized
+        fun client_inputs(value: Long) {
+            client_inputs_ = value
+        }
+
         @Synchronized fun server_outputs(): Long = server_outputs_
-        @Synchronized fun server_outputs(value: Long) { server_outputs_ = value }
+
+        @Synchronized
+        fun server_outputs(value: Long) {
+            server_outputs_ = value
+        }
 
         override fun toString(): String =
-            "{player:\"$puid\", ci:${String.format("%016x", client_inputs_)}, co:${String.format("%016x", client_outputs_)}, so:${String.format("%016x", server_outputs_)}}"
+            "{player:\"$puid\", ci:${String.format(
+            "%016x",
+            client_inputs_,
+        )}, co:${String.format("%016x", client_outputs_)}, so:${String.format("%016x", server_outputs_)}}"
     }
 
     object CommonRca {
@@ -34,19 +46,26 @@ object RcaSync {
         private var num_exceptions: Long = 0
         private const val ERROR_CUTOFF_COUNT: Long = 32
 
-        @JvmStatic @Synchronized fun ofPlayer(puid: UUID?, allow_create: Boolean): RcaData {
+        @JvmStatic
+        @Synchronized
+        fun ofPlayer(puid: UUID?, allow_create: Boolean): RcaData {
             if (puid == null) return EMPTY
             if (allow_create && !data_cache.containsKey(puid)) data_cache[puid] = RcaData(puid)
             return data_cache.getOrDefault(puid, EMPTY)
         }
 
-        @JvmStatic fun init() {
-            Networking.PacketNbtNotifyClientToServer.handlers[MESSAGE_HANDLER_ID] = BiConsumer { player, nbt ->
-                if (applyRcaUpdate(player.uuid, nbt)) Networking.PacketNbtNotifyServerToClient.sendToPlayer(player, nbt)
-            }
+        @JvmStatic
+        fun init() {
+            Networking.PacketNbtNotifyClientToServer.handlers[MESSAGE_HANDLER_ID] =
+                BiConsumer { player, nbt ->
+                    if (applyRcaUpdate(player.uuid, nbt)) {
+                        Networking.PacketNbtNotifyServerToClient.sendToPlayer(player, nbt)
+                    }
+                }
         }
 
-        @JvmStatic fun applyRcaUpdate(uid: UUID, nbt: CompoundTag): Boolean {
+        @JvmStatic
+        fun applyRcaUpdate(uid: UUID, nbt: CompoundTag): Boolean {
             if (!nbt.contains("i") || num_exceptions >= ERROR_CUTOFF_COUNT) return false
             return try {
                 val rca = ofPlayer(uid, true)
@@ -62,19 +81,24 @@ object RcaSync {
     }
 
     object ClientRca {
-        @JvmStatic fun init(): Boolean {
-            val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance() ?: run {
-                Auxiliaries.logInfo("Redstone Pen RCA disabled (default).")
-                return false
-            }
-            Networking.PacketNbtNotifyServerToClient.handlers[MESSAGE_HANDLER_ID] = Consumer { nbt ->
-                if (nbt.contains("o")) rca.setOutputs(nbt.getLong("o"))
-            }
+        @JvmStatic
+        fun init(): Boolean {
+            val rca =
+                wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance()
+                    ?: run {
+                        Auxiliaries.logInfo("Redstone Pen RCA disabled (default).")
+                        return false
+                    }
+            Networking.PacketNbtNotifyServerToClient.handlers[MESSAGE_HANDLER_ID] =
+                Consumer { nbt ->
+                    if (nbt.contains("o")) rca.setOutputs(nbt.getLong("o"))
+                }
             Auxiliaries.logInfo("Redstone Pen RCA detected and enabled on this client machine.")
             return true
         }
 
-        @JvmStatic fun tick() {
+        @JvmStatic
+        fun tick() {
             val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance() ?: return
             rca.tick()
             val nbt = CompoundTag()

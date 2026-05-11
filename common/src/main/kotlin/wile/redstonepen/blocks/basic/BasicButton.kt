@@ -25,16 +25,31 @@ import wile.redstonepen.util.Auxiliaries
 object BasicButton {
 
     class BasicButtonBlock(conf: BasicButtonConfig, properties: BlockBehaviour.Properties) :
-        net.minecraft.world.level.block.ButtonBlock(BlockSetType.SPRUCE, conf.activeTime, properties) {
+        net.minecraft.world.level.block.ButtonBlock(
+            BlockSetType.SPRUCE,
+            conf.activeTime,
+            properties,
+        ) {
 
         val config: BasicButtonConfig = conf
 
         @Environment(EnvType.CLIENT)
-        override fun appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag) {
+        override fun appendHoverText(
+            stack: ItemStack,
+            ctx: Item.TooltipContext,
+            tooltip: MutableList<Component>,
+            flag: TooltipFlag,
+        ) {
             Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
         }
 
-        override fun useWithoutItem(state: BlockState, world: Level, pos: BlockPos, player: Player?, brh: BlockHitResult): InteractionResult {
+        override fun useWithoutItem(
+            state: BlockState,
+            world: Level,
+            pos: BlockPos,
+            player: Player?,
+            brh: BlockHitResult,
+        ): InteractionResult {
             if (state.getValue(POWERED)) return InteractionResult.CONSUME
             world.setBlock(pos, state.setValue(POWERED, true), 1 or 2)
             this.press(state, world, pos, player)
@@ -43,17 +58,45 @@ object BasicButton {
         }
 
         override fun playSound(player: Player?, world: LevelAccessor, pos: BlockPos, on: Boolean) {
-            world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3f,
-                if (on) config.soundPitchPowered else config.soundPitchUnpowered)
+            world.playSound(
+                null,
+                pos,
+                SoundEvents.LEVER_CLICK,
+                SoundSource.BLOCKS,
+                0.3f,
+                if (on) config.soundPitchPowered else config.soundPitchUnpowered,
+            )
         }
 
         companion object {
-            private fun makeParticle(state: BlockState, world: LevelAccessor, pos: BlockPos, f: Float) {
+            private fun makeParticle(
+                state: BlockState,
+                world: LevelAccessor,
+                pos: BlockPos,
+                f: Float,
+            ) {
                 for (i in 0 until 3) {
-                    val vpos = Vec3.atCenterOf(pos)
-                        .add(Vec3.atBottomCenterOf(state.getValue(FACING).opposite.normal).scale(0.1))
-                        .add(Vec3.atLowerCornerOf(LeverBlock.getConnectedDirection(state).opposite.normal).scale(0.4))
-                    world.addParticle(DustParticleOptions(DustParticleOptions.REDSTONE_PARTICLE_COLOR, f), vpos.x(), vpos.y(), vpos.z(), 0.0, 0.0, 0.0)
+                    val vpos =
+                        Vec3.atCenterOf(pos)
+                            .add(
+                                Vec3.atBottomCenterOf(state.getValue(FACING).opposite.normal)
+                                    .scale(0.1)
+                            )
+                            .add(
+                                Vec3.atLowerCornerOf(
+                                        LeverBlock.getConnectedDirection(state).opposite.normal
+                                    )
+                                    .scale(0.4)
+                            )
+                    world.addParticle(
+                        DustParticleOptions(DustParticleOptions.REDSTONE_PARTICLE_COLOR, f),
+                        vpos.x(),
+                        vpos.y(),
+                        vpos.z(),
+                        0.0,
+                        0.0,
+                        0.0,
+                    )
                 }
             }
         }

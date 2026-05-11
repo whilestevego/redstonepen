@@ -1,5 +1,7 @@
 package wile.redstonepen.blocks.controlbox
 
+import java.util.Arrays
+import java.util.Collections
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
@@ -25,19 +27,25 @@ import net.minecraft.world.phys.BlockHitResult
 import wile.redstonepen.blocks.CircuitComponents
 import wile.redstonepen.blocks.StandardEntityBlocks
 import wile.redstonepen.util.Auxiliaries
-import java.util.Arrays
-import java.util.Collections
 
 @Suppress("DEPRECATION")
 class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Array<AABB>) :
     CircuitComponents.DirectedComponentBlock(config, builder, aabb),
     StandardEntityBlocks.IStandardEntityBlock<ControlBoxBlockEntity> {
 
-    override fun dropList(state: BlockState, world: Level, te: BlockEntity?, explosion: Boolean): List<ItemStack> {
+    override fun dropList(
+        state: BlockState,
+        world: Level,
+        te: BlockEntity?,
+        explosion: Boolean,
+    ): List<ItemStack> {
         val stack = ItemStack(asItem())
         if (te is ControlBoxBlockEntity) {
             val tedata = te.writenbt(world.registryAccess(), net.minecraft.nbt.CompoundTag())
-            if (tedata.contains("logic") && !tedata.getCompound("logic").getString("code").trim().isEmpty()) {
+            if (
+                tedata.contains("logic") &&
+                    !tedata.getCompound("logic").getString("code").trim().isEmpty()
+            ) {
                 Auxiliaries.setItemStackNbt(stack, "tedata", tedata)
                 Auxiliaries.setItemLabel(stack, te.getCustomName())
             }
@@ -48,7 +56,12 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
     override fun isBlockEntityTicking(world: Level, state: BlockState): Boolean = true
 
     @Environment(EnvType.CLIENT)
-    override fun appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: MutableList<Component>, flag: TooltipFlag) {
+    override fun appendHoverText(
+        stack: ItemStack,
+        ctx: Item.TooltipContext,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag,
+    ) {
         Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
         if (!Auxiliaries.Tooltip.extendedTipCondition()) return
         val nbt = Auxiliaries.getItemStackNbt(stack, "tedata")
@@ -61,7 +74,13 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
             .forEach { tooltip.add(it) }
     }
 
-    override fun setPlacedBy(world: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, stack: ItemStack) {
+    override fun setPlacedBy(
+        world: Level,
+        pos: BlockPos,
+        state: BlockState,
+        placer: LivingEntity?,
+        stack: ItemStack,
+    ) {
         if (world.isClientSide) return
         val nbt = Auxiliaries.getItemStackNbt(stack, "tedata")
         if (nbt.isEmpty) return
@@ -72,21 +91,48 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         te.setChanged()
     }
 
-    public override fun getSignal(state: BlockState, world: BlockGetter, pos: BlockPos, redstone_side: Direction): Int {
+    public override fun getSignal(
+        state: BlockState,
+        world: BlockGetter,
+        pos: BlockPos,
+        redstone_side: Direction,
+    ): Int {
         val cb = world.getBlockEntity(pos) as? ControlBoxBlockEntity ?: return 0
-        val internal_side = CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(state, redstone_side.opposite)
+        val internal_side =
+            CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(
+                state,
+                redstone_side.opposite,
+            )
         return cb.getOutputSignal(internal_side)
     }
 
-    public override fun getDirectSignal(state: BlockState, world: BlockGetter, pos: BlockPos, redstone_side: Direction): Int =
-        getSignal(state, world, pos, redstone_side)
+    public override fun getDirectSignal(
+        state: BlockState,
+        world: BlockGetter,
+        pos: BlockPos,
+        redstone_side: Direction,
+    ): Int = getSignal(state, world, pos, redstone_side)
 
-    override fun useWithoutItem(state: BlockState, world: Level, pos: BlockPos, player: Player?, brh: BlockHitResult): InteractionResult {
+    override fun useWithoutItem(
+        state: BlockState,
+        world: Level,
+        pos: BlockPos,
+        player: Player?,
+        brh: BlockHitResult,
+    ): InteractionResult {
         if (player == null) return InteractionResult.PASS
         return useOpenGui(state, world, pos, player)
     }
 
-    override fun useItemOn(stack: ItemStack, state: BlockState, world: Level, pos: BlockPos, player: Player, hand: InteractionHand, rtr: BlockHitResult): ItemInteractionResult {
+    override fun useItemOn(
+        stack: ItemStack,
+        state: BlockState,
+        world: Level,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
+        rtr: BlockHitResult,
+    ): ItemInteractionResult {
         if (stack.`is`(Items.DEBUG_STICK)) {
             if (world.isClientSide) return ItemInteractionResult.SUCCESS
             (world.getBlockEntity(pos) as? ControlBoxBlockEntity)?.toggle_trace(player)
@@ -99,13 +145,29 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         notifyOutputNeighbourOfStateChange(state, world, pos, dir)
     }
 
-    override fun update(state: BlockState, world: Level, pos: BlockPos, fromPos: BlockPos?): BlockState {
+    override fun update(
+        state: BlockState,
+        world: Level,
+        pos: BlockPos,
+        fromPos: BlockPos?,
+    ): BlockState {
         if (world.isClientSide) return state
         val cb = world.getBlockEntity(pos) as? ControlBoxBlockEntity ?: return state
-        if (fromPos == null) { cb.scheduleImmediateTick(); return state }
+        if (fromPos == null) {
+            cb.scheduleImmediateTick()
+            return state
+        }
         val dp = fromPos.subtract(pos)
         val world_side = Direction.fromDelta(dp.x, dp.y, dp.z)
-        if (world_side != null) cb.signal_update(world_side, CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(state, world_side))
+        if (world_side != null) {
+            cb.signal_update(
+                world_side,
+                CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(
+                    state,
+                    world_side,
+                ),
+            )
+        }
         return state
     }
 }

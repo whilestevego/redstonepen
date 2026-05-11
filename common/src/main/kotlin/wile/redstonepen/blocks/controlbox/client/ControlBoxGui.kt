@@ -4,25 +4,36 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractWidget
-import net.minecraft.network.chat.Component
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
+import net.minecraft.network.chat.Component
 import net.minecraft.util.Tuple
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import wile.redstonepen.ModContent
-import wile.redstonepen.blocks.controlbox.Defs
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer
-import wile.redstonepen.util.Auxiliaries
-import wile.redstonepen.client.Guis
+import wile.redstonepen.blocks.controlbox.Defs
 import wile.redstonepen.client.GuiTextEditing
-import wile.redstonepen.net.NetworkingClient
+import wile.redstonepen.client.Guis
 import wile.redstonepen.client.TooltipDisplay
+import wile.redstonepen.net.NetworkingClient
+import wile.redstonepen.util.Auxiliaries
 
 @Environment(EnvType.CLIENT)
-class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory, title: Component)
-    : Guis.ContainerGui<ControlBoxUiContainer>(container, playerInventory, title, "textures/gui/control_box_gui.png", 238, 206) {
+class ControlBoxGui(
+    container: ControlBoxUiContainer,
+    playerInventory: Inventory,
+    title: Component,
+) :
+    Guis.ContainerGui<ControlBoxUiContainer>(
+        container,
+        playerInventory,
+        title,
+        "textures/gui/control_box_gui.png",
+        238,
+        206,
+    ) {
 
     private val VALUE_UPDATE_INTERVAL = 2
     private val tooltip_prefix: String = ModContent.References.CONTROLBOX_BLOCK.descriptionId
@@ -44,8 +55,16 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
     private var activating_player_: Component = Component.empty()
 
     init {
-        titleLabelX = 17; titleLabelY = -10
-        start_stop = Guis.CheckBox(getBackgroundImage(), 12, 12, Guis.Coord2d.of(15, 213), Guis.Coord2d.of(28, 213))
+        titleLabelX = 17
+        titleLabelY = -10
+        start_stop =
+            Guis.CheckBox(
+                getBackgroundImage(),
+                12,
+                12,
+                Guis.Coord2d.of(15, 213),
+                Guis.Coord2d.of(28, 213),
+            )
         cb_copy_all = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(41, 213))
         cb_paste_all = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(54, 213))
         cb_error_indicator = Guis.Image(getBackgroundImage(), 5, 2, Guis.Coord2d.of(68, 213))
@@ -62,9 +81,16 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
 
     override fun init() {
         super.init()
-        textbox.init(this, Guis.Coord2d.of(29, 12)).setFontColor(0xdddddd).setCursorColor(0xdddddd).setLineHeight(7).onValueChanged { push_code(textbox.getValue()) }
+        textbox
+            .init(this, Guis.Coord2d.of(29, 12))
+            .setFontColor(0xdddddd)
+            .setCursorColor(0xdddddd)
+            .setLineHeight(7)
+            .onValueChanged { push_code(textbox.getValue()) }
         addRenderableWidget(textbox)
-        start_stop.init(this, Guis.Coord2d.of(196, 14)).tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.runstop"))
+        start_stop
+            .init(this, Guis.Coord2d.of(196, 14))
+            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.runstop"))
         start_stop.onclick { _ ->
             val nbt = CompoundTag()
             val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance()
@@ -73,12 +99,23 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
             focus_editor_ = true
         }
         addRenderableWidget(start_stop)
-        cb_copy_all.init(this, Guis.Coord2d.of(212, 14)).tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.copyall"))
-        cb_copy_all.onclick { _ -> Auxiliaries.setClipboard(textbox.getValue()); focus_editor_ = true }
+        cb_copy_all
+            .init(this, Guis.Coord2d.of(212, 14))
+            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.copyall"))
+        cb_copy_all.onclick { _ ->
+            Auxiliaries.setClipboard(textbox.getValue())
+            focus_editor_ = true
+        }
         cb_copy_all.visible = false
         addRenderableWidget(cb_copy_all)
-        cb_paste_all.init(this, Guis.Coord2d.of(212, 14)).tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.pasteall"))
-        cb_paste_all.onclick { _ -> textbox.setValue(Auxiliaries.getClipboard().orElse("")); push_code(textbox.getValue()); focus_editor_ = true }
+        cb_paste_all
+            .init(this, Guis.Coord2d.of(212, 14))
+            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.pasteall"))
+        cb_paste_all.onclick { _ ->
+            textbox.setValue(Auxiliaries.getClipboard().orElse(""))
+            push_code(textbox.getValue())
+            focus_editor_ = true
+        }
         cb_paste_all.visible = false
         addRenderableWidget(cb_paste_all)
         cb_error_indicator.init(this, Guis.Coord2d.of(230, 14))
@@ -86,55 +123,167 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
         addRenderableWidget(cb_error_indicator)
         rca_enabled_indicator.init(this, Guis.Coord2d.of(194, 40))
         rca_enabled_indicator.visible = false
-        rca_enabled_indicator.tooltip { _ -> Auxiliaries.localizable("$tooltip_prefix.tooltips.rcaplayer", activating_player_) }
+        rca_enabled_indicator.tooltip { _ ->
+            Auxiliaries.localizable("$tooltip_prefix.tooltips.rcaplayer", activating_player_)
+        }
         addRenderableWidget(rca_enabled_indicator)
 
-        val ygap = 12; val x0 = getGuiLeft() + 205; val y0 = getGuiTop() + 56
+        val ygap = 12
+        val x0 = getGuiLeft() + 205
+        val y0 = getGuiTop() + 56
         val lineyMap = intArrayOf(5 * ygap, 4 * ygap, 0, 2 * ygap, 3 * ygap, ygap)
-        port_stati.clear(); port_stati_i_indicators.clear(); port_stati_o_indicators.clear()
+        port_stati.clear()
+        port_stati_i_indicators.clear()
+        port_stati_o_indicators.clear()
         port_stati.add(Guis.TextBox(x0, y0 + lineyMap[0], 30, 10, Component.literal("down"), font))
         port_stati.add(Guis.TextBox(x0, y0 + lineyMap[1], 30, 10, Component.literal("up"), font))
         port_stati.add(Guis.TextBox(x0, y0 + lineyMap[2], 30, 10, Component.literal("red"), font))
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[3], 30, 10, Component.literal("yellow"), font))
+        port_stati.add(
+            Guis.TextBox(x0, y0 + lineyMap[3], 30, 10, Component.literal("yellow"), font)
+        )
         port_stati.add(Guis.TextBox(x0, y0 + lineyMap[4], 30, 10, Component.literal("green"), font))
         port_stati.add(Guis.TextBox(x0, y0 + lineyMap[5], 30, 10, Component.literal("blue"), font))
         for (i in port_stati.indices) {
             val tb = port_stati[i]
-            tb.setEditable(false); tb.setBordered(false)
-            tb.setTextColor(0xffdddddd.toInt()); tb.setTextColorUneditable(0xffdddddd.toInt())
+            tb.setEditable(false)
+            tb.setBordered(false)
+            tb.setTextColor(0xffdddddd.toInt())
+            tb.setTextColorUneditable(0xffdddddd.toInt())
             tb.setValue(String.format("%1s=00", Defs.PORT_NAMES[i].uppercase()))
             addRenderableWidget(tb)
             val imgI = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(78, 215))
             imgI.init(this, Guis.Coord2d.of(191, 56 + lineyMap[i]))
-            port_stati_i_indicators.add(imgI); addRenderableWidget(imgI)
+            port_stati_i_indicators.add(imgI)
+            addRenderableWidget(imgI)
             val imgO = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(84, 215))
             imgO.init(this, Guis.Coord2d.of(189, 56 + lineyMap[i]))
-            port_stati_o_indicators.add(imgO); addRenderableWidget(imgO)
+            port_stati_o_indicators.add(imgO)
+            addRenderableWidget(imgO)
         }
 
         val tooltips = mutableListOf<TooltipDisplay.TipRange>()
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 200, getGuiTop() + 36, 36, 16) {
-            val c = Component.literal("")
-            symbols_.entries.sortedBy { it.key }.forEach { (k, v) ->
-                if (!debug_enabled_ && (k.startsWith(".") || Defs.PORT_NAMES.contains(k) || k.endsWith(".re") || k.endsWith(".fe"))) return@forEach
-                val lf = if (c.siblings.isEmpty()) "" else "\n"
-                c.siblings.add(Component.literal(String.format("%s%s = %d", lf, k.uppercase(), v)))
+        tooltips.add(
+            TooltipDisplay.TipRange(getGuiLeft() + 200, getGuiTop() + 36, 36, 16) {
+                val c = Component.literal("")
+                symbols_.entries
+                    .sortedBy { it.key }
+                    .forEach { (k, v) ->
+                        if (
+                            !debug_enabled_ &&
+                                (k.startsWith(".") ||
+                                    Defs.PORT_NAMES.contains(k) ||
+                                    k.endsWith(".re") ||
+                                    k.endsWith(".fe"))
+                        ) {
+                            return@forEach
+                        }
+                        val lf = if (c.siblings.isEmpty()) "" else "\n"
+                        c.siblings.add(
+                            Component.literal(String.format("%s%s = %d", lf, k.uppercase(), v))
+                        )
+                    }
+                c
             }
-            c
-        })
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 196, getGuiTop() + 14, 16, 16) {
-            if (errors_.isEmpty()) Component.empty() else Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}")
-        })
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 12, 5, 8, Auxiliaries.localizable("$tooltip_prefix.help.1")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 22, 5, 3, Auxiliaries.localizable("$tooltip_prefix.help.2")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 27, 5, 5, Auxiliaries.localizable("$tooltip_prefix.help.3")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 34, 5, 5, Auxiliaries.localizable("$tooltip_prefix.help.4")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 41, 5, 6, Auxiliaries.localizable("$tooltip_prefix.help.5")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 49, 5, 4, Auxiliaries.localizable("$tooltip_prefix.help.6")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 55, 5, 5, Auxiliaries.localizable("$tooltip_prefix.help.7")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 62, 5, 3, Auxiliaries.localizable("$tooltip_prefix.help.8")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 67, 5, 7, Auxiliaries.localizable("$tooltip_prefix.help.9")))
-        tooltips.add(TooltipDisplay.TipRange(getGuiLeft() + 18, getGuiTop() + 76, 5, 3, Auxiliaries.localizable("$tooltip_prefix.help.10")))
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(getGuiLeft() + 196, getGuiTop() + 14, 16, 16) {
+                if (errors_.isEmpty()) {
+                    Component.empty()
+                } else {
+                    Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}")
+                }
+            }
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 12,
+                5,
+                8,
+                Auxiliaries.localizable("$tooltip_prefix.help.1"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 22,
+                5,
+                3,
+                Auxiliaries.localizable("$tooltip_prefix.help.2"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 27,
+                5,
+                5,
+                Auxiliaries.localizable("$tooltip_prefix.help.3"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 34,
+                5,
+                5,
+                Auxiliaries.localizable("$tooltip_prefix.help.4"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 41,
+                5,
+                6,
+                Auxiliaries.localizable("$tooltip_prefix.help.5"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 49,
+                5,
+                4,
+                Auxiliaries.localizable("$tooltip_prefix.help.6"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 55,
+                5,
+                5,
+                Auxiliaries.localizable("$tooltip_prefix.help.7"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 62,
+                5,
+                3,
+                Auxiliaries.localizable("$tooltip_prefix.help.8"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 67,
+                5,
+                7,
+                Auxiliaries.localizable("$tooltip_prefix.help.9"),
+            )
+        )
+        tooltips.add(
+            TooltipDisplay.TipRange(
+                getGuiLeft() + 18,
+                getGuiTop() + 76,
+                5,
+                3,
+                Auxiliaries.localizable("$tooltip_prefix.help.10"),
+            )
+        )
         tooltip_.init(tooltips).delay(50)
 
         setInitialFocus(textbox)
@@ -151,19 +300,39 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
                 val io = nbt.getInt("ports")
                 for (i in Defs.PORT_NAMES.indices) {
                     if ((mask and (0xf shl (4 * i))) == 0) continue
-                    port_stati[i].setValue(String.format("%1s=%02d", Defs.PORT_NAMES[i].uppercase(), (io shr (4 * i)) and 0xf))
+                    port_stati[i].setValue(
+                        String.format(
+                            "%1s=%02d",
+                            Defs.PORT_NAMES[i].uppercase(),
+                            (io shr (4 * i)) and 0xf,
+                        )
+                    )
                 }
             }
-            if (nbt.contains("code")) { textbox.setValue(nbt.getString("code")); focus_editor_ = true }
-            if (nbt.contains("enabled")) { start_stop.checked(nbt.getBoolean("enabled")); focus_editor_ = true }
-            if (nbt.contains("debug")) { debug_enabled_ = nbt.getBoolean("debug") }
+            if (nbt.contains("code")) {
+                textbox.setValue(nbt.getString("code"))
+                focus_editor_ = true
+            }
+            if (nbt.contains("enabled")) {
+                start_stop.checked(nbt.getBoolean("enabled"))
+                focus_editor_ = true
+            }
+            if (nbt.contains("debug")) {
+                debug_enabled_ = nbt.getBoolean("debug")
+            }
             if (nbt.contains("inputs")) {
                 var mask = nbt.getInt("inputs")
-                for (i in Defs.PORT_NAMES.indices) { port_stati_i_indicators[i].visible = (mask and 0xf) != 0; mask = mask shr 4 }
+                for (i in Defs.PORT_NAMES.indices) {
+                    port_stati_i_indicators[i].visible = (mask and 0xf) != 0
+                    mask = mask shr 4
+                }
             }
             if (nbt.contains("outputs")) {
                 var mask = nbt.getInt("outputs")
-                for (i in Defs.PORT_NAMES.indices) { port_stati_o_indicators[i].visible = (mask and 0xf) != 0; mask = mask shr 4 }
+                for (i in Defs.PORT_NAMES.indices) {
+                    port_stati_o_indicators[i].visible = (mask and 0xf) != 0
+                    mask = mask shr 4
+                }
             }
             if (nbt.contains("symbols", Tag.TAG_COMPOUND.toInt())) {
                 val symNbt = nbt.getCompound("symbols")
@@ -173,32 +342,46 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
             if (nbt.contains("errors", Tag.TAG_COMPOUND.toInt())) {
                 val errNbt = nbt.getCompound("errors")
                 errors_.clear()
-                errNbt.allKeys.forEach { k -> try { errors_.add(Tuple(k.toInt(), errNbt.getString(k))) } catch (_: Throwable) {} }
+                errNbt.allKeys.forEach { k ->
+                    try {
+                        errors_.add(Tuple(k.toInt(), errNbt.getString(k)))
+                    } catch (_: Throwable) {}
+                }
                 if (errors_.isEmpty()) {
                     cb_error_indicator.visible = false
-                    cb_error_indicator.setX(0); cb_error_indicator.setY(0)
+                    cb_error_indicator.setX(0)
+                    cb_error_indicator.setY(0)
                     cb_error_indicator.tooltip(Component.empty())
                 } else {
                     val exy = textbox.getCoordinatesAtIndex(errors_[0].a)
-                    cb_error_indicator.tooltip(Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}"))
+                    cb_error_indicator.tooltip(
+                        Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}")
+                    )
                     cb_error_indicator.visible = true
-                    cb_error_indicator.setX(exy.x); cb_error_indicator.setY(exy.y + textbox.getLineHeight())
+                    cb_error_indicator.setX(exy.x)
+                    cb_error_indicator.setY(exy.y + textbox.getLineHeight())
                 }
             }
             if (nbt.contains("player", Tag.TAG_STRING.toInt())) {
                 val playerName = nbt.getString("player")
                 if (playerName.isEmpty()) {
                     activating_player_ = Component.empty()
-                    rca_enabled_indicator.visible = false; rca_enabled_indicator.active = false
+                    rca_enabled_indicator.visible = false
+                    rca_enabled_indicator.active = false
                 } else {
                     activating_player_ = Component.literal(playerName)
-                    rca_enabled_indicator.visible = true; rca_enabled_indicator.active = true
+                    rca_enabled_indicator.visible = true
+                    rca_enabled_indicator.active = true
                 }
             }
         } else if (--update_counter_ <= 0) {
             update_counter_ = VALUE_UPDATE_INTERVAL
-            if (!code_requested_) { code_requested_ = true; onGuiAction("serverdata") }
-            else onGuiAction("servervalues")
+            if (!code_requested_) {
+                code_requested_ = true
+                onGuiAction("serverdata")
+            } else {
+                onGuiAction("servervalues")
+            }
         }
 
         start_stop.active = errors_.isEmpty()
@@ -227,7 +410,12 @@ class ControlBoxGui(container: ControlBoxUiContainer, playerInventory: Inventory
         gg.drawString(font, title, titleLabelX, titleLabelY, 0x707070)
     }
 
-    override fun slotClicked(hoveredSlot: Slot?, hoveredIndex: Int, no: Int, clickType: ClickType) {}
+    override fun slotClicked(
+        hoveredSlot: Slot?,
+        hoveredIndex: Int,
+        no: Int,
+        clickType: ClickType,
+    ) {}
 
     private fun push_code(text: String) {
         val nbt = CompoundTag()
