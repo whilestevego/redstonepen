@@ -142,7 +142,8 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         ClientboundBlockEntityDataPacket.create(this)
 
     @Suppress("FunctionOnlyReturningConstant")
-    @Environment(EnvType.CLIENT) fun getViewDistance(): Double = 64.0
+    @Environment(EnvType.CLIENT)
+    fun getViewDistance(): Double = 64.0
 
     fun sync(schedule: Boolean): Boolean {
         if (level!!.isClientSide()) return true

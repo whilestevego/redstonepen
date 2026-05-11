@@ -809,8 +809,7 @@ object TrackTests {
     }
 
     private fun seedTrackNet(helper: GameTestHelper, power: Int, vararg powerSides: Direction) {
-        val te =
-            getTrack(helper) ?: error("expected track block entity to exist")
+        val te = getTrack(helper) ?: error("expected track block entity to exist")
         val route = CompoundTag()
         route.putInt("power", power)
         route.put("npos", LongArrayTag(listOf()))

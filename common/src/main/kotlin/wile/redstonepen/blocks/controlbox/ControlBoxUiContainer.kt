@@ -59,9 +59,7 @@ class ControlBoxUiContainer(
     fun world(): Level = player_.level()
 
     fun te(): ControlBoxBlockEntity? =
-        wpc_
-            .evaluate { w, p -> w.getBlockEntity(p) as? ControlBoxBlockEntity }
-            .orElse(null)
+        wpc_.evaluate { w, p -> w.getBlockEntity(p) as? ControlBoxBlockEntity }.orElse(null)
 
     override fun stillValid(player: Player): Boolean = inventory_.stillValid(player)
 

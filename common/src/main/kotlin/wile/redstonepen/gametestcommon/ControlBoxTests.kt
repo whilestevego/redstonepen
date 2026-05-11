@@ -30,9 +30,7 @@ object ControlBoxTests {
         controlBox.setEnabled(true)
         controlBox.tick()
         helper.succeedWhen {
-            val te =
-                getControlBox(helper)
-                    ?: error("expected control box block entity to exist")
+            val te = getControlBox(helper) ?: error("expected control box block entity to exist")
             check(te.getEnabled()) { "expected control box to be enabled" }
             check("b=7" == te.getCode()) { "expected control box code to remain applied" }
             val output =
