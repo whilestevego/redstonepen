@@ -24,6 +24,12 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      - name: Check formatting
+        run: ./gradlew format
+
+      - name: Check lint
+        run: ./gradlew lint
+
       - name: Build all modules
         run: ./gradlew build
 
