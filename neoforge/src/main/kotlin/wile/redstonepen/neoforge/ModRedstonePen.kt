@@ -91,7 +91,6 @@ class ModRedstonePen(bus: IEventBus) {
             )
     }
 
-    @Suppress("UtilityClassWithPublicConstructor")
     private class LiveCycleEvents {
         companion object {
             @JvmStatic
@@ -115,7 +114,6 @@ class ModRedstonePen(bus: IEventBus) {
         }
     }
 
-    @Suppress("UtilityClassWithPublicConstructor")
     @EventBusSubscriber(
         modid = ModConstants.MODID,
         bus = EventBusSubscriber.Bus.MOD,
@@ -165,7 +163,6 @@ class ModRedstonePen(bus: IEventBus) {
         }
     }
 
-    @Suppress("UtilityClassWithPublicConstructor")
     @EventBusSubscriber(modid = ModConstants.MODID, value = [Dist.CLIENT])
     class ClientGameEvents {
         companion object {

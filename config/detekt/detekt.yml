@@ -56,6 +56,11 @@ exceptions:
     allowedExceptionNameRegex: '_.*|(ignore|expected).*'
 
 style:
+  UtilityClassWithPublicConstructor:
+    # All hits are structural false positives: Fabric GameTest classes must be
+    # concrete (runner reflects them) and NeoForge @EventBusSubscriber inner
+    # classes are framework-wired. The one real case (Defs) is already an object.
+    active: false
   LoopWithTooManyJumpStatements:
     # Loops with one break and one continue are idiomatic in Kotlin iteration;
     # the default threshold of 1 flags almost every non-trivial loop. Raise to 2
