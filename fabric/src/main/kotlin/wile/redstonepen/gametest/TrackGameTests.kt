@@ -271,5 +271,11 @@ class TrackGameTests {
         @GameTest(template = TEMPLATE, timeoutTicks = 10)
         fun trackGetNonWireSignalFromRedstoneBlock(helper: GameTestHelper) =
             TrackTests.trackGetNonWireSignalFromRedstoneBlock(helper)
+
+        @JvmStatic
+        @GameTest(template = TEMPLATE, timeoutTicks = 10)
+        fun verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(
+            helper: GameTestHelper
+        ) = TrackTests.verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper)
     }
 }
