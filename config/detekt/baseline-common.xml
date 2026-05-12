@@ -341,27 +341,10 @@
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
     <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun modifySegments( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
     <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack)</ID>
-    <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter") fun &lt;T : AbstractContainerMenu> render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T>, x: Int, y: Int, ): Boolean</ID>
+    <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter", "TooGenericExceptionCaught") fun &lt;T : AbstractContainerMenu> render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T>, x: Int, y: Int, ): Boolean</ID>
     <ID>SpreadOperator:Auxiliaries.kt$Auxiliaries$(modtrkey, *emptyArray&lt;Any>())</ID>
     <ID>SpreadOperator:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe.Serializer.Companion$(Ingredient.EMPTY, *ingredients)</ID>
     <ID>SpreadOperator:Registries.kt$Registries$(ctor::create, *blocks)</ID>
-    <ID>ThrowsCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
-    <ID>TooGenericExceptionCaught:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$_e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ModRenderers.kt$ModRenderers.TrackTer$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:TooltipDisplay.kt$TooltipDisplay$ex: Exception</ID>
-    <ID>TooGenericExceptionCaught:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ExprFunc$throw RuntimeException("invalid_number_of_arguments")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("expected_assignment")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("invalid_character")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_function_parenthesis")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_parenthesis")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_function_arguments")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("symbol_readonly")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unexpected_character")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unknown_function")</ID>
     <ID>TooManyFunctions:Auxiliaries.kt$Auxiliaries</ID>
     <ID>TooManyFunctions:ControlBoxTests.kt$ControlBoxTests</ID>
     <ID>TooManyFunctions:DemoTests.kt$DemoTests</ID>

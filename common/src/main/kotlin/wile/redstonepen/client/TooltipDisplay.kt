@@ -68,7 +68,7 @@ class TooltipDisplay {
         t = System.currentTimeMillis()
     }
 
-    @Suppress("UnusedParameter")
+    @Suppress("UnusedParameter", "TooGenericExceptionCaught")
     fun <T : AbstractContainerMenu> render(
         gg: GuiGraphics,
         gui: AbstractContainerScreen<T>,

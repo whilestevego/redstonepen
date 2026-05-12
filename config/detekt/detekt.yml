@@ -41,6 +41,19 @@ exceptions:
     # Underscore-prefixed names signal intentional suppression (e.g. catch (_e: Exception)
     # used when a fallback value is returned and the exception carries no actionable info).
     allowedExceptionNameRegex: '_.*|(ignore|expected).*'
+  TooGenericExceptionCaught:
+    # Catching Throwable is intentional in game-loop handlers (neighborChanged, tick, render)
+    # to prevent Minecraft crashes when unexpected errors occur. Remove Throwable from the
+    # default banned list. Underscore-prefixed names are used for intentional fallback catches.
+    exceptionNames:
+      - ArrayIndexOutOfBoundsException
+      - Error
+      - Exception
+      - IllegalMonitorStateException
+      - NullPointerException
+      - IndexOutOfBoundsException
+      - RuntimeException
+    allowedExceptionNameRegex: '_.*|(ignore|expected).*'
 
 style:
   # Early-return guard clauses are idiomatic Kotlin; the default of 2 flags
