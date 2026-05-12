@@ -54,9 +54,7 @@ class RedstoneTrackStateTest :
                 th.addWireFlags(1L) shouldBe 0
             }
 
-            withData((0 until 24).toList()) { i ->
-                h().addWireFlags(1L shl i) shouldBe 1
-            }
+            withData((0 until 24).toList()) { i -> h().addWireFlags(1L shl i) shouldBe 1 }
 
             it("addWireFlags all at once sets all 24") {
                 val th = h()
@@ -87,9 +85,7 @@ class RedstoneTrackStateTest :
         }
 
         describe("side power") {
-            withData(Direction.values().toList()) { dir ->
-                h().getSidePower(dir) shouldBe 0
-            }
+            withData(Direction.values().toList()) { dir -> h().getSidePower(dir) shouldBe 0 }
 
             context("round trips at max") {
                 withData(Direction.values().toList()) { dir ->

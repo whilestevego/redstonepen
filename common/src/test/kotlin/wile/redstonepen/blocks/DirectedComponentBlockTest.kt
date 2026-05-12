@@ -53,7 +53,8 @@ class DirectedComponentBlockTest :
                 RotationCase(Direction.EAST, Direction.EAST, 0),
                 RotationCase(Direction.EAST, Direction.WEST, 0),
             ) { (face, dir, expected) ->
-                CircuitComponents.DirectedComponentBlock.placementRotation(face, dir) shouldBe expected
+                CircuitComponents.DirectedComponentBlock.placementRotation(face, dir) shouldBe
+                    expected
             }
         }
     })
