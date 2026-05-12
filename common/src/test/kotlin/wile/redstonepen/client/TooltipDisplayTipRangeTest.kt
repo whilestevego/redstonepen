@@ -1,40 +1,39 @@
 package wile.redstonepen.client
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 
-class TooltipDisplayTipRangeTest {
-    @Test
-    fun boundsComputedFromWidthAndHeight() {
-        val r = TooltipDisplay.TipRange(10, 20, 5, 3) { null }
-        assertEquals(10, r.x0)
-        assertEquals(20, r.y0)
-        assertEquals(14, r.x1)
-        assertEquals(22, r.y1)
-    }
+class TooltipDisplayTipRangeTest :
+    DescribeSpec({
+        describe("TipRange") {
+            it("computes bounds from width and height") {
+                val r = TooltipDisplay.TipRange(10, 20, 5, 3) { null }
+                r.x0 shouldBe 10
+                r.y0 shouldBe 20
+                r.x1 shouldBe 14
+                r.y1 shouldBe 22
+            }
 
-    @Test
-    fun singlePixelWidthHeightCollapsesBounds() {
-        val r = TooltipDisplay.TipRange(7, 4, 1, 1) { null }
-        assertEquals(7, r.x0)
-        assertEquals(4, r.y0)
-        assertEquals(7, r.x1)
-        assertEquals(4, r.y1)
-    }
+            it("single pixel width and height collapse bounds to origin") {
+                val r = TooltipDisplay.TipRange(7, 4, 1, 1) { null }
+                r.x0 shouldBe 7
+                r.y0 shouldBe 4
+                r.x1 shouldBe 7
+                r.y1 shouldBe 4
+            }
 
-    @Test
-    fun zeroOriginBounds() {
-        val r = TooltipDisplay.TipRange(0, 0, 10, 10) { null }
-        assertEquals(0, r.x0)
-        assertEquals(0, r.y0)
-        assertEquals(9, r.x1)
-        assertEquals(9, r.y1)
-    }
+            it("zero origin gives correct bounds") {
+                val r = TooltipDisplay.TipRange(0, 0, 10, 10) { null }
+                r.x0 shouldBe 0
+                r.y0 shouldBe 0
+                r.x1 shouldBe 9
+                r.y1 shouldBe 9
+            }
 
-    @Test
-    fun componentConstructorDelegatesSupplier() {
-        val r = TooltipDisplay.TipRange(0, 0, 1, 1) { null }
-        assertNotNull(r.text)
-    }
-}
+            it("constructor delegates supplier") {
+                val r = TooltipDisplay.TipRange(0, 0, 1, 1) { null }
+                r.text shouldNotBe null
+            }
+        }
+    })
