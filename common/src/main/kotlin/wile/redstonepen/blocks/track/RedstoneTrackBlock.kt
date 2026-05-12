@@ -430,6 +430,10 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         } else {
             RedstonePenItem.popRedstone(stack, redstone_use, player, hand)
             world.playSound(null, pos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 0.4f, 2.4f)
+            val blocks_to_update = te.updateAllPowerValuesFromAdjacent()
+            for ((key, value) in blocks_to_update) {
+                world.neighborChanged(key, this, value)
+            }
         }
         updateNeighbourShapes(state, world, pos)
         notifyAdjacent(world, pos)

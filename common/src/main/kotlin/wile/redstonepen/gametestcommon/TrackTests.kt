@@ -803,6 +803,82 @@ object TrackTests {
         helper.succeed()
     }
 
+    @JvmStatic
+    fun verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper: GameTestHelper) {
+        // Regression test for a bug where adding a wire segment to a powered neighbour leaves
+        // getSidePower()==0 on the track face even though the new connection reaches a power source.
+        //
+        // Root cause: RedstoneTrackBlock.modifySegments had no updateAllPowerValuesFromAdjacent()
+        // safety-net call in the add branch (redstone_use > 0), unlike the removal branch.
+        // Inside te.modifySegments, change_notifications_before and change_notifications_after are
+        // both empty when the power source is a signal source (redstone block), because signal sources
+        // are stripped from the notification maps at handleNeighborChanged line 610.
+        // connected=[] disconnected=[] → TRUE branch fires → setSidePower(face, initial_side_power=0).
+        // notifyAdjacent cannot fix it because signal sources do not call back into the track.
+        //
+        // Topology:
+        //   redstone block at TRACK_POS.below()
+        //   TrackA at TRACK_POS with ONLY bit 0x0100 (NORTH-UP, dangling — above is air)
+        //     → genuinely unpowered (NORTH face power = 0).
+        //
+        // Adding 0x0200 (NORTH-DOWN → redstone block):
+        //   te.modifySegments TRUE branch sets NORTH = initial_side_power = 0.  BUG without fix.
+        //   With the safety net, updateAllPowerValuesFromAdjacent recomputes NORTH = 15.  FIXED.
+        //
+        // Click target: SOUTH face below centre → clicked_face=SOUTH, face=NORTH, dir=DOWN → flip=0x0200.
+
+        val block = Registries.getBlock("track")!! as RedstoneTrackBlock
+        val redstonePos = TRACK_POS.below()
+        val absA = helper.absolutePos(TRACK_POS)
+
+        // Place the redstone block below, then place TrackA with only the dangling 0x0100 bit.
+        helper.setBlock(redstonePos, Blocks.REDSTONE_BLOCK)
+        helper.setBlock(TRACK_POS, Registries.getBlock("track")!!.defaultBlockState())
+        val teA =
+            helper.getBlockEntity(TRACK_POS) as? TrackBlockEntity
+                ?: run { helper.fail("expected TrackBlockEntity at TRACK_POS"); return }
+
+        teA.addWireFlags(0x0100L)
+        teA.updateConnections(1)
+
+        if (teA.getSidePower(Direction.NORTH) != 0) {
+            helper.fail("precondition: TrackA NORTH face must be 0 before adding the external connection")
+            return
+        }
+
+        // Add the 0x0200 segment (click SOUTH face below centre → face=NORTH, dir=DOWN → flip=0x0200).
+        val hitVec = Vec3(absA.x + 0.5, absA.y + 0.2, absA.z.toDouble())
+        val rtr = BlockHitResult(hitVec, Direction.SOUTH, absA, false)
+        val player = helper.makeMockPlayer(GameType.CREATIVE)
+        val pen = ItemStack(Items.REDSTONE, 64)
+        player.setItemInHand(InteractionHand.MAIN_HAND, pen)
+        block.modifySegments(
+            helper.getBlockState(TRACK_POS),
+            helper.level,
+            absA,
+            player,
+            pen,
+            InteractionHand.MAIN_HAND,
+            rtr,
+            no_add = false,
+            no_remove = true,
+        )
+
+        val teAfterAdd =
+            helper.getBlockEntity(TRACK_POS) as? TrackBlockEntity
+                ?: run { helper.fail("track block entity missing after add"); return }
+        val powerAfter = teAfterAdd.getSidePower(Direction.NORTH)
+        if (powerAfter == 0) {
+            helper.fail(
+                "BUG: TrackA NORTH face power is 0 after adding the external connection to redstone block. " +
+                    "RedstoneTrackBlock.modifySegments is missing the updateAllPowerValuesFromAdjacent " +
+                    "safety-net call in the add branch."
+            )
+            return
+        }
+        helper.succeed()
+    }
+
     private fun placeTrack(helper: GameTestHelper): RedstoneTrackBlock {
         helper.setBlock(TRACK_POS, Registries.getBlock("track")!!.defaultBlockState())
         return Registries.getBlock("track")!! as RedstoneTrackBlock
