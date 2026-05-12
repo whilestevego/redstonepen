@@ -17,9 +17,10 @@ class ModRenderersTest {
         @JvmStatic @BeforeAll fun bootstrap() = McBootstrap.bootstrap()
     }
 
-    @Test fun poseStackIsBalancedWhenEntityThrowsDuringRender() {
+    @Test
+    fun poseStackIsBalancedWhenEntityThrowsDuringRender() {
         val ter = ModRenderers.TrackTer(null)
-        val te  = mockk<TrackBlockEntity>()
+        val te = mockk<TrackBlockEntity>()
         val mxs = PoseStack()
         val buf = mockk<MultiBufferSource>()
 
@@ -32,7 +33,8 @@ class ModRenderersTest {
         assertDoesNotThrow({ mxs.last() }, "PoseStack was drained by an unmatched popPose")
     }
 
-    @Test fun renderErrorIsIsolatedToFailingEntityAndClearsOnStateChange() {
+    @Test
+    fun renderErrorIsIsolatedToFailingEntityAndClearsOnStateChange() {
         val ter = ModRenderers.TrackTer(null)
         val teA = mockk<TrackBlockEntity>()
         val teB = mockk<TrackBlockEntity>()

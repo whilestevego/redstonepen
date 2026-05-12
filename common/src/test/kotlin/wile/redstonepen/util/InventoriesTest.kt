@@ -18,7 +18,8 @@ class InventoriesTest {
         @JvmStatic @BeforeAll fun bootstrap() = McBootstrap.bootstrap()
     }
 
-    @Test fun identicalIgnoreDamageTreatsDifferentDurabilityAsEquivalent() {
+    @Test
+    fun identicalIgnoreDamageTreatsDifferentDurabilityAsEquivalent() {
         val a = ItemStack(Items.IRON_PICKAXE)
         val b = ItemStack(Items.IRON_PICKAXE)
         a.setDamageValue(5)
@@ -26,7 +27,8 @@ class InventoriesTest {
         assertTrue(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
     }
 
-    @Test fun identicalIgnoreDamageIgnoresComponentsOnlyPresentOnTheOtherStack() {
+    @Test
+    fun identicalIgnoreDamageIgnoresComponentsOnlyPresentOnTheOtherStack() {
         val a = ItemStack(Items.IRON_PICKAXE)
         val b = ItemStack(Items.IRON_PICKAXE)
         a.setDamageValue(5)
@@ -35,7 +37,8 @@ class InventoriesTest {
         assertTrue(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
     }
 
-    @Test fun identicalIgnoreDamageStillRespectsSharedNonDamageComponents() {
+    @Test
+    fun identicalIgnoreDamageStillRespectsSharedNonDamageComponents() {
         val a = ItemStack(Items.IRON_PICKAXE)
         val b = ItemStack(Items.IRON_PICKAXE)
         a.setDamageValue(5)
@@ -45,7 +48,8 @@ class InventoriesTest {
         assertFalse(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
     }
 
-    @Test fun copyOfClonesContentsInsteadOfSharingItemStacks() {
+    @Test
+    fun copyOfClonesContentsInsteadOfSharingItemStacks() {
         val source = SimpleContainer(2)
         source.setItem(0, ItemStack(Items.REDSTONE, 3))
         val copy = Inventories.copyOf(source) as SimpleContainer
@@ -55,54 +59,63 @@ class InventoriesTest {
         assertNotSame(source.getItem(0), copy.getItem(0))
     }
 
-    @Test fun areItemStacksIdenticalTrueForSameItemAndComponents() {
+    @Test
+    fun areItemStacksIdenticalTrueForSameItemAndComponents() {
         val a = ItemStack(Items.REDSTONE, 5)
         val b = ItemStack(Items.REDSTONE, 5)
         assertTrue(Inventories.areItemStacksIdentical(a, b))
     }
 
-    @Test fun areItemStacksIdenticalFalseForDifferentItems() {
+    @Test
+    fun areItemStacksIdenticalFalseForDifferentItems() {
         val a = ItemStack(Items.REDSTONE)
         val b = ItemStack(Items.COAL)
         assertFalse(Inventories.areItemStacksIdentical(a, b))
     }
 
-    @Test fun areItemStacksDifferentIsTrueWhenItemsDiffer() {
+    @Test
+    fun areItemStacksDifferentIsTrueWhenItemsDiffer() {
         val a = ItemStack(Items.REDSTONE)
         val b = ItemStack(Items.COAL)
         assertTrue(Inventories.areItemStacksDifferent(a, b))
     }
 
-    @Test fun areItemStacksDifferentIsFalseForSameItem() {
+    @Test
+    fun areItemStacksDifferentIsFalseForSameItem() {
         val a = ItemStack(Items.REDSTONE, 3)
         val b = ItemStack(Items.REDSTONE, 3)
         assertFalse(Inventories.areItemStacksDifferent(a, b))
     }
 
-    @Test fun isItemStackableOnFalseForEmptySourceStack() {
+    @Test
+    fun isItemStackableOnFalseForEmptySourceStack() {
         val b = ItemStack(Items.REDSTONE)
         assertFalse(Inventories.isItemStackableOn(ItemStack.EMPTY, b))
     }
 
-    @Test fun isItemStackableOnFalseForUnstackableItem() {
+    @Test
+    fun isItemStackableOnFalseForUnstackableItem() {
         val a = ItemStack(Items.IRON_PICKAXE)
         val b = ItemStack(Items.IRON_PICKAXE)
         assertFalse(Inventories.isItemStackableOn(a, b))
     }
 
-    @Test fun isItemStackableOnTrueForMatchingStackableItems() {
+    @Test
+    fun isItemStackableOnTrueForMatchingStackableItems() {
         val a = ItemStack(Items.REDSTONE, 3)
         val b = ItemStack(Items.REDSTONE, 10)
         assertTrue(Inventories.isItemStackableOn(a, b))
     }
 
-    @Test fun isItemStackableOnFalseForDifferentItems() {
+    @Test
+    fun isItemStackableOnFalseForDifferentItems() {
         val a = ItemStack(Items.REDSTONE)
         val b = ItemStack(Items.COAL)
         assertFalse(Inventories.isItemStackableOn(a, b))
     }
 
-    @Test fun copyOfPreservesContainerSize() {
+    @Test
+    fun copyOfPreservesContainerSize() {
         val source = SimpleContainer(5)
         val copy = Inventories.copyOf(source) as SimpleContainer
         assertEquals(5, copy.containerSize)

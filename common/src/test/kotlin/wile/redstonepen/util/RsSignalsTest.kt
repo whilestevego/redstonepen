@@ -13,39 +13,46 @@ class RsSignalsTest {
         @JvmStatic @BeforeAll fun bootstrap() = McBootstrap.bootstrap()
     }
 
-    @Test fun fromContainerReturnsZeroForNullContainers() {
+    @Test
+    fun fromContainerReturnsZeroForNullContainers() {
         assertEquals(0, RsSignals.fromContainer(null))
     }
 
-    @Test fun fromContainerMatchesVanillaComparatorStyleFillLevel() {
+    @Test
+    fun fromContainerMatchesVanillaComparatorStyleFillLevel() {
         val container = SimpleContainer(2)
         container.setItem(0, ItemStack(Items.REDSTONE, 32))
         assertEquals(4, RsSignals.fromContainer(container))
     }
 
-    @Test fun fromContainerReturnsZeroForEmptyContainer() {
+    @Test
+    fun fromContainerReturnsZeroForEmptyContainer() {
         assertEquals(0, RsSignals.fromContainer(SimpleContainer(1)))
     }
 
-    @Test fun fromContainerReturnsFifteenForFullSingleSlot() {
+    @Test
+    fun fromContainerReturnsFifteenForFullSingleSlot() {
         val container = SimpleContainer(1)
         container.setItem(0, ItemStack(Items.REDSTONE, 64))
         assertEquals(15, RsSignals.fromContainer(container))
     }
 
-    @Test fun fromContainerAppliesNonemptyBonusWhenFillRoundsToZero() {
+    @Test
+    fun fromContainerAppliesNonemptyBonusWhenFillRoundsToZero() {
         val container = SimpleContainer(27)
         container.setItem(0, ItemStack(Items.REDSTONE, 1))
         assertEquals(1, RsSignals.fromContainer(container))
     }
 
-    @Test fun fromContainerReturnsFifteenForFullContainer() {
+    @Test
+    fun fromContainerReturnsFifteenForFullContainer() {
         val container = SimpleContainer(27)
         for (i in 0 until 27) container.setItem(i, ItemStack(Items.REDSTONE, 64))
         assertEquals(15, RsSignals.fromContainer(container))
     }
 
-    @Test fun fromContainerSignalBoundaryAtOneFourteenth() {
+    @Test
+    fun fromContainerSignalBoundaryAtOneFourteenth() {
         val at4 = SimpleContainer(1)
         at4.setItem(0, ItemStack(Items.REDSTONE, 4))
         assertEquals(1, RsSignals.fromContainer(at4))
