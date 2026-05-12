@@ -94,6 +94,7 @@ style:
     excludes:
       - '**/gametestcommon/**'
       - '**/commands/DemoSections.kt'
+      - '**/test/kotlin/**'
     # Ignore universally accepted non-magic literals.
     ignoreNumbers:
       - '-1'
