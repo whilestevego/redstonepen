@@ -274,7 +274,8 @@ class TrackGameTests {
 
         @JvmStatic
         @GameTest(template = TEMPLATE, timeoutTicks = 10)
-        fun verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper: GameTestHelper) =
-            TrackTests.verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper)
+        fun verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(
+            helper: GameTestHelper
+        ) = TrackTests.verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper)
     }
 }
