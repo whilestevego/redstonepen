@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$ranges.stream().noneMatch { tip -> val outside = x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1 if (outside) return@noneMatch false val tipComponent = tip.text.get() ?: return@noneMatch false if (tipComponent.string.isEmpty()) return@noneMatch false try { val lines = Auxiliaries.wrapText(tipComponent, 80) gg.renderTooltip(font, lines, Optional.empty(), x, y) } catch (ex: Exception) { hadRenderException = true Auxiliaries.logError( "Tooltip rendering disabled due to exception: '${ex.message}'" ) return@noneMatch false } true }</ID>
     <ID>CyclomaticComplexMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB>): VoxelShape</ID>
     <ID>CyclomaticComplexMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>CyclomaticComplexMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
@@ -14,21 +13,6 @@
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos>?, )</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
-    <ID>EmptyFunctionBlock:Registries.kt$Registries${}</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s from %s (%s)", posstr(my_pos), posstr(fromPos), world.getBlockState(fromPos).block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s updates: [%s]", posstr(blockPos), notifications.entries.joinToString(", ") { "${posstr(it.value)}>${posstr(it.key)}" }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s changed (%s->%s).", posstr(blockPos), posstr(fromPos), bltv.descriptionId, facingState.block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s(=%s) removed.", posstr(blockPos), posstr(fromPos), facingState.block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONFL: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONNECTED NEIGHBOURS: %s", posstr(blockPos), connected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONRT: ext:%08x | ext:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, external_connected_routes[0], external_connected_routes[1], external_connected_routes[2], external_connected_routes[3], external_connected_routes[4], external_connected_routes[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONSD: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NEIGHBOURS: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NONTRACK: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s SIDPW: [%01x %01x %01x %01x %01x %01x]", posstr(blockPos), current_side_powers[0], current_side_powers[1], current_side_powers[2], current_side_powers[3], current_side_powers[4], current_side_powers[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE NET OF %s", posstr(blockPos), posstr(te.blockPos), )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE TRACK CHANGES TO %s.", posstr(blockPos), posstr(pos), )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s adj:%s | ints:%s | pwrs:%s", poss, ss.joinToString(", "), int_sides, pwr_sides, )</ID>
     <ID>LargeClass:RelayTests.kt$RelayTests</ID>
     <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
     <ID>LargeClass:TrackTests.kt$TrackTests</ID>
@@ -295,11 +279,6 @@
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$4</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$5</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$6</ID>
-    <ID>MaxLineLength:Auxiliaries.kt$Auxiliaries$// -------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MaxLineLength:Inventories.kt$Inventories$// ------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MaxLineLength:Inventories.kt$Inventories.InventoryRange$// ------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MayBeConst:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmField val bool_false: Int = 0</ID>
-    <ID>MayBeConst:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmField val bool_true: Int = 15</ID>
     <ID>NestedBlockDepth:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$protected open fun getInputPower( world: Level, relayPos: BlockPos, redstoneSide: Direction, ): Int</ID>
     <ID>NestedBlockDepth:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>NestedBlockDepth:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
@@ -358,6 +337,5 @@
     <ID>UnusedParameter:RsSignals.kt$RsSignals$_world: BlockGetter</ID>
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_pos: BlockPos</ID>
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_weak: Boolean</ID>
-    <ID>UnusedPrivateProperty:ModRenderers.kt$ModRenderers.TrackTer$_ctx: BlockEntityRendererProvider.Context?</ID>
   </CurrentIssues>
 </SmellBaseline>

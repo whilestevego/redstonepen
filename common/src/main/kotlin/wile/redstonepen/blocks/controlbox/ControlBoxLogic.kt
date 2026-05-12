@@ -584,9 +584,9 @@ internal class ControlBoxLogic {
             companion object {
                 @JvmField val EMPTY = Expr(ExprType.VOID, "<EMPTY>")
 
-                @JvmField val bool_true: Int = 15
+                const val bool_true: Int = 15
 
-                @JvmField val bool_false: Int = 0
+                const val bool_false: Int = 0
 
                 @JvmStatic fun assignment_sanitize(x: Int): Int = x
             }
