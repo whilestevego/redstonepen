@@ -27,15 +27,21 @@ class DemoBuilderTest :
             }
 
             it("rejects zero columns") {
-                shouldThrow<IllegalArgumentException> { DemoBuilder.cellOrigin(BlockPos.ZERO, 0, 0, 1) }
+                shouldThrow<IllegalArgumentException> {
+                    DemoBuilder.cellOrigin(BlockPos.ZERO, 0, 0, 1)
+                }
             }
 
             it("rejects zero spacing") {
-                shouldThrow<IllegalArgumentException> { DemoBuilder.cellOrigin(BlockPos.ZERO, 0, 4, 0) }
+                shouldThrow<IllegalArgumentException> {
+                    DemoBuilder.cellOrigin(BlockPos.ZERO, 0, 4, 0)
+                }
             }
 
             it("rejects negative index") {
-                shouldThrow<IllegalArgumentException> { DemoBuilder.cellOrigin(BlockPos.ZERO, -1, 4, 3) }
+                shouldThrow<IllegalArgumentException> {
+                    DemoBuilder.cellOrigin(BlockPos.ZERO, -1, 4, 3)
+                }
             }
         }
 

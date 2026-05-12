@@ -22,7 +22,9 @@ class RedstoneTrackDefsTest :
                 RedstoneTrackDefs.shape.get(0x3F) shouldBe RedstoneTrackDefs.shape.get(0x3F)
             }
 
-            it("no faces yields empty shape") { RedstoneTrackDefs.shape.get(0).isEmpty shouldBe true }
+            it("no faces yields empty shape") {
+                RedstoneTrackDefs.shape.get(0).isEmpty shouldBe true
+            }
 
             it("any single face yields non-empty shape") {
                 for (bit in 0 until 6) {
