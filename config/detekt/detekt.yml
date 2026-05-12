@@ -39,6 +39,7 @@ empty-blocks:
     # object initialisation from Java call sites; the body is intentionally empty.
     ignoreAnnotated:
       - 'JvmStatic'
+      - 'Disabled'
 
 exceptions:
   SwallowedException:
@@ -94,6 +95,7 @@ style:
     excludes:
       - '**/gametestcommon/**'
       - '**/commands/DemoSections.kt'
+      - '**/test/kotlin/**'
     # Ignore universally accepted non-magic literals.
     ignoreNumbers:
       - '-1'

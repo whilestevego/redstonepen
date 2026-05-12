@@ -1130,7 +1130,7 @@ class ControlBoxTest {
             assertTrue(h.setCode("b=cnt1(d, u, 5)"))
             h.setInput(Direction.DOWN, 1)
             h.setInput(Direction.UP, 0)
-            for (i in 0 until 10) h.tick()
+            repeat(10) { h.tick() }
             assertEquals(5, h.output(Direction.EAST))
         }
 
@@ -1158,11 +1158,11 @@ class ControlBoxTest {
             assertTrue(h.setCode("b=cnt1(d, u, 2, 8)"))
             h.setInput(Direction.DOWN, 0)
             h.setInput(Direction.UP, 1)
-            for (i in 0 until 10) h.tick()
+            repeat(10) { h.tick() }
             assertEquals(2, h.output(Direction.EAST))
             h.setInput(Direction.UP, 0)
             h.setInput(Direction.DOWN, 1)
-            for (i in 0 until 10) h.tick()
+            repeat(10) { h.tick() }
             assertEquals(8, h.output(Direction.EAST))
         }
     }
