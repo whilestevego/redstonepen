@@ -15,7 +15,5 @@
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests</ID>
     <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests</ID>
     <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests</ID>
-    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$_event: FMLClientSetupEvent</ID>
-    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.LiveCycleEvents.Companion$_event: FMLConstructModEvent</ID>
   </CurrentIssues>
 </SmellBaseline>
