@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import wile.redstonepen.McBootstrap
@@ -61,13 +60,6 @@ class AuxiliariesTest {
             Assumptions.assumeTrue(false, "PlatformHelper not available in unit-test environment")
         }
 
-        @Test
-        @Disabled("Requires ServerLevel — exercised by GameTests")
-        fun particlesOnNonServerLevelReturnsEarly() {}
-
-        @Test
-        @Disabled("Requires Level/ServerLevel — exercised by GameTests")
-        fun getFakePlayerOnNonServerLevelReturnsEmpty() {}
     }
 
     @Nested

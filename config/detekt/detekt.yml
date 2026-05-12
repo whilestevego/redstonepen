@@ -39,7 +39,6 @@ empty-blocks:
     # object initialisation from Java call sites; the body is intentionally empty.
     ignoreAnnotated:
       - 'JvmStatic'
-      - 'Disabled'
 
 exceptions:
   SwallowedException:
