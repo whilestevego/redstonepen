@@ -59,7 +59,6 @@ class AuxiliariesTest {
         fun isModLoadedReturnsFalseForUnknownMod() {
             Assumptions.assumeTrue(false, "PlatformHelper not available in unit-test environment")
         }
-
     }
 
     @Nested
