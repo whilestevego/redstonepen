@@ -169,6 +169,7 @@ object Auxiliaries {
     }
 
     @JvmStatic
+    @Suppress("SpreadOperator")
     fun localizable(modtrkey: String): MutableComponent = localizable(modtrkey, *emptyArray<Any>())
 
     @JvmStatic

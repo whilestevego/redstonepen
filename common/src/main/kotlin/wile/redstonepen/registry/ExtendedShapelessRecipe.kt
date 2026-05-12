@@ -237,6 +237,7 @@ class ExtendedShapelessRecipe(
                                                 DataResult.error { "too many ingredients" }
                                             else ->
                                                 DataResult.success(
+                                                    @Suppress("SpreadOperator")
                                                     NonNullList.of(Ingredient.EMPTY, *ingredients)
                                                 )
                                         }
