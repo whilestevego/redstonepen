@@ -307,13 +307,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             val face_is_empty =
                 (getWireFlags() and
                     RedstoneTrackDefs.connections.getAllElementsOnFace(face).toInt()) == 0
+            val shouldBulkConnect =
+                !no_bulk &&
+                    !face_is_empty &&
+                    hit.length() < 0.10 &&
+                    (!no_add || getConnectionFlags() != 0)
             flip_mask =
-                if (
-                    !no_bulk &&
-                        !face_is_empty &&
-                        hit.length() < 0.10 &&
-                        (!no_add || getConnectionFlags() != 0)
-                ) {
+                if (shouldBulkConnect) {
                     RedstoneTrackDefs.connections.getBulkConnectorBit(face)
                 } else if (no_add || hit.length() > 0.11) {
                     var m = RedstoneTrackDefs.connections.getWireBit(face, dir)

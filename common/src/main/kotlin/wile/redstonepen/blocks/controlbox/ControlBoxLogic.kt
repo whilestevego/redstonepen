@@ -1006,10 +1006,13 @@ internal class ControlBoxLogic {
                 error("unexpected_character")
             }
 
+            private fun isIdentChar(): Boolean =
+                c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'
+
             private fun const_literal(): String {
                 if (c < 'a' || c > 'z') return ""
                 val p0 = pe
-                while (c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_') adv()
+                while (isIdentChar()) adv()
                 return line.substring(p0, pe).lowercase()
             }
 

@@ -85,7 +85,8 @@ class TooltipDisplay {
             return false
         } else if (
             ranges.stream().noneMatch { tip ->
-                if (x < tip.x0 || x > tip.x1 || y < tip.y0 || y > tip.y1) return@noneMatch false
+                val outside = x < tip.x0 || x > tip.x1 || y < tip.y0 || y > tip.y1
+                if (outside) return@noneMatch false
                 val tipComponent = tip.text.get() ?: return@noneMatch false
                 if (tipComponent.string.isEmpty()) return@noneMatch false
                 try {

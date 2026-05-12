@@ -220,13 +220,13 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         itemSlot: Int,
         isSelected: Boolean,
     ) {
-        if (
+        val shouldSkipSync =
             !isSelected ||
                 !entity.isShiftKeyDown ||
                 world.isClientSide ||
                 (world.gameTime and 0x1L) != 0L ||
                 entity !is ServerPlayer
-        ) {
+        if (shouldSkipSync) {
             return
         }
         val rt = entity.pick(10.0, 0f, false)

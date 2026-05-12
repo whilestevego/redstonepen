@@ -171,15 +171,12 @@ class ControlBoxGui(
                 symbols_.entries
                     .sortedBy { it.key }
                     .forEach { (k, v) ->
-                        if (
-                            !debug_enabled_ &&
-                                (k.startsWith(".") ||
-                                    Defs.PORT_NAMES.contains(k) ||
-                                    k.endsWith(".re") ||
-                                    k.endsWith(".fe"))
-                        ) {
-                            return@forEach
-                        }
+                        val isInternalSymbol =
+                            k.startsWith(".") ||
+                                Defs.PORT_NAMES.contains(k) ||
+                                k.endsWith(".re") ||
+                                k.endsWith(".fe")
+                        if (!debug_enabled_ && isInternalSymbol) return@forEach
                         val lf = if (c.siblings.isEmpty()) "" else "\n"
                         c.siblings.add(
                             Component.literal(

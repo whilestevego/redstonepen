@@ -2,14 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ComplexCondition:ControlBoxGui.kt$ControlBoxGui$!debug_enabled_ &amp;&amp; (k.startsWith(".") || Defs.PORT_NAMES.contains(k) || k.endsWith(".re") || k.endsWith(".fe"))</ID>
-    <ID>ComplexCondition:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'</ID>
-    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$!active || !visible || x &lt; getX() || y &lt; getY() || x > getX() + width || y > getY() + height</ID>
-    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$xy.x >= 0 &amp;&amp; xy.y >= 0 &amp;&amp; xy.x &lt; width &amp;&amp; xy.y &lt; height</ID>
-    <ID>ComplexCondition:RedstonePenItem.kt$RedstonePenItem$!isSelected || !entity.isShiftKeyDown || world.isClientSide || (world.gameTime and 0x1L) != 0L || entity !is ServerPlayer</ID>
-    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$ranges.stream().noneMatch { tip -> if (x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1) return@noneMatch false val tipComponent = tip.text.get() ?: return@noneMatch false if (tipComponent.string.isEmpty()) return@noneMatch false try { val lines = Auxiliaries.wrapText(tipComponent, 80) gg.renderTooltip(font, lines, Optional.empty(), x, y) } catch (ex: Exception) { hadRenderException = true Auxiliaries.logError( "Tooltip rendering disabled due to exception: '${ex.message}'" ) return@noneMatch false } true }</ID>
-    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1</ID>
-    <ID>ComplexCondition:TrackBlockEntity.kt$TrackBlockEntity$!no_bulk &amp;&amp; !face_is_empty &amp;&amp; hit.length() &lt; 0.10 &amp;&amp; (!no_add || getConnectionFlags() != 0)</ID>
+    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$ranges.stream().noneMatch { tip -> val outside = x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1 if (outside) return@noneMatch false val tipComponent = tip.text.get() ?: return@noneMatch false if (tipComponent.string.isEmpty()) return@noneMatch false try { val lines = Auxiliaries.wrapText(tipComponent, 80) gg.renderTooltip(font, lines, Optional.empty(), x, y) } catch (ex: Exception) { hadRenderException = true Auxiliaries.logError( "Tooltip rendering disabled due to exception: '${ex.message}'" ) return@noneMatch false } true }</ID>
     <ID>CyclomaticComplexMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB>): VoxelShape</ID>
     <ID>CyclomaticComplexMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>CyclomaticComplexMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>

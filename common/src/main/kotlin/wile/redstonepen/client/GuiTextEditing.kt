@@ -176,14 +176,9 @@ object GuiTextEditing {
         }
 
         override fun mouseClicked(x: Double, y: Double, button: Int): Boolean {
-            if (
-                !active ||
-                    !visible ||
-                    x < getX() ||
-                    y < getY() ||
-                    x > getX() + width ||
-                    y > getY() + height
-            ) {
+            val isOutsideBounds =
+                x < getX() || y < getY() || x > getX() + width || y > getY() + height
+            if (!active || !visible || isOutsideBounds) {
                 return false
             }
             if (button != 0) return true
@@ -285,7 +280,8 @@ object GuiTextEditing {
             renderCursor(gg, cache.cursor, cache.cursorAtEnd)
             renderHighlight(gg, cache.selection)
             val xy = getMousePosition()
-            if (xy.x >= 0 && xy.y >= 0 && xy.x < width && xy.y < height) {
+            val isInBounds = xy.x >= 0 && xy.y >= 0 && xy.x < width && xy.y < height
+            if (isInBounds) {
                 on_mouse_move_.accept(this, getMousePosition())
             }
             mxs.popPose()
