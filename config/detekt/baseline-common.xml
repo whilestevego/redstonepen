@@ -318,24 +318,5 @@
     <ID>TooManyFunctions:RelayTests.kt$RelayTests</ID>
     <ID>TooManyFunctions:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
     <ID>TooManyFunctions:TrackTests.kt$TrackTests</ID>
-    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$_ctx: Item.TooltipContext</ID>
-    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$_flag: TooltipFlag</ID>
-    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$_pos: BlockPos</ID>
-    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$_side: Direction?</ID>
-    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$_state: BlockState</ID>
-    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$_world: BlockGetter</ID>
-    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$_level: SignalGetter</ID>
-    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$_pos: BlockPos</ID>
-    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$_side: Direction</ID>
-    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$_state: BlockState</ID>
-    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$_world: BlockGetter</ID>
-    <ID>UnusedParameter:Inventories.kt$Inventories.InventoryRange$_random: Boolean</ID>
-    <ID>UnusedParameter:RedstoneTrackBlock.kt$RedstoneTrackBlock$_state: BlockState</ID>
-    <ID>UnusedParameter:RsSignals.kt$RsSignals$_pos: BlockPos</ID>
-    <ID>UnusedParameter:RsSignals.kt$RsSignals$_realSide: Direction?</ID>
-    <ID>UnusedParameter:RsSignals.kt$RsSignals$_redstoneSide: Direction</ID>
-    <ID>UnusedParameter:RsSignals.kt$RsSignals$_world: BlockGetter</ID>
-    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_pos: BlockPos</ID>
-    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_weak: Boolean</ID>
   </CurrentIssues>
 </SmellBaseline>

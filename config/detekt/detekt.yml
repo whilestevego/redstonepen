@@ -60,6 +60,10 @@ exceptions:
     allowedExceptionNameRegex: '_.*|(ignore|expected).*'
 
 style:
+  UnusedParameter:
+    # Underscore-prefixed names signal intentional suppression (parameters required
+    # by framework/API overrides but not used in the method body).
+    allowedNames: '_.*'
   UnusedPrivateProperty:
     # Underscore-prefixed names signal intentional suppression (constructor parameters
     # required by framework APIs but not used inside the class body).
