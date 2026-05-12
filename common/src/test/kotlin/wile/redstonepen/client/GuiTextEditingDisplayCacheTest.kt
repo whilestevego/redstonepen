@@ -45,31 +45,19 @@ class GuiTextEditingDisplayCacheTest :
                 twoLineCache().changeLine(2, -1) shouldBe 2
             }
 
-            it("moves down preserving column offset") {
-                twoLineCache().changeLine(2, 1) shouldBe 8
-            }
+            it("moves down preserving column offset") { twoLineCache().changeLine(2, 1) shouldBe 8 }
 
-            it("moves up preserving column offset") {
-                twoLineCache().changeLine(9, -1) shouldBe 3
-            }
+            it("moves up preserving column offset") { twoLineCache().changeLine(9, -1) shouldBe 3 }
 
-            it("clamps to line length") {
-                twoLineCache().changeLine(5, 1) shouldBe 11
-            }
+            it("clamps to line length") { twoLineCache().changeLine(5, 1) shouldBe 11 }
         }
 
         describe("findLineStart") {
-            it("returns zero for first line") {
-                twoLineCache().findLineStart(0) shouldBe 0
-            }
+            it("returns zero for first line") { twoLineCache().findLineStart(0) shouldBe 0 }
 
-            it("returns zero for mid first line") {
-                twoLineCache().findLineStart(3) shouldBe 0
-            }
+            it("returns zero for mid first line") { twoLineCache().findLineStart(3) shouldBe 0 }
 
-            it("returns its start for second line") {
-                twoLineCache().findLineStart(7) shouldBe 6
-            }
+            it("returns its start for second line") { twoLineCache().findLineStart(7) shouldBe 6 }
         }
 
         describe("findLineEnd") {
@@ -77,8 +65,6 @@ class GuiTextEditingDisplayCacheTest :
                 twoLineCache().findLineEnd(2) shouldBe 5
             }
 
-            it("returns its end for second line") {
-                twoLineCache().findLineEnd(8) shouldBe 11
-            }
+            it("returns its end for second line") { twoLineCache().findLineEnd(8) shouldBe 11 }
         }
     })

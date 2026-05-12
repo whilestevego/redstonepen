@@ -97,9 +97,7 @@ class ExtendedShapelessRecipeTest :
                 recipe(1, CompoundTag()).category() shouldBe CraftingBookCategory.MISC
             }
 
-            it("serializer is not null") {
-                recipe(1, CompoundTag()).serializer shouldNotBe null
-            }
+            it("serializer is not null") { recipe(1, CompoundTag()).serializer shouldNotBe null }
 
             it("serializer exposes codecs") {
                 ExtendedShapelessRecipe.SERIALIZER.codec() shouldNotBe null
@@ -183,7 +181,8 @@ class ExtendedShapelessRecipeTest :
                         NonNullList.withSize(1, Ingredient.EMPTY),
                         CompoundTag(),
                     )
-                r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null).isEmpty shouldBe true
+                r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
+                    .isEmpty shouldBe true
             }
         }
 
@@ -253,7 +252,8 @@ class ExtendedShapelessRecipeTest :
                 val r = repairRecipe(50)
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(0)
-                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null).isEmpty shouldBe true
+                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null).isEmpty shouldBe
+                    true
             }
 
             it("over_repair aspect allows zero damage input") {
@@ -282,7 +282,12 @@ class ExtendedShapelessRecipeTest :
 
             it("missing tool returns empty") {
                 val r = repairRecipe(50)
-                val inv = CraftingInput.of(2, 1, listOf(ItemStack(Items.IRON_INGOT), ItemStack(Items.IRON_INGOT)))
+                val inv =
+                    CraftingInput.of(
+                        2,
+                        1,
+                        listOf(ItemStack(Items.IRON_INGOT), ItemStack(Items.IRON_INGOT)),
+                    )
                 r.assemble(inv, null).isEmpty shouldBe true
             }
 
@@ -291,7 +296,12 @@ class ExtendedShapelessRecipeTest :
                 aspects.putString("tool", "minecraft:stick")
                 aspects.putInt("tool_repair", 50)
                 val r = recipe(2, aspects)
-                val inv = CraftingInput.of(2, 1, listOf(ItemStack(Items.STICK), ItemStack(Items.IRON_INGOT)))
+                val inv =
+                    CraftingInput.of(
+                        2,
+                        1,
+                        listOf(ItemStack(Items.STICK), ItemStack(Items.IRON_INGOT)),
+                    )
                 r.assemble(inv, null).isEmpty shouldBe true
             }
         }

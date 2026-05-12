@@ -42,42 +42,61 @@ class InventoriesTest :
 
         describe("areItemStacksIdentical") {
             it("true for same item and components") {
-                Inventories.areItemStacksIdentical(ItemStack(Items.REDSTONE, 5), ItemStack(Items.REDSTONE, 5)) shouldBe
-                    true
+                Inventories.areItemStacksIdentical(
+                    ItemStack(Items.REDSTONE, 5),
+                    ItemStack(Items.REDSTONE, 5),
+                ) shouldBe true
             }
 
             it("false for different items") {
-                Inventories.areItemStacksIdentical(ItemStack(Items.REDSTONE), ItemStack(Items.COAL)) shouldBe false
+                Inventories.areItemStacksIdentical(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe false
             }
         }
 
         describe("areItemStacksDifferent") {
             it("true when items differ") {
-                Inventories.areItemStacksDifferent(ItemStack(Items.REDSTONE), ItemStack(Items.COAL)) shouldBe true
+                Inventories.areItemStacksDifferent(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe true
             }
 
             it("false for same item") {
-                Inventories.areItemStacksDifferent(ItemStack(Items.REDSTONE, 3), ItemStack(Items.REDSTONE, 3)) shouldBe
-                    false
+                Inventories.areItemStacksDifferent(
+                    ItemStack(Items.REDSTONE, 3),
+                    ItemStack(Items.REDSTONE, 3),
+                ) shouldBe false
             }
         }
 
         describe("isItemStackableOn") {
             it("false for empty source stack") {
-                Inventories.isItemStackableOn(ItemStack.EMPTY, ItemStack(Items.REDSTONE)) shouldBe false
-            }
-
-            it("false for unstackable item") {
-                Inventories.isItemStackableOn(ItemStack(Items.IRON_PICKAXE), ItemStack(Items.IRON_PICKAXE)) shouldBe
+                Inventories.isItemStackableOn(ItemStack.EMPTY, ItemStack(Items.REDSTONE)) shouldBe
                     false
             }
 
+            it("false for unstackable item") {
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.IRON_PICKAXE),
+                    ItemStack(Items.IRON_PICKAXE),
+                ) shouldBe false
+            }
+
             it("true for matching stackable items") {
-                Inventories.isItemStackableOn(ItemStack(Items.REDSTONE, 3), ItemStack(Items.REDSTONE, 10)) shouldBe true
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.REDSTONE, 3),
+                    ItemStack(Items.REDSTONE, 10),
+                ) shouldBe true
             }
 
             it("false for different items") {
-                Inventories.isItemStackableOn(ItemStack(Items.REDSTONE), ItemStack(Items.COAL)) shouldBe false
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe false
             }
         }
 

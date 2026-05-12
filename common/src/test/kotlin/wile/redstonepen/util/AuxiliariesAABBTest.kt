@@ -54,27 +54,42 @@ class AuxiliariesAABBTest :
 
             it("SOUTH mirrors X and Z") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.4, 0.2, 0.2, 0.9, 0.7, 0.7), Auxiliaries.getRotatedAABB(bb, Direction.SOUTH))
+                assertAABB(
+                    AABB(0.4, 0.2, 0.2, 0.9, 0.7, 0.7),
+                    Auxiliaries.getRotatedAABB(bb, Direction.SOUTH),
+                )
             }
 
             it("DOWN swaps Y and Z") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.4, 0.3, 0.2, 0.9, 0.8, 0.7), Auxiliaries.getRotatedAABB(bb, Direction.DOWN))
+                assertAABB(
+                    AABB(0.4, 0.3, 0.2, 0.9, 0.8, 0.7),
+                    Auxiliaries.getRotatedAABB(bb, Direction.DOWN),
+                )
             }
 
             it("UP inverts all three axes") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.4, 0.2, 0.3, 0.9, 0.7, 0.8), Auxiliaries.getRotatedAABB(bb, Direction.UP))
+                assertAABB(
+                    AABB(0.4, 0.2, 0.3, 0.9, 0.7, 0.8),
+                    Auxiliaries.getRotatedAABB(bb, Direction.UP),
+                )
             }
 
             it("WEST swaps X and Z") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.3, 0.2, 0.4, 0.8, 0.7, 0.9), Auxiliaries.getRotatedAABB(bb, Direction.WEST))
+                assertAABB(
+                    AABB(0.3, 0.2, 0.4, 0.8, 0.7, 0.9),
+                    Auxiliaries.getRotatedAABB(bb, Direction.WEST),
+                )
             }
 
             it("EAST swaps X and Z") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.2, 0.2, 0.1, 0.7, 0.7, 0.6), Auxiliaries.getRotatedAABB(bb, Direction.EAST))
+                assertAABB(
+                    AABB(0.2, 0.2, 0.1, 0.7, 0.7, 0.6),
+                    Auxiliaries.getRotatedAABB(bb, Direction.EAST),
+                )
             }
 
             it("all six faces produce valid boxes") {
@@ -89,7 +104,8 @@ class AuxiliariesAABBTest :
             }
 
             it("array overload preserves length") {
-                val inn = arrayOf(AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), AABB(0.2, 0.2, 0.2, 0.8, 0.8, 0.8))
+                val inn =
+                    arrayOf(AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), AABB(0.2, 0.2, 0.2, 0.8, 0.8, 0.8))
                 Auxiliaries.getRotatedAABB(inn, Direction.EAST).size shouldBe inn.size
             }
 
@@ -177,21 +193,31 @@ class AuxiliariesAABBTest :
         describe("getMirroredAABB") {
             it("X axis swaps X coordinates") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.4, 0.2, 0.3, 0.9, 0.7, 0.8), Auxiliaries.getMirroredAABB(bb, Direction.Axis.X))
+                assertAABB(
+                    AABB(0.4, 0.2, 0.3, 0.9, 0.7, 0.8),
+                    Auxiliaries.getMirroredAABB(bb, Direction.Axis.X),
+                )
             }
 
             it("Y axis swaps Y coordinates") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.1, 0.3, 0.3, 0.6, 0.8, 0.8), Auxiliaries.getMirroredAABB(bb, Direction.Axis.Y))
+                assertAABB(
+                    AABB(0.1, 0.3, 0.3, 0.6, 0.8, 0.8),
+                    Auxiliaries.getMirroredAABB(bb, Direction.Axis.Y),
+                )
             }
 
             it("Z axis swaps Z coordinates") {
                 val bb = AABB(0.1, 0.2, 0.3, 0.6, 0.7, 0.8)
-                assertAABB(AABB(0.1, 0.2, 0.2, 0.6, 0.7, 0.7), Auxiliaries.getMirroredAABB(bb, Direction.Axis.Z))
+                assertAABB(
+                    AABB(0.1, 0.2, 0.2, 0.6, 0.7, 0.7),
+                    Auxiliaries.getMirroredAABB(bb, Direction.Axis.Z),
+                )
             }
 
             it("array overload preserves length") {
-                val inn = arrayOf(AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), AABB(0.2, 0.2, 0.2, 0.8, 0.8, 0.8))
+                val inn =
+                    arrayOf(AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), AABB(0.2, 0.2, 0.2, 0.8, 0.8, 0.8))
                 Auxiliaries.getMirroredAABB(inn, Direction.Axis.X).size shouldBe inn.size
             }
 
@@ -203,7 +229,10 @@ class AuxiliariesAABBTest :
         describe("getMappedAABB") {
             it("applies mapper") {
                 val inn = arrayOf(AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0))
-                assertAABB(AABB(2.0, 0.0, 0.0, 3.0, 1.0, 1.0), Auxiliaries.getMappedAABB(inn) { b -> b.move(2.0, 0.0, 0.0) }[0])
+                assertAABB(
+                    AABB(2.0, 0.0, 0.0, 3.0, 1.0, 1.0),
+                    Auxiliaries.getMappedAABB(inn) { b -> b.move(2.0, 0.0, 0.0) }[0],
+                )
             }
 
             it("handles empty input") {

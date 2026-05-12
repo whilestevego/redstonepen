@@ -39,7 +39,10 @@ class AuxiliariesTest :
             }
 
             it("is mod loaded returns false for unknown mod") {
-                Assumptions.assumeTrue(false, "PlatformHelper not available in unit-test environment")
+                Assumptions.assumeTrue(
+                    false,
+                    "PlatformHelper not available in unit-test environment",
+                )
             }
         }
 
@@ -72,12 +75,14 @@ class AuxiliariesTest :
             }
 
             it("join with separator yields concatenation") {
-                val c = Auxiliaries.join(listOf(Component.literal("a"), Component.literal("b")), ",")
+                val c =
+                    Auxiliaries.join(listOf(Component.literal("a"), Component.literal("b")), ",")
                 c.string shouldBe "a,b"
             }
 
             it("join varargs concatenates without separator") {
-                Auxiliaries.join(Component.literal("x"), Component.literal("y")).string shouldBe "xy"
+                Auxiliaries.join(Component.literal("x"), Component.literal("y")).string shouldBe
+                    "xy"
             }
 
             it("isEmpty true only for empty component") {
@@ -88,7 +93,8 @@ class AuxiliariesTest :
 
         describe("registry lookups") {
             it("resource location for vanilla item and block") {
-                Auxiliaries.getResourceLocation(Items.REDSTONE).toString() shouldBe "minecraft:redstone"
+                Auxiliaries.getResourceLocation(Items.REDSTONE).toString() shouldBe
+                    "minecraft:redstone"
                 Auxiliaries.getResourceLocation(Blocks.STONE).toString() shouldBe "minecraft:stone"
             }
         }
@@ -254,7 +260,8 @@ class AuxiliariesTest :
             }
 
             it("reads byte content") {
-                val stream = ByteArrayInputStream("hello\nworld".toByteArray(StandardCharsets.UTF_8))
+                val stream =
+                    ByteArrayInputStream("hello\nworld".toByteArray(StandardCharsets.UTF_8))
                 Auxiliaries.loadResourceText(stream) shouldBe "hello\nworld"
             }
 

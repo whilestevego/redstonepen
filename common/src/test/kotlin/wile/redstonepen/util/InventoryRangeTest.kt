@@ -140,12 +140,16 @@ class InventoryRangeTest :
                 c.setItem(0, ItemStack(Items.COAL))
                 c.setItem(2, ItemStack(Items.REDSTONE))
                 val r = Inventories.InventoryRange(c)
-                val idx = r.find { i, s -> if (s.`is`(Items.REDSTONE)) Optional.of(i) else Optional.empty() }
+                val idx = r.find { i, s ->
+                    if (s.`is`(Items.REDSTONE)) Optional.of(i) else Optional.empty()
+                }
                 idx shouldBe Optional.of(2)
             }
 
             it("find returns empty when nothing matches") {
-                Inventories.InventoryRange(container(2)).find { _, _ -> Optional.empty<Int>() }.isEmpty shouldBe true
+                Inventories.InventoryRange(container(2))
+                    .find { _, _ -> Optional.empty<Int>() }
+                    .isEmpty shouldBe true
             }
 
             it("collect gathers all present results") {
@@ -153,7 +157,9 @@ class InventoryRangeTest :
                 c.setItem(0, ItemStack(Items.REDSTONE))
                 c.setItem(2, ItemStack(Items.REDSTONE))
                 val r = Inventories.InventoryRange(c)
-                val hits = r.collect { i, s -> if (s.`is`(Items.REDSTONE)) Optional.of(i) else Optional.empty() }
+                val hits = r.collect { i, s ->
+                    if (s.`is`(Items.REDSTONE)) Optional.of(i) else Optional.empty()
+                }
                 hits shouldBe listOf(0, 2)
             }
 
@@ -189,7 +195,8 @@ class InventoryRangeTest :
 
         describe("insert") {
             it("empty stack returns empty") {
-                Inventories.InventoryRange(container(3)).insert(ItemStack.EMPTY).isEmpty shouldBe true
+                Inventories.InventoryRange(container(3)).insert(ItemStack.EMPTY).isEmpty shouldBe
+                    true
             }
 
             it("fills existing matching stack before any empty slot") {
@@ -242,7 +249,9 @@ class InventoryRangeTest :
             it("simulate reports leftover when full") {
                 val c = container(1)
                 c.setItem(0, ItemStack(Items.REDSTONE, 64))
-                Inventories.InventoryRange(c).insert(ItemStack(Items.REDSTONE, 4), true).count shouldBe 4
+                Inventories.InventoryRange(c)
+                    .insert(ItemStack(Items.REDSTONE, 4), true)
+                    .count shouldBe 4
             }
 
             it("at index fills target slot and returns remainder") {
@@ -271,7 +280,8 @@ class InventoryRangeTest :
             }
 
             it("at index empty input returns empty") {
-                Inventories.InventoryRange(container(1)).insert(0, ItemStack.EMPTY).isEmpty shouldBe true
+                Inventories.InventoryRange(container(1)).insert(0, ItemStack.EMPTY).isEmpty shouldBe
+                    true
             }
         }
 
@@ -312,7 +322,8 @@ class InventoryRangeTest :
             }
 
             it("by stack returns empty for empty request") {
-                Inventories.InventoryRange(filled(2, 4)).extract(ItemStack.EMPTY).isEmpty shouldBe true
+                Inventories.InventoryRange(filled(2, 4)).extract(ItemStack.EMPTY).isEmpty shouldBe
+                    true
             }
 
             it("by stack pulls requested amount") {
@@ -336,7 +347,8 @@ class InventoryRangeTest :
             it("by stack returns empty when no match") {
                 val c = container(2)
                 c.setItem(0, ItemStack(Items.COAL, 4))
-                Inventories.InventoryRange(c).extract(ItemStack(Items.REDSTONE, 1)).isEmpty shouldBe true
+                Inventories.InventoryRange(c).extract(ItemStack(Items.REDSTONE, 1)).isEmpty shouldBe
+                    true
             }
         }
 
@@ -353,7 +365,8 @@ class InventoryRangeTest :
             }
 
             it("slot with empty source returns false") {
-                Inventories.InventoryRange(container(2)).move(0, Inventories.InventoryRange(container(2))) shouldBe false
+                Inventories.InventoryRange(container(2))
+                    .move(0, Inventories.InventoryRange(container(2))) shouldBe false
             }
 
             it("moveAll identical drains source when target has room") {
@@ -379,7 +392,8 @@ class InventoryRangeTest :
             }
 
             it("range returns false when source empty") {
-                Inventories.InventoryRange(container(3)).move(Inventories.InventoryRange(container(3))) shouldBe false
+                Inventories.InventoryRange(container(3))
+                    .move(Inventories.InventoryRange(container(3))) shouldBe false
             }
 
             it("fillup variant compiles and runs") {
