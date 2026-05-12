@@ -1,72 +1,60 @@
 package wile.redstonepen.client
 
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import net.minecraft.network.chat.Component
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import wile.redstonepen.McBootstrap
 
-class OverlayTextOverlayGuiTest {
-    companion object {
-        @JvmStatic @BeforeAll fun bootstrap() = McBootstrap.bootstrap()
-    }
+class OverlayTextOverlayGuiTest :
+    DescribeSpec({
+        beforeEach { Overlay.TextOverlayGui.hide() }
 
-    @BeforeEach
-    fun reset() {
-        Overlay.TextOverlayGui.hide()
-    }
+        describe("hide") {
+            it("zeros deadline and clears text") {
+                Overlay.TextOverlayGui.show("hello", 5000)
+                Overlay.TextOverlayGui.hide()
+                Overlay.TextOverlayGui.deadline() shouldBe 0
+                Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+            }
+        }
 
-    @Test
-    fun hideZerosDeadlineAndClearsText() {
-        Overlay.TextOverlayGui.show("hello", 5000)
-        Overlay.TextOverlayGui.hide()
-        assertEquals(0, Overlay.TextOverlayGui.deadline())
-        assertEquals(Overlay.TextOverlayGui.EMPTY_TEXT, Overlay.TextOverlayGui.text())
-    }
+        describe("show string") {
+            it("updates text to match input") {
+                Overlay.TextOverlayGui.show("ping", 1000)
+                Overlay.TextOverlayGui.text().string shouldBe "ping"
+            }
 
-    @Test
-    fun showStringUpdatesTextToMatchInput() {
-        Overlay.TextOverlayGui.show("ping", 1000)
-        assertEquals("ping", Overlay.TextOverlayGui.text().string)
-    }
+            it("null string falls back to empty text") {
+                Overlay.TextOverlayGui.show(null as String?, 1000)
+                Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+            }
 
-    @Test
-    fun showNullStringFallsBackToEmptyText() {
-        Overlay.TextOverlayGui.show(null as String?, 1000)
-        assertEquals(Overlay.TextOverlayGui.EMPTY_TEXT, Overlay.TextOverlayGui.text())
-    }
+            it("empty string falls back to empty text") {
+                Overlay.TextOverlayGui.show("", 1000)
+                Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+            }
 
-    @Test
-    fun showEmptyStringFallsBackToEmptyText() {
-        Overlay.TextOverlayGui.show("", 1000)
-        assertEquals(Overlay.TextOverlayGui.EMPTY_TEXT, Overlay.TextOverlayGui.text())
-    }
+            it("sets deadline in future") {
+                val before = System.currentTimeMillis()
+                Overlay.TextOverlayGui.show("x", 500)
+                (Overlay.TextOverlayGui.deadline() >= before + 500) shouldBe true
+            }
+        }
 
-    @Test
-    fun showStringSetsDeadlineInFuture() {
-        val before = System.currentTimeMillis()
-        Overlay.TextOverlayGui.show("x", 500)
-        assertTrue(Overlay.TextOverlayGui.deadline() >= before + 500)
-    }
+        describe("show component") {
+            it("updates text to match input") {
+                Overlay.TextOverlayGui.show(Component.literal("world"), 1000)
+                Overlay.TextOverlayGui.text().string shouldBe "world"
+            }
 
-    @Test
-    fun showComponentUpdatesTextToMatchInput() {
-        Overlay.TextOverlayGui.show(Component.literal("world"), 1000)
-        assertEquals("world", Overlay.TextOverlayGui.text().string)
-    }
+            it("null component falls back to empty text") {
+                Overlay.TextOverlayGui.show(null as Component?, 1000)
+                Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+            }
 
-    @Test
-    fun showNullComponentFallsBackToEmptyText() {
-        Overlay.TextOverlayGui.show(null as Component?, 1000)
-        assertEquals(Overlay.TextOverlayGui.EMPTY_TEXT, Overlay.TextOverlayGui.text())
-    }
-
-    @Test
-    fun showComponentSetsDeadlineInFuture() {
-        val before = System.currentTimeMillis()
-        Overlay.TextOverlayGui.show(Component.literal("x"), 1000)
-        assertTrue(Overlay.TextOverlayGui.deadline() >= before + 1000)
-    }
-}
+            it("sets deadline in future") {
+                val before = System.currentTimeMillis()
+                Overlay.TextOverlayGui.show(Component.literal("x"), 1000)
+                (Overlay.TextOverlayGui.deadline() >= before + 1000) shouldBe true
+            }
+        }
+    })

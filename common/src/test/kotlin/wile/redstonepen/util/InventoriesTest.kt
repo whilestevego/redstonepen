@@ -1,123 +1,120 @@
 package wile.redstonepen.util
 
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotSame
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import wile.redstonepen.McBootstrap
 
-class InventoriesTest {
-    companion object {
-        @JvmStatic @BeforeAll fun bootstrap() = McBootstrap.bootstrap()
-    }
+class InventoriesTest :
+    DescribeSpec({
+        describe("areItemStacksIdenticalIgnoreDamage") {
+            it("treats different durability as equivalent") {
+                val a = ItemStack(Items.IRON_PICKAXE)
+                val b = ItemStack(Items.IRON_PICKAXE)
+                a.setDamageValue(5)
+                b.setDamageValue(42)
+                Inventories.areItemStacksIdenticalIgnoreDamage(a, b) shouldBe true
+            }
 
-    @Test
-    fun identicalIgnoreDamageTreatsDifferentDurabilityAsEquivalent() {
-        val a = ItemStack(Items.IRON_PICKAXE)
-        val b = ItemStack(Items.IRON_PICKAXE)
-        a.setDamageValue(5)
-        b.setDamageValue(42)
-        assertTrue(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
-    }
+            it("ignores components only present on the other stack") {
+                val a = ItemStack(Items.IRON_PICKAXE)
+                val b = ItemStack(Items.IRON_PICKAXE)
+                a.setDamageValue(5)
+                b.setDamageValue(42)
+                b.set(DataComponents.CUSTOM_NAME, Component.literal("Renamed"))
+                Inventories.areItemStacksIdenticalIgnoreDamage(a, b) shouldBe true
+            }
 
-    @Test
-    fun identicalIgnoreDamageIgnoresComponentsOnlyPresentOnTheOtherStack() {
-        val a = ItemStack(Items.IRON_PICKAXE)
-        val b = ItemStack(Items.IRON_PICKAXE)
-        a.setDamageValue(5)
-        b.setDamageValue(42)
-        b.set(DataComponents.CUSTOM_NAME, Component.literal("Renamed"))
-        assertTrue(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
-    }
+            it("still respects shared non-damage components") {
+                val a = ItemStack(Items.IRON_PICKAXE)
+                val b = ItemStack(Items.IRON_PICKAXE)
+                a.setDamageValue(5)
+                b.setDamageValue(42)
+                a.set(DataComponents.CUSTOM_NAME, Component.literal("Left"))
+                b.set(DataComponents.CUSTOM_NAME, Component.literal("Right"))
+                Inventories.areItemStacksIdenticalIgnoreDamage(a, b) shouldBe false
+            }
+        }
 
-    @Test
-    fun identicalIgnoreDamageStillRespectsSharedNonDamageComponents() {
-        val a = ItemStack(Items.IRON_PICKAXE)
-        val b = ItemStack(Items.IRON_PICKAXE)
-        a.setDamageValue(5)
-        b.setDamageValue(42)
-        a.set(DataComponents.CUSTOM_NAME, Component.literal("Left"))
-        b.set(DataComponents.CUSTOM_NAME, Component.literal("Right"))
-        assertFalse(Inventories.areItemStacksIdenticalIgnoreDamage(a, b))
-    }
+        describe("areItemStacksIdentical") {
+            it("true for same item and components") {
+                Inventories.areItemStacksIdentical(
+                    ItemStack(Items.REDSTONE, 5),
+                    ItemStack(Items.REDSTONE, 5),
+                ) shouldBe true
+            }
 
-    @Test
-    fun copyOfClonesContentsInsteadOfSharingItemStacks() {
-        val source = SimpleContainer(2)
-        source.setItem(0, ItemStack(Items.REDSTONE, 3))
-        val copy = Inventories.copyOf(source) as SimpleContainer
-        copy.getItem(0).count = 1
-        assertEquals(3, source.getItem(0).count)
-        assertEquals(1, copy.getItem(0).count)
-        assertNotSame(source.getItem(0), copy.getItem(0))
-    }
+            it("false for different items") {
+                Inventories.areItemStacksIdentical(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe false
+            }
+        }
 
-    @Test
-    fun areItemStacksIdenticalTrueForSameItemAndComponents() {
-        val a = ItemStack(Items.REDSTONE, 5)
-        val b = ItemStack(Items.REDSTONE, 5)
-        assertTrue(Inventories.areItemStacksIdentical(a, b))
-    }
+        describe("areItemStacksDifferent") {
+            it("true when items differ") {
+                Inventories.areItemStacksDifferent(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe true
+            }
 
-    @Test
-    fun areItemStacksIdenticalFalseForDifferentItems() {
-        val a = ItemStack(Items.REDSTONE)
-        val b = ItemStack(Items.COAL)
-        assertFalse(Inventories.areItemStacksIdentical(a, b))
-    }
+            it("false for same item") {
+                Inventories.areItemStacksDifferent(
+                    ItemStack(Items.REDSTONE, 3),
+                    ItemStack(Items.REDSTONE, 3),
+                ) shouldBe false
+            }
+        }
 
-    @Test
-    fun areItemStacksDifferentIsTrueWhenItemsDiffer() {
-        val a = ItemStack(Items.REDSTONE)
-        val b = ItemStack(Items.COAL)
-        assertTrue(Inventories.areItemStacksDifferent(a, b))
-    }
+        describe("isItemStackableOn") {
+            it("false for empty source stack") {
+                Inventories.isItemStackableOn(ItemStack.EMPTY, ItemStack(Items.REDSTONE)) shouldBe
+                    false
+            }
 
-    @Test
-    fun areItemStacksDifferentIsFalseForSameItem() {
-        val a = ItemStack(Items.REDSTONE, 3)
-        val b = ItemStack(Items.REDSTONE, 3)
-        assertFalse(Inventories.areItemStacksDifferent(a, b))
-    }
+            it("false for unstackable item") {
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.IRON_PICKAXE),
+                    ItemStack(Items.IRON_PICKAXE),
+                ) shouldBe false
+            }
 
-    @Test
-    fun isItemStackableOnFalseForEmptySourceStack() {
-        val b = ItemStack(Items.REDSTONE)
-        assertFalse(Inventories.isItemStackableOn(ItemStack.EMPTY, b))
-    }
+            it("true for matching stackable items") {
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.REDSTONE, 3),
+                    ItemStack(Items.REDSTONE, 10),
+                ) shouldBe true
+            }
 
-    @Test
-    fun isItemStackableOnFalseForUnstackableItem() {
-        val a = ItemStack(Items.IRON_PICKAXE)
-        val b = ItemStack(Items.IRON_PICKAXE)
-        assertFalse(Inventories.isItemStackableOn(a, b))
-    }
+            it("false for different items") {
+                Inventories.isItemStackableOn(
+                    ItemStack(Items.REDSTONE),
+                    ItemStack(Items.COAL),
+                ) shouldBe false
+            }
+        }
 
-    @Test
-    fun isItemStackableOnTrueForMatchingStackableItems() {
-        val a = ItemStack(Items.REDSTONE, 3)
-        val b = ItemStack(Items.REDSTONE, 10)
-        assertTrue(Inventories.isItemStackableOn(a, b))
-    }
+        describe("copyOf") {
+            it("clones contents instead of sharing item stacks") {
+                val source = SimpleContainer(2)
+                source.setItem(0, ItemStack(Items.REDSTONE, 3))
+                val copy = Inventories.copyOf(source) as SimpleContainer
+                copy.getItem(0).count = 1
+                source.getItem(0).count shouldBe 3
+                copy.getItem(0).count shouldBe 1
+                copy.getItem(0) shouldNotBeSameInstanceAs source.getItem(0)
+            }
 
-    @Test
-    fun isItemStackableOnFalseForDifferentItems() {
-        val a = ItemStack(Items.REDSTONE)
-        val b = ItemStack(Items.COAL)
-        assertFalse(Inventories.isItemStackableOn(a, b))
-    }
-
-    @Test
-    fun copyOfPreservesContainerSize() {
-        val source = SimpleContainer(5)
-        val copy = Inventories.copyOf(source) as SimpleContainer
-        assertEquals(5, copy.containerSize)
-    }
-}
+            it("preserves container size") {
+                val source = SimpleContainer(5)
+                val copy = Inventories.copyOf(source) as SimpleContainer
+                copy.containerSize shouldBe 5
+            }
+        }
+    })
