@@ -48,12 +48,7 @@
     <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, )</ID>
     <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( world: Level, rand: RandomSource, pos: BlockPos, color: Vec3, from: Direction, to: Direction, minChance: Float, maxChance: Float, )</ID>
     <ID>LongParameterList:TrackBlockEntity.kt$TrackBlockEntity$( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, )</ID>
-    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$for</ID>
-    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.RelayBlock$for</ID>
-    <ID>LoopWithTooManyJumpStatements:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$for</ID>
     <ID>LoopWithTooManyJumpStatements:Inventories.kt$Inventories.InventoryRange$for</ID>
-    <ID>LoopWithTooManyJumpStatements:RedstonePenItem.kt$RedstonePenItem$for</ID>
-    <ID>LoopWithTooManyJumpStatements:RedstoneTrackBlock.kt$RedstoneTrackBlock$for</ID>
     <ID>LoopWithTooManyJumpStatements:TrackBlockEntity.kt$TrackBlockEntity$for</ID>
     <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.1</ID>
     <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.2</ID>

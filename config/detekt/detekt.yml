@@ -56,6 +56,11 @@ exceptions:
     allowedExceptionNameRegex: '_.*|(ignore|expected).*'
 
 style:
+  LoopWithTooManyJumpStatements:
+    # Loops with one break and one continue are idiomatic in Kotlin iteration;
+    # the default threshold of 1 flags almost every non-trivial loop. Raise to 2
+    # to allow the common continue-guard + break-early-exit pattern.
+    maxJumpCount: 2
   # Early-return guard clauses are idiomatic Kotlin; the default of 2 flags
   # almost every non-trivial function. Raise to a level that catches genuine
   # spaghetti logic without penalising normal guard-clause style.
