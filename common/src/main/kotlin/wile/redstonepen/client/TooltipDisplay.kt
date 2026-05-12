@@ -68,7 +68,7 @@ class TooltipDisplay {
         t = System.currentTimeMillis()
     }
 
-    @Suppress("UnusedParameter")
+    @Suppress("UnusedParameter", "TooGenericExceptionCaught")
     fun <T : AbstractContainerMenu> render(
         gg: GuiGraphics,
         gui: AbstractContainerScreen<T>,
@@ -85,7 +85,10 @@ class TooltipDisplay {
             return false
         } else if (
             ranges.stream().noneMatch { tip ->
-                if (x < tip.x0 || x > tip.x1 || y < tip.y0 || y > tip.y1) return@noneMatch false
+                val outsideX = x < tip.x0 || x > tip.x1
+                val outsideY = y < tip.y0 || y > tip.y1
+                val outside = outsideX || outsideY
+                if (outside) return@noneMatch false
                 val tipComponent = tip.text.get() ?: return@noneMatch false
                 if (tipComponent.string.isEmpty()) return@noneMatch false
                 try {

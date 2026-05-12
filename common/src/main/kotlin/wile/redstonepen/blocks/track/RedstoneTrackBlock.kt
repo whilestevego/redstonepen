@@ -313,7 +313,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 world.neighborChanged(key, this, value)
             }
         } catch (ex: Throwable) {
-            Auxiliaries.logError("Track neighborChanged recursion detected, dropping!")
+            Auxiliaries.logError("Track neighborChanged recursion detected, dropping! ($ex)")
             val num_redstone = tile(world, pos).map { it.getRedstoneDustCount() }.orElse(0)
             if (num_redstone > 0) {
                 val p = Vec3.atCenterOf(pos)

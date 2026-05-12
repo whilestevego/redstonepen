@@ -1,6 +1,7 @@
 package wile.redstonepen.blocks.track
 
 import java.util.LinkedList
+import java.util.Locale
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
@@ -91,7 +92,9 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 }
             } catch (ex: Throwable) {
                 nets_.clear()
-                Auxiliaries.logError("Dropped invalid NBT for Redstone Track at pos $blockPos")
+                Auxiliaries.logError(
+                    "Dropped invalid NBT for Redstone Track at pos $blockPos ($ex)"
+                )
             }
         }
         return nbt
@@ -304,13 +307,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             val face_is_empty =
                 (getWireFlags() and
                     RedstoneTrackDefs.connections.getAllElementsOnFace(face).toInt()) == 0
+            val shouldBulkConnect =
+                !no_bulk &&
+                    !face_is_empty &&
+                    hit.length() < 0.10 &&
+                    (!no_add || getConnectionFlags() != 0)
             flip_mask =
-                if (
-                    !no_bulk &&
-                        !face_is_empty &&
-                        hit.length() < 0.10 &&
-                        (!no_add || getConnectionFlags() != 0)
-                ) {
+                if (shouldBulkConnect) {
                     RedstoneTrackDefs.connections.getBulkConnectorBit(face)
                 } else if (no_add || hit.length() > 0.11) {
                     var m = RedstoneTrackDefs.connections.getWireBit(face, dir)
@@ -509,6 +512,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 if (trace_) {
                     Auxiliaries.logWarn(
                         String.format(
+                            Locale.ROOT,
                             "SHUP: %s <-%s(=%s) removed.",
                             posstr(blockPos),
                             posstr(fromPos),
@@ -529,6 +533,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (trace_) {
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "SHUP: %s <-%s changed (%s->%s).",
                         posstr(blockPos),
                         posstr(fromPos),
@@ -606,6 +611,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (trace_ && notifications.isNotEmpty()) {
             Auxiliaries.logWarn(
                 String.format(
+                    Locale.ROOT,
                     "NBCH: %s updates: [%s]",
                     posstr(blockPos),
                     notifications.entries.joinToString(", ") {
@@ -638,6 +644,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (trace_) {
             Auxiliaries.logWarn(
                 String.format(
+                    Locale.ROOT,
                     "NBCH: %s from %s (%s)",
                     posstr(my_pos),
                     posstr(fromPos),
@@ -689,7 +696,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (net.power != pmax) {
             if (trace_) {
                 Auxiliaries.logWarn(
-                    String.format("NBCH: %s net power %d->%d", posstr(my_pos), net.power, pmax)
+                    String.format(
+                        Locale.ROOT,
+                        "NBCH: %s net power %d->%d",
+                        posstr(my_pos),
+                        net.power,
+                        pmax,
+                    )
                 )
             }
             net.power = pmax
@@ -749,6 +762,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (trace_) {
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "UCON: %s SIDPW: [%01x %01x %01x %01x %01x %01x]",
                         posstr(blockPos),
                         current_side_powers[0],
@@ -779,6 +793,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (trace_) {
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "UCON: %s CONFL: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]",
                         posstr(blockPos),
                         external_connection_flags,
@@ -828,6 +843,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (trace_) {
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "UCON: %s CONSD: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]",
                         posstr(blockPos),
                         external_connection_flags,
@@ -841,6 +857,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 )
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "UCON: %s CONRT: ext:%08x | ext:[%08x %08x %08x %08x %08x %08x]",
                         posstr(blockPos),
                         external_connection_flags,
@@ -999,6 +1016,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     val pwr_sides = net.power_sides.joinToString(",") { it.toString() }
                     Auxiliaries.logWarn(
                         String.format(
+                            Locale.ROOT,
                             "UCON: %s adj:%s | ints:%s | pwrs:%s",
                             poss,
                             ss.joinToString(", "),
@@ -1010,6 +1028,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 if (disconnected_neighbours.isNotEmpty()) {
                     Auxiliaries.logWarn(
                         String.format(
+                            Locale.ROOT,
                             "UCON: %s DISCONNECTED NEIGHBOURS: %s",
                             posstr(blockPos),
                             disconnected_neighbours.joinToString(",") { posstr(it) },
@@ -1019,6 +1038,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 if (connected_neighbours.isNotEmpty()) {
                     Auxiliaries.logWarn(
                         String.format(
+                            Locale.ROOT,
                             "UCON: %s CONNECTED NEIGHBOURS: %s",
                             posstr(blockPos),
                             connected_neighbours.joinToString(",") { posstr(it) },
@@ -1035,6 +1055,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (trace_ && disconnected_neighbours.isNotEmpty()) {
                 Auxiliaries.logWarn(
                     String.format(
+                        Locale.ROOT,
                         "UCON: %s DISCONNECTED NONTRACK: %s",
                         posstr(blockPos),
                         disconnected_neighbours.joinToString(",") { posstr(it) },
@@ -1049,6 +1070,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     if (trace_) {
                         Auxiliaries.logWarn(
                             String.format(
+                                Locale.ROOT,
                                 "UCON: %s UPDATE NET OF %s",
                                 posstr(blockPos),
                                 posstr(te.blockPos),
@@ -1071,6 +1093,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 if (trace_) {
                     Auxiliaries.logWarn(
                         String.format(
+                            Locale.ROOT,
                             "UCON: %s UPDATE TRACK CHANGES TO %s.",
                             posstr(blockPos),
                             posstr(pos),

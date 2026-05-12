@@ -1,5 +1,6 @@
 package wile.redstonepen.detail
 
+import java.util.Locale
 import java.util.UUID
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -33,10 +34,10 @@ object RcaSync {
         }
 
         override fun toString(): String =
-            "{player:\"$puid\", ci:${String.format(
-            "%016x",
-            client_inputs_,
-        )}, co:${String.format("%016x", client_outputs_)}, so:${String.format("%016x", server_outputs_)}}"
+            "{player:\"$puid\", " +
+                "ci:${String.format(Locale.ROOT, "%016x", client_inputs_)}, " +
+                "co:${String.format(Locale.ROOT, "%016x", client_outputs_)}, " +
+                "so:${String.format(Locale.ROOT, "%016x", server_outputs_)}}"
     }
 
     object CommonRca {

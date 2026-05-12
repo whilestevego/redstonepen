@@ -1,5 +1,6 @@
 package wile.redstonepen.items
 
+import java.util.Locale
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
@@ -219,13 +220,13 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         itemSlot: Int,
         isSelected: Boolean,
     ) {
-        if (
+        val shouldSkipSync =
             !isSelected ||
                 !entity.isShiftKeyDown ||
                 world.isClientSide ||
                 (world.gameTime and 0x1L) != 0L ||
                 entity !is ServerPlayer
-        ) {
+        if (shouldSkipSync) {
             return
         }
         val rt = entity.pick(10.0, 0f, false)
@@ -253,7 +254,9 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     )
                 if (Auxiliaries.isDevelopmentMode()) {
                     tc.append(
-                        Component.literal(String.format(" | flags: %016x, p: ", te.getStateFlags()))
+                        Component.literal(
+                            String.format(Locale.ROOT, " | flags: %016x, p: ", te.getStateFlags())
+                        )
                     )
                     tc.append(
                         Component.literal(
@@ -354,7 +357,9 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         if (Auxiliaries.isDevelopmentMode()) {
             val lookDir = Direction.orderedByNearest(entity)[0].toString().substring(0, 1)
             tc.append(
-                Component.literal(String.format(" | %s [%d,%d,%d]", lookDir, pos.x, pos.y, pos.z))
+                Component.literal(
+                    String.format(Locale.ROOT, " | %s [%d,%d,%d]", lookDir, pos.x, pos.y, pos.z)
+                )
             )
         }
         Overlay.show(entity, tc, 400)
@@ -393,7 +398,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         return false
     }
 
-    private fun powerFormatted(p: Int): String = String.format("%02d", p)
+    private fun powerFormatted(p: Int): String = String.format(Locale.ROOT, "%02d", p)
 
     companion object {
         @JvmStatic

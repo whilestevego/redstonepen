@@ -2,14 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ComplexCondition:ControlBoxGui.kt$ControlBoxGui$!debug_enabled_ &amp;&amp; (k.startsWith(".") || Defs.PORT_NAMES.contains(k) || k.endsWith(".re") || k.endsWith(".fe"))</ID>
-    <ID>ComplexCondition:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'</ID>
-    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$!active || !visible || x &lt; getX() || y &lt; getY() || x > getX() + width || y > getY() + height</ID>
-    <ID>ComplexCondition:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$xy.x >= 0 &amp;&amp; xy.y >= 0 &amp;&amp; xy.x &lt; width &amp;&amp; xy.y &lt; height</ID>
-    <ID>ComplexCondition:RedstonePenItem.kt$RedstonePenItem$!isSelected || !entity.isShiftKeyDown || world.isClientSide || (world.gameTime and 0x1L) != 0L || entity !is ServerPlayer</ID>
-    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$ranges.stream().noneMatch { tip -> if (x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1) return@noneMatch false val tipComponent = tip.text.get() ?: return@noneMatch false if (tipComponent.string.isEmpty()) return@noneMatch false try { val lines = Auxiliaries.wrapText(tipComponent, 80) gg.renderTooltip(font, lines, Optional.empty(), x, y) } catch (ex: Exception) { hadRenderException = true Auxiliaries.logError( "Tooltip rendering disabled due to exception: '${ex.message}'" ) return@noneMatch false } true }</ID>
-    <ID>ComplexCondition:TooltipDisplay.kt$TooltipDisplay$x &lt; tip.x0 || x > tip.x1 || y &lt; tip.y0 || y > tip.y1</ID>
-    <ID>ComplexCondition:TrackBlockEntity.kt$TrackBlockEntity$!no_bulk &amp;&amp; !face_is_empty &amp;&amp; hit.length() &lt; 0.10 &amp;&amp; (!no_add || getConnectionFlags() != 0)</ID>
     <ID>CyclomaticComplexMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB>): VoxelShape</ID>
     <ID>CyclomaticComplexMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>CyclomaticComplexMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
@@ -21,31 +13,6 @@
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos>?, )</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun modifySegments( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, ): Int</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$internal fun updateConnections(recursion_left: Int)</ID>
-    <ID>EmptyFunctionBlock:Registries.kt$Registries${}</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format( "%1s=%02d", Defs.PORT_NAMES[i].uppercase(), (io shr (4 * i)) and 0xf, )</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%1s=00", Defs.PORT_NAMES[i].uppercase())</ID>
-    <ID>ImplicitDefaultLocale:ControlBoxGui.kt$ControlBoxGui$String.format("%s%s = %d", lf, k.uppercase(), v)</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format( "%016x", client_inputs_, )</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", client_outputs_)</ID>
-    <ID>ImplicitDefaultLocale:RcaSync.kt$RcaSync.RcaData$String.format("%016x", server_outputs_)</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | %s [%d,%d,%d]", lookDir, pos.x, pos.y, pos.z)</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format(" | flags: %016x, p: ", te.getStateFlags())</ID>
-    <ID>ImplicitDefaultLocale:RedstonePenItem.kt$RedstonePenItem$String.format("%02d", p)</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s from %s (%s)", posstr(my_pos), posstr(fromPos), world.getBlockState(fromPos).block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "NBCH: %s updates: [%s]", posstr(blockPos), notifications.entries.joinToString(", ") { "${posstr(it.value)}>${posstr(it.key)}" }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s changed (%s->%s).", posstr(blockPos), posstr(fromPos), bltv.descriptionId, facingState.block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "SHUP: %s &lt;-%s(=%s) removed.", posstr(blockPos), posstr(fromPos), facingState.block.descriptionId, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONFL: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONNECTED NEIGHBOURS: %s", posstr(blockPos), connected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONRT: ext:%08x | ext:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, external_connected_routes[0], external_connected_routes[1], external_connected_routes[2], external_connected_routes[3], external_connected_routes[4], external_connected_routes[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s CONSD: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]", posstr(blockPos), external_connection_flags, internal_connected_sides[0], internal_connected_sides[1], internal_connected_sides[2], internal_connected_sides[3], internal_connected_sides[4], internal_connected_sides[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NEIGHBOURS: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s DISCONNECTED NONTRACK: %s", posstr(blockPos), disconnected_neighbours.joinToString(",") { posstr(it) }, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s SIDPW: [%01x %01x %01x %01x %01x %01x]", posstr(blockPos), current_side_powers[0], current_side_powers[1], current_side_powers[2], current_side_powers[3], current_side_powers[4], current_side_powers[5], )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE NET OF %s", posstr(blockPos), posstr(te.blockPos), )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s UPDATE TRACK CHANGES TO %s.", posstr(blockPos), posstr(pos), )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format( "UCON: %s adj:%s | ints:%s | pwrs:%s", poss, ss.joinToString(", "), int_sides, pwr_sides, )</ID>
-    <ID>ImplicitDefaultLocale:TrackBlockEntity.kt$TrackBlockEntity$String.format("NBCH: %s net power %d->%d", posstr(my_pos), net.power, pmax)</ID>
     <ID>LargeClass:RelayTests.kt$RelayTests</ID>
     <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
     <ID>LargeClass:TrackTests.kt$TrackTests</ID>
@@ -65,12 +32,7 @@
     <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, )</ID>
     <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( world: Level, rand: RandomSource, pos: BlockPos, color: Vec3, from: Direction, to: Direction, minChance: Float, maxChance: Float, )</ID>
     <ID>LongParameterList:TrackBlockEntity.kt$TrackBlockEntity$( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, )</ID>
-    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$for</ID>
-    <ID>LoopWithTooManyJumpStatements:CircuitComponents.kt$CircuitComponents.RelayBlock$for</ID>
-    <ID>LoopWithTooManyJumpStatements:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$for</ID>
     <ID>LoopWithTooManyJumpStatements:Inventories.kt$Inventories.InventoryRange$for</ID>
-    <ID>LoopWithTooManyJumpStatements:RedstonePenItem.kt$RedstonePenItem$for</ID>
-    <ID>LoopWithTooManyJumpStatements:RedstoneTrackBlock.kt$RedstoneTrackBlock$for</ID>
     <ID>LoopWithTooManyJumpStatements:TrackBlockEntity.kt$TrackBlockEntity$for</ID>
     <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.1</ID>
     <ID>MagicNumber:Auxiliaries.kt$Auxiliaries$0.2</ID>
@@ -317,11 +279,6 @@
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$4</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$5</ID>
     <ID>MagicNumber:TrackBlockEntity.kt$TrackBlockEntity$6</ID>
-    <ID>MaxLineLength:Auxiliaries.kt$Auxiliaries$// -------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MaxLineLength:Inventories.kt$Inventories$// ------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MaxLineLength:Inventories.kt$Inventories.InventoryRange$// ------------------------------------------------------------------------------------------------------------------</ID>
-    <ID>MayBeConst:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmField val bool_false: Int = 0</ID>
-    <ID>MayBeConst:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.Expr.Companion$@JvmField val bool_true: Int = 15</ID>
     <ID>NestedBlockDepth:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$protected open fun getInputPower( world: Level, relayPos: BlockPos, redstoneSide: Direction, ): Int</ID>
     <ID>NestedBlockDepth:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>NestedBlockDepth:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
@@ -351,31 +308,7 @@
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
     <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun modifySegments( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
     <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack)</ID>
-    <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter") fun &lt;T : AbstractContainerMenu> render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T>, x: Int, y: Int, ): Boolean</ID>
-    <ID>SpreadOperator:Auxiliaries.kt$Auxiliaries$(modtrkey, *emptyArray&lt;Any>())</ID>
-    <ID>SpreadOperator:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe.Serializer.Companion$(Ingredient.EMPTY, *ingredients)</ID>
-    <ID>SpreadOperator:Registries.kt$Registries$(ctor::create, *blocks)</ID>
-    <ID>SwallowedException:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
-    <ID>SwallowedException:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
-    <ID>SwallowedException:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
-    <ID>SwallowedException:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
-    <ID>ThrowsCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
-    <ID>TooGenericExceptionCaught:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ModRenderers.kt$ModRenderers.TrackTer$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:RedstoneTrackBlock.kt$RedstoneTrackBlock$ex: Throwable</ID>
-    <ID>TooGenericExceptionCaught:TooltipDisplay.kt$TooltipDisplay$ex: Exception</ID>
-    <ID>TooGenericExceptionCaught:TrackBlockEntity.kt$TrackBlockEntity$ex: Throwable</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ExprFunc$throw RuntimeException("invalid_number_of_arguments")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("expected_assignment")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("invalid_character")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_function_parenthesis")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_closing_parenthesis")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("missing_function_arguments")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("symbol_readonly")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unexpected_character")</ID>
-    <ID>TooGenericExceptionThrown:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$throw RuntimeException("unknown_function")</ID>
+    <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter", "TooGenericExceptionCaught") fun &lt;T : AbstractContainerMenu> render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T>, x: Int, y: Int, ): Boolean</ID>
     <ID>TooManyFunctions:Auxiliaries.kt$Auxiliaries</ID>
     <ID>TooManyFunctions:ControlBoxTests.kt$ControlBoxTests</ID>
     <ID>TooManyFunctions:DemoTests.kt$DemoTests</ID>
@@ -404,13 +337,5 @@
     <ID>UnusedParameter:RsSignals.kt$RsSignals$_world: BlockGetter</ID>
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_pos: BlockPos</ID>
     <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$_weak: Boolean</ID>
-    <ID>UnusedPrivateProperty:ModRenderers.kt$ModRenderers.TrackTer$_ctx: BlockEntityRendererProvider.Context?</ID>
-    <ID>UtilityClassWithPublicConstructor:Defs.kt$Defs</ID>
-    <ID>WildcardImport:ControlBoxUiContainer.kt$import net.minecraft.world.inventory.*</ID>
-    <ID>WildcardImport:ExtendedShapelessRecipe.kt$import net.minecraft.world.item.crafting.*</ID>
-    <ID>WildcardImport:Inventories.kt$import net.minecraft.world.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.basic.*</ID>
-    <ID>WildcardImport:ModContent.kt$import wile.redstonepen.blocks.controlbox.*</ID>
   </CurrentIssues>
 </SmellBaseline>

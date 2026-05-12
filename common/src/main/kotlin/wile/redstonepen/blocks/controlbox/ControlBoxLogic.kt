@@ -584,9 +584,9 @@ internal class ControlBoxLogic {
             companion object {
                 @JvmField val EMPTY = Expr(ExprType.VOID, "<EMPTY>")
 
-                @JvmField val bool_true: Int = 15
+                const val bool_true: Int = 15
 
-                @JvmField val bool_false: Int = 0
+                const val bool_false: Int = 0
 
                 @JvmStatic fun assignment_sanitize(x: Int): Int = x
             }
@@ -628,7 +628,7 @@ internal class ControlBoxLogic {
 
             init {
                 if (nargs >= 0 && nargs != args.size) {
-                    throw RuntimeException("invalid_number_of_arguments")
+                    error("invalid_number_of_arguments")
                 }
             }
 
@@ -785,7 +785,7 @@ internal class ControlBoxLogic {
                         } else {
                             assign = exp.name.lowercase()
                         }
-                    } catch (e: Exception) {
+                    } catch (_e: Exception) {
                         err = "parse_error"
                     }
                 }
@@ -834,7 +834,7 @@ internal class ControlBoxLogic {
                 } else {
                     val ci = line[pe].code
                     if (ci > 127) {
-                        throw RuntimeException("invalid_character")
+                        error("invalid_character")
                     } else {
                         c = line[pe].lowercaseChar()
                     }
@@ -870,9 +870,9 @@ internal class ControlBoxLogic {
                 var ref = default_assignment_variable
                 if (line.matches(Regex("^[\\s]*[a-zA-Z][\\w.]*[\\s]*[=][^=].*"))) {
                     ref = const_literal()
-                    if (!adv('=')) throw RuntimeException("expected_assignment")
+                    if (!adv('=')) error("expected_assignment")
                     if (functions.containsKey(ref.lowercase())) {
-                        throw RuntimeException("symbol_readonly")
+                        error("symbol_readonly")
                     }
                 }
                 symbols.add(ref)
@@ -976,7 +976,7 @@ internal class ControlBoxLogic {
                 if (adv('!')) return ExprNot(listOf(arith_fact()))
                 if (adv('(')) {
                     val e = expr()
-                    if (!adv(')')) throw RuntimeException("missing_closing_parenthesis")
+                    if (!adv(')')) error("missing_closing_parenthesis")
                     return e
                 } else if (c in '0'..'9') {
                     return ExprConst(const_number())
@@ -990,26 +990,29 @@ internal class ControlBoxLogic {
                             args.add(expr())
                             while (adv(',')) args.add(expr())
                             if (!adv(')')) {
-                                throw RuntimeException("missing_closing_function_parenthesis")
+                                error("missing_closing_function_parenthesis")
                             }
                         }
-                        val fn = functions[sym] ?: throw RuntimeException("unknown_function")
+                        val fn = functions[sym] ?: error("unknown_function")
                         return ExprFunc(fn.name, fn.nargs, fn.func, args)
                     } else {
                         if (functions.containsKey(sym)) {
-                            throw RuntimeException("missing_function_arguments")
+                            error("missing_function_arguments")
                         }
                         symbols.add(sym)
                         return ExprVarRef(sym)
                     }
                 }
-                throw RuntimeException("unexpected_character")
+                error("unexpected_character")
             }
+
+            private fun isIdentChar(): Boolean =
+                c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'
 
             private fun const_literal(): String {
                 if (c < 'a' || c > 'z') return ""
                 val p0 = pe
-                while (c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_') adv()
+                while (isIdentChar()) adv()
                 return line.substring(p0, pe).lowercase()
             }
 

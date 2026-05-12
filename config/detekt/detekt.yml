@@ -35,8 +35,50 @@ empty-blocks:
     # Interface stubs and Minecraft API no-op overrides intentionally have empty
     # bodies; penalising them adds noise without improving the code.
     ignoreOverridden: true
+    # init() is a Java interop trigger stub — its only purpose is to force Kotlin
+    # object initialisation from Java call sites; the body is intentionally empty.
+    ignoreAnnotated:
+      - 'JvmStatic'
+
+exceptions:
+  SwallowedException:
+    # Underscore-prefixed names signal intentional suppression (e.g. catch (_e: Exception)
+    # used when a fallback value is returned and the exception carries no actionable info).
+    allowedExceptionNameRegex: '_.*|(ignore|expected).*'
+  TooGenericExceptionCaught:
+    # Catching Throwable is intentional in game-loop handlers (neighborChanged, tick, render)
+    # to prevent Minecraft crashes when unexpected errors occur. Remove Throwable from the
+    # default banned list. Underscore-prefixed names are used for intentional fallback catches.
+    exceptionNames:
+      - ArrayIndexOutOfBoundsException
+      - Error
+      - Exception
+      - IllegalMonitorStateException
+      - NullPointerException
+      - IndexOutOfBoundsException
+      - RuntimeException
+    allowedExceptionNameRegex: '_.*|(ignore|expected).*'
 
 style:
+  UnusedPrivateProperty:
+    # Underscore-prefixed names signal intentional suppression (constructor parameters
+    # required by framework APIs but not used inside the class body).
+    allowedNames: '_.*'
+  MaxLineLength:
+    # ktfmt (kotlinlangStyle, 100-char limit) runs first via spotlessCheck and wraps
+    # everything it can. Any remaining lines over 120 chars are unwrappable literals or
+    # comments — violations no tool can fix. Disable to avoid flagging unavoidable cases.
+    active: false
+  UtilityClassWithPublicConstructor:
+    # All hits are structural false positives: Fabric GameTest classes must be
+    # concrete (runner reflects them) and NeoForge @EventBusSubscriber inner
+    # classes are framework-wired. The one real case (Defs) is already an object.
+    active: false
+  LoopWithTooManyJumpStatements:
+    # Loops with one break and one continue are idiomatic in Kotlin iteration;
+    # the default threshold of 1 flags almost every non-trivial loop. Raise to 2
+    # to allow the common continue-guard + break-early-exit pattern.
+    maxJumpCount: 2
   # Early-return guard clauses are idiomatic Kotlin; the default of 2 flags
   # almost every non-trivial function. Raise to a level that catches genuine
   # spaghetti logic without penalising normal guard-clause style.

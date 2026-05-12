@@ -16,7 +16,7 @@ class PlatformHelperFabric : IPlatformHelper {
         try {
             val player = net.fabricmc.fabric.api.entity.FakePlayer.get(world)
             if (player == null) Optional.empty() else Optional.of(player)
-        } catch (e: Exception) {
+        } catch (_e: Exception) {
             Optional.empty()
         }
 }

@@ -10,8 +10,6 @@
     <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$0.5</ID>
     <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$3.0</ID>
     <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$90f</ID>
-    <ID>SwallowedException:PlatformHelperNeoForge.kt$PlatformHelperNeoForge$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:PlatformHelperNeoForge.kt$PlatformHelperNeoForge$e: Exception</ID>
     <ID>TooManyFunctions:ControlBoxGameTests.kt$ControlBoxGameTests</ID>
     <ID>TooManyFunctions:DemoGameTests.kt$DemoGameTests</ID>
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests</ID>
@@ -19,8 +17,5 @@
     <ID>TooManyFunctions:TrackGameTests.kt$TrackGameTests</ID>
     <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$_event: FMLClientSetupEvent</ID>
     <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.LiveCycleEvents.Companion$_event: FMLConstructModEvent</ID>
-    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$ClientEvents</ID>
-    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$ClientGameEvents</ID>
-    <ID>UtilityClassWithPublicConstructor:ModRedstonePen.kt$ModRedstonePen$LiveCycleEvents</ID>
   </CurrentIssues>
 </SmellBaseline>

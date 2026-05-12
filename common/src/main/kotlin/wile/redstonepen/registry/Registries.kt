@@ -204,6 +204,7 @@ object Registries {
                                     }
                             }
                             .toTypedArray()
+                    @Suppress("SpreadOperator")
                     BlockEntityType.Builder.of(ctor::create, *blocks).build(null)
                 },
             )
