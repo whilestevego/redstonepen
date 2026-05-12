@@ -1,1221 +1,1079 @@
 package wile.redstonepen.blocks
 
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import net.minecraft.core.Direction
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity.TestHooks
 
-class ControlBoxTest {
-    private fun isInputUsed(h: TestHooks, d: Direction) =
-        (h.inputMask() and (0xf shl (4 * d.ordinal))) != 0
+class ControlBoxTest :
+    DescribeSpec({
+        fun isInputUsed(h: TestHooks, d: Direction) =
+            (h.inputMask() and (0xf shl (4 * d.ordinal))) != 0
 
-    private fun isOutputUsed(h: TestHooks, d: Direction) =
-        (h.outputMask() and (0xf shl (4 * d.ordinal))) != 0
+        fun isOutputUsed(h: TestHooks, d: Direction) =
+            (h.outputMask() and (0xf shl (4 * d.ordinal))) != 0
 
-    private fun tickAt(h: TestHooks, clock: Int) {
-        h.setSymbol(".clock", clock)
-        h.tick()
-    }
-
-    @Nested
-    inner class AlternateOperators {
-        @Test
-        fun andKeywordActsAsLogicalAnd() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d and u"))
-            h.setInput(Direction.DOWN, 3)
-            h.setInput(Direction.UP, 5)
+        fun tickAt(h: TestHooks, clock: Int) {
+            h.setSymbol(".clock", clock)
             h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 0)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
         }
 
-        @Test
-        fun orKeywordActsAsLogicalOr() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d or u"))
-            h.setInput(Direction.DOWN, 0)
-            h.setInput(Direction.UP, 5)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.UP, 0)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
+        describe("alternate operators") {
+            it("and keyword acts as logical and") {
+                val h = TestHooks()
+                h.setCode("b=d and u") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun notKeywordInvertsValue() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=not d"))
-            h.setInput(Direction.DOWN, 0)
-            h.tick()
-            assertTrue(h.output(Direction.EAST) > 0)
-            h.setInput(Direction.DOWN, 3)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
+            it("or keyword acts as logical or") {
+                val h = TestHooks()
+                h.setCode("b=d or u") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.UP, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun xorKeywordActsAsExclusiveOr() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d xor u"))
-            h.setInput(Direction.DOWN, 1)
-            h.setInput(Direction.UP, 0)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.UP, 1)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
+            it("not keyword inverts value") {
+                val h = TestHooks()
+                h.setCode("b=not d") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun diamondOperatorActsAsInequality() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d<>5"))
-            h.setInput(Direction.DOWN, 6)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 5)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
+            it("xor keyword acts as exclusive or") {
+                val h = TestHooks()
+                h.setCode("b=d xor u") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.UP, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun singlePipeActsAsLogicalOr() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d|u"))
-            h.setInput(Direction.DOWN, 0)
-            h.setInput(Direction.UP, 5)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.UP, 0)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
+            it("diamond operator acts as inequality") {
+                val h = TestHooks()
+                h.setCode("b=d<>5") shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun singleAmpersandActsAsLogicalAnd() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d&u"))
-            h.setInput(Direction.DOWN, 3)
-            h.setInput(Direction.UP, 5)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 0)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
-    }
+            it("single pipe acts as logical or") {
+                val h = TestHooks()
+                h.setCode("b=d|u") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.UP, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-    @Nested
-    inner class UserVariables {
-        @Test
-        fun userVariableChainPropagatesWithinSameTick() {
-            val h = TestHooks()
-            assertTrue(h.setCode("foo=d\nb=foo+1"))
-            h.setInput(Direction.DOWN, 4)
-            h.tick()
-            assertEquals(5, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun settingNewCodeClearsSymbolTable() {
-            val h = TestHooks()
-            h.setCode("b=d")
-            h.setSymbol("myvar", 9)
-            assertEquals(9, h.getSymbol("myvar"))
-            h.setCode("b=u")
-            assertEquals(0, h.getSymbol("myvar"))
-        }
-
-        @Test
-        fun userVariableRisingEdgeFiresOneLaterThanPort() {
-            val h = TestHooks()
-            assertTrue(h.setCode("foo=d\nb=foo.re"))
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 0)
-            assertEquals(0, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 1)
-            assertEquals(0, h.output(Direction.EAST))
-            tickAt(h, 2)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 3)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun userVariableNotInPortMasks() {
-            val h = TestHooks()
-            assertTrue(h.setCode("foo=3"))
-            assertEquals(0, h.inputMask())
-            assertEquals(0, h.outputMask())
-        }
-    }
-
-    @Nested
-    inner class Parsing {
-        @Test
-        fun rejectsUnknownSignalSuffixes() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b=d.bad"))
-            assertFalse(hooks.errors().isEmpty())
-        }
-
-        @Test
-        fun emptyCodeIsValidWithNoMasks() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode(""))
-            assertTrue(hooks.valid())
-            assertEquals(0, hooks.inputMask())
-            assertEquals(0, hooks.outputMask())
-        }
-
-        @Test
-        fun commentOnlyLineIsValid() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("# this is a comment"))
-            assertTrue(hooks.valid())
-            assertEquals(0, hooks.inputMask())
-            assertEquals(0, hooks.outputMask())
-        }
-
-        @Test
-        fun unknownFunctionCallIsInvalid() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b=foo(d)"))
-            assertFalse(hooks.valid())
-            assertFalse(hooks.errors().isEmpty())
-        }
-
-        @Test
-        fun allPortNamesAcceptedOnLhs() {
-            for (port in listOf("d", "u", "r", "y", "g", "b")) {
-                val hooks = TestHooks()
-                assertTrue(
-                    hooks.setCode("$port=5"),
-                    "port '$port' should be a valid LHS assignment",
-                )
+            it("single ampersand acts as logical and") {
+                val h = TestHooks()
+                h.setCode("b=d&u") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
             }
         }
 
-        @Test
-        fun derivesInputAndOutputMasksFromProgram() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d\nu=15"))
-            assertTrue(hooks.valid())
-            assertTrue(isInputUsed(hooks, Direction.DOWN), "expected input mask for d")
-            assertTrue(isOutputUsed(hooks, Direction.EAST), "expected output mask for b")
-            assertTrue(isOutputUsed(hooks, Direction.UP), "expected output mask for u")
-        }
-
-        @Test
-        fun unterminatedParenIsInvalid() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b=(1+2"))
-            assertFalse(hooks.errors().isEmpty())
-        }
-
-        @Test
-        fun missingRhsIsInvalid() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b="))
-            assertFalse(hooks.errors().isEmpty())
-        }
-
-        @Test
-        fun numericConstantOutsideZeroToFifteenStillParses() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=100"))
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun settingTheSameCodeTwiceReturnsValid() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d"))
-            assertTrue(hooks.setCode("b=d"))
-        }
-
-        @Test
-        fun trailingDotSuffixIsInvalid() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b=d."))
-            assertFalse(hooks.errors().isEmpty())
-        }
-
-        @Test
-        fun invalidCharacterAfterExpressionIsRejected() {
-            val hooks = TestHooks()
-            assertFalse(hooks.setCode("b=3 5"))
-            assertFalse(hooks.errors().isEmpty())
-            assertTrue(hooks.errors().values.contains("invalid_character"))
-        }
-
-        @Test
-        fun comparatorOverrideSuffixIsValid() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d.co"))
-            assertTrue(hooks.valid())
-        }
-
-        @Test
-        fun timerElapsedAndPresetSuffixesAreValid() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=ton1.et\nu=ton1.pt"))
-            assertTrue(hooks.valid())
-        }
-    }
-
-    @Nested
-    inner class ArithmeticOperators {
-        @Test
-        fun additionOperatorOutputsSum() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=3+4"))
-            hooks.tick()
-            assertEquals(7, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun subtractionOperatorOutputsDifference() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=15-3"))
-            hooks.tick()
-            assertEquals(12, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun multiplicationOperatorOutputsProduct() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=3*4"))
-            hooks.tick()
-            assertEquals(12, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun divisionOperatorOutputsQuotient() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=8/2"))
-            hooks.tick()
-            assertEquals(4, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun moduloOperatorOutputsRemainder() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=9%5"))
-            hooks.tick()
-            assertEquals(4, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun divisionByZeroReturnsZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d/0"))
-            hooks.setInput(Direction.DOWN, 6)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun portAssignmentClampsOverflowToFifteen() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=20"))
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun portAssignmentClampsUnderflowToZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=0-1"))
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun parenthesizedExpressionForcesPrecedence() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=(2+3)*2"))
-            hooks.tick()
-            assertEquals(10, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun unaryNegationProducesZeroAfterPortClamp() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=-5"))
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun moduloByZeroReturnsZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d%0"))
-            hooks.setInput(Direction.DOWN, 9)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-    }
-
-    @Nested
-    inner class ComparisonOperators {
-        @Test
-        fun greaterThanReturnsTrueWhenInputExceedsThreshold() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d>5"))
-            hooks.setInput(Direction.DOWN, 6)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun greaterThanReturnsFalseWhenInputEqualsThreshold() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d>5"))
-            hooks.setInput(Direction.DOWN, 5)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun greaterThanOrEqualReturnsTrueAtBoundary() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d>=5"))
-            hooks.setInput(Direction.DOWN, 5)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun greaterThanOrEqualReturnsFalseBelowBoundary() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d>=5"))
-            hooks.setInput(Direction.DOWN, 4)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun equalityReturnsTrueOnMatch() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d==5"))
-            hooks.setInput(Direction.DOWN, 5)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun equalityReturnsFalseOnMismatch() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d==5"))
-            hooks.setInput(Direction.DOWN, 4)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun inequalityReturnsTrueWhenValuesDiffer() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d!=5"))
-            hooks.setInput(Direction.DOWN, 6)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun lessThanOperatorEvaluates() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d<5"))
-            h.setInput(Direction.DOWN, 3)
-            h.tick()
-            assertTrue(h.output(Direction.EAST) > 0)
-            h.setInput(Direction.DOWN, 5)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun lessThanOrEqualOperatorEvaluates() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d<=5"))
-            h.setInput(Direction.DOWN, 5)
-            h.tick()
-            assertTrue(h.output(Direction.EAST) > 0)
-            h.setInput(Direction.DOWN, 6)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
-    }
-
-    @Nested
-    inner class LogicalOperators {
-        @Test
-        fun logicalAndReturnsTrueWhenBothInputsNonzero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d&&u"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.setInput(Direction.UP, 5)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun logicalAndReturnsFalseWhenOneInputIsZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d&&u"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.setInput(Direction.UP, 5)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun logicalOrReturnsTrueWhenOneInputIsNonzero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d||u"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.setInput(Direction.UP, 5)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun logicalOrReturnsFalseWhenBothInputsAreZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d||u"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.setInput(Direction.UP, 0)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun xorReturnsTrueWhenInputsDiffer() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d^u"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.setInput(Direction.UP, 0)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun xorReturnsFalseWhenInputsMatch() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d^u"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.setInput(Direction.UP, 1)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun logicalNotInvertsTruthiness() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=!d"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-            hooks.setInput(Direction.DOWN, 5)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-    }
-
-    @Nested
-    inner class BuiltinFunctions {
-        @Test
-        fun invFunctionComplementsInputRelativeToFifteen() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=inv(d)"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.tick()
-            assertEquals(12, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun maxFunctionReturnsLargestOfArguments() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=max(d,u,r)"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.setInput(Direction.UP, 8)
-            hooks.setInput(Direction.NORTH, 5)
-            hooks.tick()
-            assertEquals(8, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun minFunctionReturnsSmallestOfArguments() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=min(d,u)"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.setInput(Direction.UP, 8)
-            hooks.tick()
-            assertEquals(3, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun limFunctionClampsValueBelowMinimum() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=lim(d,3,10)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            assertEquals(3, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun limFunctionPassesThroughValueWithinRange() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=lim(d,3,10)"))
-            hooks.setInput(Direction.DOWN, 5)
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun limFunctionClampsValueAboveMaximum() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=lim(d,3,10)"))
-            hooks.setInput(Direction.DOWN, 12)
-            hooks.tick()
-            assertEquals(10, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun ifFunctionReturnsThenBranchWhenConditionNonzero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=if(d,5,2)"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun ifFunctionReturnsElseBranchWhenConditionZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=if(d,5,2)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertEquals(2, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun meanFunctionReturnsTruncatedAverage() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=mean(d,u)"))
-            hooks.setInput(Direction.DOWN, 3)
-            hooks.setInput(Direction.UP, 7)
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun ifFunctionWithSingleArgYieldsBooleanFifteen() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=if(d)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun ifFunctionWithSingleArgYieldsZeroForFalseCondition() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=if(d)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun ifFunctionWithTwoArgsReturnsZeroForFalse() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=if(d,7)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun limFunctionTwoArgsClampsBetweenZeroAndUpper() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=lim(d,8)"))
-            hooks.setInput(Direction.DOWN, 12)
-            hooks.tick()
-            assertEquals(8, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun limFunctionSingleArgClampsToFifteen() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=lim(d)"))
-            hooks.setInput(Direction.DOWN, 12)
-            hooks.tick()
-            assertEquals(12, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun meanWithSingleArgReturnsThatArg() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=mean(d)"))
-            hooks.setInput(Direction.DOWN, 6)
-            hooks.tick()
-            assertEquals(6, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun clockFunctionReturnsCurrentClockSymbolValue() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=clock()"))
-            hooks.setSymbol(".clock", 7)
-            hooks.tick()
-            assertEquals(7, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun timeFunctionReturnsCurrentTimeSymbolValue() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=time()"))
-            hooks.setSymbol(".time", 5)
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun rndFunctionReturnsValueInRange() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=rnd()"))
-            hooks.tick()
-            val v = hooks.output(Direction.EAST)
-            assertTrue(v in 0..15)
-        }
-
-        @Test
-        fun invOfZeroReturnsMaxSignal() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=inv(d)"))
-            h.setInput(Direction.DOWN, 0)
-            h.tick()
-            assertEquals(15, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun invOfFifteenReturnsZero() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=inv(d)"))
-            h.setInput(Direction.DOWN, 15)
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun maxWithOneArgReturnsThatArg() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=max(d)"))
-            h.setInput(Direction.DOWN, 7)
-            h.tick()
-            assertEquals(7, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun maxWithZeroArgsReturnsZero() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=max()"))
-            h.tick()
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun minWithOneArgReturnsThatArg() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=min(d)"))
-            h.setInput(Direction.DOWN, 7)
-            h.tick()
-            assertEquals(7, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun meanWithThreeArgsReturnsTruncatedAverage() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=mean(d,u,r)"))
-            h.setInput(Direction.DOWN, 3)
-            h.setInput(Direction.UP, 6)
-            h.setInput(Direction.NORTH, 9)
-            h.tick()
-            assertEquals(6, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun limWithInvertedRangeClampsToUpperBound() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=lim(d,8,3)"))
-            h.setInput(Direction.DOWN, 5)
-            h.tick()
-            assertEquals(3, h.output(Direction.EAST))
-        }
-    }
-
-    @Nested
-    inner class Execution {
-        @Test
-        fun tickEvaluatesAssignmentsFromInputs() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d+1"))
-            hooks.setInput(Direction.DOWN, 4)
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun multilineAssignmentsAreEvaluatedForAllPorts() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=5\nu=3"))
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-            assertEquals(3, hooks.output(Direction.UP))
-        }
-
-        @Test
-        fun whitespaceOnlyLinesAreIgnored() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=5\n   \nu=3"))
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-            assertEquals(3, hooks.output(Direction.UP))
-        }
-
-        @Test
-        fun inlineCommentAfterAssignmentIsIgnored() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=5 # comment"))
-            hooks.tick()
-            assertEquals(5, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun duplicateAssignmentUsesLastValue() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=3\nb=7"))
-            hooks.tick()
-            assertEquals(7, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun singleAssignmentSetsOnlyExpectedInputAndOutputMasks() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=d"))
-            assertTrue(isInputUsed(hooks, Direction.DOWN), "expected input mask for d")
-            assertTrue(isOutputUsed(hooks, Direction.EAST), "expected output mask for b")
-            assertFalse(isInputUsed(hooks, Direction.UP), "unexpected input mask for u")
-            assertFalse(isInputUsed(hooks, Direction.NORTH), "unexpected input mask for r")
-            assertFalse(isOutputUsed(hooks, Direction.DOWN), "unexpected output mask for d")
-            assertFalse(isOutputUsed(hooks, Direction.UP), "unexpected output mask for u")
-        }
-
-        @Test
-        fun setSymbolStoresAndGetSymbolReadsBack() {
-            val hooks = TestHooks()
-            hooks.setCode("")
-            hooks.setSymbol("foo", 7)
-            assertEquals(7, hooks.getSymbol("foo"))
-        }
-
-        @Test
-        fun getUnknownSymbolReturnsZero() {
-            val hooks = TestHooks()
-            assertEquals(0, hooks.getSymbol("never_set"))
-        }
-
-        @Test
-        fun edgeRisingSymbolFiresOnceOnPositiveTransition() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d.re"))
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 0)
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 1)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 2)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun edgeFallingSymbolFiresOnceOnNegativeTransition() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=d.fe"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 1)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 2)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-    }
-
-    @Nested
-    inner class Timers {
-        @Test
-        fun tivTimerUsesClockSymbolForPulseGeneration() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tiv1(3)"))
-            hooks.setSymbol(".clock", 0)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-            hooks.setSymbol(".clock", 3)
-            hooks.tick()
-            assertEquals(15, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun tonWithZeroPeriodReturnsTrueImmediately() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=ton1(d, 0)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tonWithFalseInputReturnsFalse() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=ton1(d, 5)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun tofWithTrueInputReturnsTrue() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tof1(d, 5)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tofWithZeroPeriodReturnsTrue() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tof1(d, 0)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tpWithZeroPeriodMatchesInput() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tp1(d, 0)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tpWithZeroInputAndZeroPeriodReturnsFalse() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tp1(d, 0)"))
-            hooks.setInput(Direction.DOWN, 0)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun tivWithZeroPeriodReturnsFalse() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tiv1(0)"))
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun tivWithDisabledEnableSignalReturnsZero() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=tiv1(5, 0)"))
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
-
-        @Test
-        fun tonRisesAfterPeriodElapses() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=ton1(d, 4)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            assertEquals(0, h.output(Direction.EAST))
-            tickAt(h, 2)
-            assertEquals(0, h.output(Direction.EAST))
-            tickAt(h, 5)
-            assertTrue(h.output(Direction.EAST) > 0)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 6)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun tonResetsWhenInputDrops() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=ton1(d, 4)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            tickAt(h, 1)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 2)
-            assertEquals(0, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 3)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun tofFallsAfterPeriodElapses() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tof1(d, 4)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            assertTrue(h.output(Direction.EAST) > 0)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 1)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 6)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun tofResetsWhenInputReturnsHigh() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tof1(d, 4)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 1)
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 2)
-            assertTrue(h.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tpStaysHighForPeriodThenFalls() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tp1(d, 4)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 2)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 6)
-            assertEquals(0, h.output(Direction.EAST))
-        }
-
-        @Test
-        fun tpRequiresInputDropBeforeRetrigger() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tp1(d, 3)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            tickAt(h, 5)
-            assertEquals(0, h.output(Direction.EAST))
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 6)
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 7)
-            assertTrue(h.output(Direction.EAST) > 0)
-        }
-
-        @Test
-        fun tivProducesPulseWhenIntervalElapses() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tiv1(5)"))
-            tickAt(h, 0)
-            val n0 = h.output(Direction.EAST)
-            tickAt(h, 6)
-            val n1 = h.output(Direction.EAST)
-            if (n0 == 0 && n1 == 0) {
-                tickAt(h, 12)
-                assertTrue(h.output(Direction.EAST) >= 0)
+        describe("user variables") {
+            it("user variable chain propagates within same tick") {
+                val h = TestHooks()
+                h.setCode("foo=d\nb=foo+1") shouldBe true
+                h.setInput(Direction.DOWN, 4)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("setting new code clears symbol table") {
+                val h = TestHooks()
+                h.setCode("b=d")
+                h.setSymbol("myvar", 9)
+                h.getSymbol("myvar") shouldBe 9
+                h.setCode("b=u")
+                h.getSymbol("myvar") shouldBe 0
+            }
+
+            it("user variable rising edge fires one later than port") {
+                val h = TestHooks()
+                h.setCode("foo=d\nb=foo.re") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 0)
+                h.output(Direction.EAST) shouldBe 0
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 1)
+                h.output(Direction.EAST) shouldBe 0
+                tickAt(h, 2)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 3)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("user variable not in port masks") {
+                val h = TestHooks()
+                h.setCode("foo=3") shouldBe true
+                h.inputMask() shouldBe 0
+                h.outputMask() shouldBe 0
             }
         }
 
-        @Test
-        fun tonStaysHighAfterPeriodWithInputStillHigh() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=ton1(d, 3)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            tickAt(h, 4)
-            assertTrue(h.output(Direction.EAST) > 0)
-            tickAt(h, 5)
-            assertTrue(h.output(Direction.EAST) > 0)
+        describe("parsing") {
+            it("rejects unknown signal suffixes") {
+                val h = TestHooks()
+                h.setCode("b=d.bad") shouldBe false
+                h.errors().isEmpty() shouldBe false
+            }
+
+            it("empty code is valid with no masks") {
+                val h = TestHooks()
+                h.setCode("") shouldBe true
+                h.valid() shouldBe true
+                h.inputMask() shouldBe 0
+                h.outputMask() shouldBe 0
+            }
+
+            it("comment only line is valid") {
+                val h = TestHooks()
+                h.setCode("# this is a comment") shouldBe true
+                h.valid() shouldBe true
+                h.inputMask() shouldBe 0
+                h.outputMask() shouldBe 0
+            }
+
+            it("unknown function call is invalid") {
+                val h = TestHooks()
+                h.setCode("b=foo(d)") shouldBe false
+                h.valid() shouldBe false
+                h.errors().isEmpty() shouldBe false
+            }
+
+            it("all port names accepted on lhs") {
+                for (port in listOf("d", "u", "r", "y", "g", "b")) {
+                    val h = TestHooks()
+                    h.setCode("$port=5") shouldBe true
+                }
+            }
+
+            it("derives input and output masks from program") {
+                val h = TestHooks()
+                h.setCode("b=d\nu=15") shouldBe true
+                h.valid() shouldBe true
+                isInputUsed(h, Direction.DOWN) shouldBe true
+                isOutputUsed(h, Direction.EAST) shouldBe true
+                isOutputUsed(h, Direction.UP) shouldBe true
+            }
+
+            it("unterminated paren is invalid") {
+                val h = TestHooks()
+                h.setCode("b=(1+2") shouldBe false
+                h.errors().isEmpty() shouldBe false
+            }
+
+            it("missing rhs is invalid") {
+                val h = TestHooks()
+                h.setCode("b=") shouldBe false
+                h.errors().isEmpty() shouldBe false
+            }
+
+            it("numeric constant outside zero to fifteen still parses") {
+                val h = TestHooks()
+                h.setCode("b=100") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("setting the same code twice returns valid") {
+                val h = TestHooks()
+                h.setCode("b=d") shouldBe true
+                h.setCode("b=d") shouldBe true
+            }
+
+            it("trailing dot suffix is invalid") {
+                val h = TestHooks()
+                h.setCode("b=d.") shouldBe false
+                h.errors().isEmpty() shouldBe false
+            }
+
+            it("invalid character after expression is rejected") {
+                val h = TestHooks()
+                h.setCode("b=3 5") shouldBe false
+                h.errors().isEmpty() shouldBe false
+                h.errors().values.contains("invalid_character") shouldBe true
+            }
+
+            it("comparator override suffix is valid") {
+                val h = TestHooks()
+                h.setCode("b=d.co") shouldBe true
+                h.valid() shouldBe true
+            }
+
+            it("timer elapsed and preset suffixes are valid") {
+                val h = TestHooks()
+                h.setCode("b=ton1.et\nu=ton1.pt") shouldBe true
+                h.valid() shouldBe true
+            }
         }
 
-        @Test
-        fun tofStaysLowAfterPeriodWithInputStillLow() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tof1(d, 3)"))
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 0)
-            h.setInput(Direction.DOWN, 0)
-            tickAt(h, 1)
-            tickAt(h, 5)
-            assertEquals(0, h.output(Direction.EAST))
-            tickAt(h, 6)
-            assertEquals(0, h.output(Direction.EAST))
+        describe("arithmetic operators") {
+            it("addition operator outputs sum") {
+                val h = TestHooks()
+                h.setCode("b=3+4") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 7
+            }
+
+            it("subtraction operator outputs difference") {
+                val h = TestHooks()
+                h.setCode("b=15-3") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 12
+            }
+
+            it("multiplication operator outputs product") {
+                val h = TestHooks()
+                h.setCode("b=3*4") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 12
+            }
+
+            it("division operator outputs quotient") {
+                val h = TestHooks()
+                h.setCode("b=8/2") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 4
+            }
+
+            it("modulo operator outputs remainder") {
+                val h = TestHooks()
+                h.setCode("b=9%5") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 4
+            }
+
+            it("division by zero returns zero") {
+                val h = TestHooks()
+                h.setCode("b=d/0") shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("port assignment clamps overflow to fifteen") {
+                val h = TestHooks()
+                h.setCode("b=20") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("port assignment clamps underflow to zero") {
+                val h = TestHooks()
+                h.setCode("b=0-1") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("parenthesized expression forces precedence") {
+                val h = TestHooks()
+                h.setCode("b=(2+3)*2") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 10
+            }
+
+            it("unary negation produces zero after port clamp") {
+                val h = TestHooks()
+                h.setCode("b=-5") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("modulo by zero returns zero") {
+                val h = TestHooks()
+                h.setCode("b=d%0") shouldBe true
+                h.setInput(Direction.DOWN, 9)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
         }
 
-        @Test
-        fun tivWithNoArgsAlwaysReturnsZero() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=tiv1()"))
-            tickAt(h, 0)
-            assertEquals(0, h.output(Direction.EAST))
-            tickAt(h, 100)
-            assertEquals(0, h.output(Direction.EAST))
+        describe("comparison operators") {
+            it("greater than returns true when input exceeds threshold") {
+                val h = TestHooks()
+                h.setCode("b=d>5") shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("greater than returns false when input equals threshold") {
+                val h = TestHooks()
+                h.setCode("b=d>5") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("greater than or equal returns true at boundary") {
+                val h = TestHooks()
+                h.setCode("b=d>=5") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("greater than or equal returns false below boundary") {
+                val h = TestHooks()
+                h.setCode("b=d>=5") shouldBe true
+                h.setInput(Direction.DOWN, 4)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("equality returns true on match") {
+                val h = TestHooks()
+                h.setCode("b=d==5") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("equality returns false on mismatch") {
+                val h = TestHooks()
+                h.setCode("b=d==5") shouldBe true
+                h.setInput(Direction.DOWN, 4)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("inequality returns true when values differ") {
+                val h = TestHooks()
+                h.setCode("b=d!=5") shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("less than operator evaluates") {
+                val h = TestHooks()
+                h.setCode("b=d<5") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("less than or equal operator evaluates") {
+                val h = TestHooks()
+                h.setCode("b=d<=5") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
         }
 
-        @Test
-        fun twoTimerInstancesMaintainIndependentState() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=ton1(d, 3)\nu=ton2(r, 6)"))
-            h.setInput(Direction.DOWN, 1)
-            h.setInput(Direction.NORTH, 1)
-            tickAt(h, 0)
-            assertEquals(0, h.output(Direction.EAST))
-            assertEquals(0, h.output(Direction.UP))
-            tickAt(h, 4)
-            assertTrue(h.output(Direction.EAST) > 0)
-            assertEquals(0, h.output(Direction.UP))
-            tickAt(h, 7)
-            assertTrue(h.output(Direction.UP) > 0)
-        }
-    }
+        describe("logical operators") {
+            it("logical and returns true when both inputs nonzero") {
+                val h = TestHooks()
+                h.setCode("b=d&&u") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
 
-    @Nested
-    inner class Counter {
-        @Test
-        fun counterWithSingleArgIncrementsOnPositiveInput() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=cnt1(d)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            hooks.tick()
-            hooks.tick()
-            assertTrue(hooks.output(Direction.EAST) > 0)
-        }
+            it("logical and returns false when one input is zero") {
+                val h = TestHooks()
+                h.setCode("b=d&&u") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun counterWithFiveArgsClearsOnReset() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=cnt1(d, u, 0, 15, r)"))
-            hooks.setInput(Direction.DOWN, 1)
-            hooks.tick()
-            hooks.tick()
-            hooks.setInput(Direction.NORTH, 1)
-            hooks.tick()
-            assertEquals(0, hooks.output(Direction.EAST))
-        }
+            it("logical or returns true when one input is nonzero") {
+                val h = TestHooks()
+                h.setCode("b=d||u") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
 
-        @Test
-        fun counterThreeArgsClampsBetweenZeroAndMax() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=cnt1(d, u, 5)"))
-            h.setInput(Direction.DOWN, 1)
-            h.setInput(Direction.UP, 0)
-            repeat(10) { h.tick() }
-            assertEquals(5, h.output(Direction.EAST))
-        }
+            it("logical or returns false when both inputs are zero") {
+                val h = TestHooks()
+                h.setCode("b=d||u") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
 
-        @Test
-        fun counterRisingEdgeIncrementsAcrossClockTicks() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=cnt1(d, u)"))
-            h.setInput(Direction.DOWN, 0)
-            h.setInput(Direction.UP, 0)
-            tickAt(h, 0)
-            h.setInput(Direction.DOWN, 1)
-            tickAt(h, 1)
-            val afterRise = h.output(Direction.EAST)
-            assertTrue(afterRise > 0)
-            h.setInput(Direction.DOWN, 0)
-            h.setInput(Direction.UP, 1)
-            tickAt(h, 2)
-            val afterFall = h.output(Direction.EAST)
-            assertTrue(afterFall <= afterRise)
+            it("xor returns true when inputs differ") {
+                val h = TestHooks()
+                h.setCode("b=d^u") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("xor returns false when inputs match") {
+                val h = TestHooks()
+                h.setCode("b=d^u") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("logical not inverts truthiness") {
+                val h = TestHooks()
+                h.setCode("b=!d") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
         }
 
-        @Test
-        fun counterFourArgsClampsBetweenExplicitMinAndMax() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=cnt1(d, u, 2, 8)"))
-            h.setInput(Direction.DOWN, 0)
-            h.setInput(Direction.UP, 1)
-            repeat(10) { h.tick() }
-            assertEquals(2, h.output(Direction.EAST))
-            h.setInput(Direction.UP, 0)
-            h.setInput(Direction.DOWN, 1)
-            repeat(10) { h.tick() }
-            assertEquals(8, h.output(Direction.EAST))
-        }
-    }
+        describe("builtin functions") {
+            it("inv function complements input relative to fifteen") {
+                val h = TestHooks()
+                h.setCode("b=inv(d)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 12
+            }
 
-    @Nested
-    inner class Rca {
-        @Test
-        fun rcaInputChannelsAreRecognised() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=di0+di1"))
+            it("max function returns largest of arguments") {
+                val h = TestHooks()
+                h.setCode("b=max(d,u,r)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 8)
+                h.setInput(Direction.NORTH, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 8
+            }
+
+            it("min function returns smallest of arguments") {
+                val h = TestHooks()
+                h.setCode("b=min(d,u)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 8)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 3
+            }
+
+            it("lim function clamps value below minimum") {
+                val h = TestHooks()
+                h.setCode("b=lim(d,3,10)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 3
+            }
+
+            it("lim function passes through value within range") {
+                val h = TestHooks()
+                h.setCode("b=lim(d,3,10)") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("lim function clamps value above maximum") {
+                val h = TestHooks()
+                h.setCode("b=lim(d,3,10)") shouldBe true
+                h.setInput(Direction.DOWN, 12)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 10
+            }
+
+            it("if function returns then branch when condition nonzero") {
+                val h = TestHooks()
+                h.setCode("b=if(d,5,2)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("if function returns else branch when condition zero") {
+                val h = TestHooks()
+                h.setCode("b=if(d,5,2)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 2
+            }
+
+            it("mean function returns truncated average") {
+                val h = TestHooks()
+                h.setCode("b=mean(d,u)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 7)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("if function with single arg yields boolean fifteen") {
+                val h = TestHooks()
+                h.setCode("b=if(d)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("if function with single arg yields zero for false condition") {
+                val h = TestHooks()
+                h.setCode("b=if(d)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("if function with two args returns zero for false") {
+                val h = TestHooks()
+                h.setCode("b=if(d,7)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("lim function two args clamps between zero and upper") {
+                val h = TestHooks()
+                h.setCode("b=lim(d,8)") shouldBe true
+                h.setInput(Direction.DOWN, 12)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 8
+            }
+
+            it("lim function single arg clamps to fifteen") {
+                val h = TestHooks()
+                h.setCode("b=lim(d)") shouldBe true
+                h.setInput(Direction.DOWN, 12)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 12
+            }
+
+            it("mean with single arg returns that arg") {
+                val h = TestHooks()
+                h.setCode("b=mean(d)") shouldBe true
+                h.setInput(Direction.DOWN, 6)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 6
+            }
+
+            it("clock function returns current clock symbol value") {
+                val h = TestHooks()
+                h.setCode("b=clock()") shouldBe true
+                h.setSymbol(".clock", 7)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 7
+            }
+
+            it("time function returns current time symbol value") {
+                val h = TestHooks()
+                h.setCode("b=time()") shouldBe true
+                h.setSymbol(".time", 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("rnd function returns value in range") {
+                val h = TestHooks()
+                h.setCode("b=rnd()") shouldBe true
+                h.tick()
+                val v = h.output(Direction.EAST)
+                (v in 0..15) shouldBe true
+            }
+
+            it("inv of zero returns max signal") {
+                val h = TestHooks()
+                h.setCode("b=inv(d)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("inv of fifteen returns zero") {
+                val h = TestHooks()
+                h.setCode("b=inv(d)") shouldBe true
+                h.setInput(Direction.DOWN, 15)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("max with one arg returns that arg") {
+                val h = TestHooks()
+                h.setCode("b=max(d)") shouldBe true
+                h.setInput(Direction.DOWN, 7)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 7
+            }
+
+            it("max with zero args returns zero") {
+                val h = TestHooks()
+                h.setCode("b=max()") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("min with one arg returns that arg") {
+                val h = TestHooks()
+                h.setCode("b=min(d)") shouldBe true
+                h.setInput(Direction.DOWN, 7)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 7
+            }
+
+            it("mean with three args returns truncated average") {
+                val h = TestHooks()
+                h.setCode("b=mean(d,u,r)") shouldBe true
+                h.setInput(Direction.DOWN, 3)
+                h.setInput(Direction.UP, 6)
+                h.setInput(Direction.NORTH, 9)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 6
+            }
+
+            it("lim with inverted range clamps to upper bound") {
+                val h = TestHooks()
+                h.setCode("b=lim(d,8,3)") shouldBe true
+                h.setInput(Direction.DOWN, 5)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 3
+            }
         }
 
-        @Test
-        fun rcaOutputChannelsAreRecognised() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("do0=d"))
+        describe("execution") {
+            it("tick evaluates assignments from inputs") {
+                val h = TestHooks()
+                h.setCode("b=d+1") shouldBe true
+                h.setInput(Direction.DOWN, 4)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("multiline assignments are evaluated for all ports") {
+                val h = TestHooks()
+                h.setCode("b=5\nu=3") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+                h.output(Direction.UP) shouldBe 3
+            }
+
+            it("whitespace only lines are ignored") {
+                val h = TestHooks()
+                h.setCode("b=5\n   \nu=3") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+                h.output(Direction.UP) shouldBe 3
+            }
+
+            it("inline comment after assignment is ignored") {
+                val h = TestHooks()
+                h.setCode("b=5 # comment") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("duplicate assignment uses last value") {
+                val h = TestHooks()
+                h.setCode("b=3\nb=7") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 7
+            }
+
+            it("single assignment sets only expected input and output masks") {
+                val h = TestHooks()
+                h.setCode("b=d") shouldBe true
+                isInputUsed(h, Direction.DOWN) shouldBe true
+                isOutputUsed(h, Direction.EAST) shouldBe true
+                isInputUsed(h, Direction.UP) shouldBe false
+                isInputUsed(h, Direction.NORTH) shouldBe false
+                isOutputUsed(h, Direction.DOWN) shouldBe false
+                isOutputUsed(h, Direction.UP) shouldBe false
+            }
+
+            it("setSymbol stores and getSymbol reads back") {
+                val h = TestHooks()
+                h.setCode("")
+                h.setSymbol("foo", 7)
+                h.getSymbol("foo") shouldBe 7
+            }
+
+            it("get unknown symbol returns zero") { TestHooks().getSymbol("never_set") shouldBe 0 }
+
+            it("edge rising symbol fires once on positive transition") {
+                val h = TestHooks()
+                h.setCode("b=d.re") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 0)
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 1)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 2)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("edge falling symbol fires once on negative transition") {
+                val h = TestHooks()
+                h.setCode("b=d.fe") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 1)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 2)
+                h.output(Direction.EAST) shouldBe 0
+            }
         }
 
-        @Test
-        fun rcaChannelOutOfRangeStillParses() {
-            val hooks = TestHooks()
-            assertTrue(hooks.setCode("b=di20"))
+        describe("timers") {
+            it("tiv timer uses clock symbol for pulse generation") {
+                val h = TestHooks()
+                h.setCode("b=tiv1(3)") shouldBe true
+                h.setSymbol(".clock", 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+                h.setSymbol(".clock", 3)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 15
+            }
+
+            it("ton with zero period returns true immediately") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 0)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("ton with false input returns false") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 5)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tof with true input returns true") {
+                val h = TestHooks()
+                h.setCode("b=tof1(d, 5)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tof with zero period returns true") {
+                val h = TestHooks()
+                h.setCode("b=tof1(d, 0)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tp with zero period matches input") {
+                val h = TestHooks()
+                h.setCode("b=tp1(d, 0)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tp with zero input and zero period returns false") {
+                val h = TestHooks()
+                h.setCode("b=tp1(d, 0)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tiv with zero period returns false") {
+                val h = TestHooks()
+                h.setCode("b=tiv1(0)") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tiv with disabled enable signal returns zero") {
+                val h = TestHooks()
+                h.setCode("b=tiv1(5, 0)") shouldBe true
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("ton rises after period elapses") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 4)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                h.output(Direction.EAST) shouldBe 0
+                tickAt(h, 2)
+                h.output(Direction.EAST) shouldBe 0
+                tickAt(h, 5)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 6)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("ton resets when input drops") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 4)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                tickAt(h, 1)
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 2)
+                h.output(Direction.EAST) shouldBe 0
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 3)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tof falls after period elapses") {
+                val h = TestHooks()
+                h.setCode("b=tof1(d, 4)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 1)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 6)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tof resets when input returns high") {
+                val h = TestHooks()
+                h.setCode("b=tof1(d, 4)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 1)
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 2)
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tp stays high for period then falls") {
+                val h = TestHooks()
+                h.setCode("b=tp1(d, 4)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 2)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 6)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tp requires input drop before retrigger") {
+                val h = TestHooks()
+                h.setCode("b=tp1(d, 3)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                tickAt(h, 5)
+                h.output(Direction.EAST) shouldBe 0
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 6)
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 7)
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tiv produces pulse when interval elapses") {
+                val h = TestHooks()
+                h.setCode("b=tiv1(5)") shouldBe true
+                tickAt(h, 0)
+                val n0 = h.output(Direction.EAST)
+                tickAt(h, 6)
+                val n1 = h.output(Direction.EAST)
+                if (n0 == 0 && n1 == 0) {
+                    tickAt(h, 12)
+                    (h.output(Direction.EAST) >= 0) shouldBe true
+                }
+            }
+
+            it("ton stays high after period with input still high") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 3)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                tickAt(h, 4)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                tickAt(h, 5)
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("tof stays low after period with input still low") {
+                val h = TestHooks()
+                h.setCode("b=tof1(d, 3)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 0)
+                h.setInput(Direction.DOWN, 0)
+                tickAt(h, 1)
+                tickAt(h, 5)
+                h.output(Direction.EAST) shouldBe 0
+                tickAt(h, 6)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("tiv with no args always returns zero") {
+                val h = TestHooks()
+                h.setCode("b=tiv1()") shouldBe true
+                tickAt(h, 0)
+                h.output(Direction.EAST) shouldBe 0
+                tickAt(h, 100)
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("two timer instances maintain independent state") {
+                val h = TestHooks()
+                h.setCode("b=ton1(d, 3)\nu=ton2(r, 6)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.NORTH, 1)
+                tickAt(h, 0)
+                h.output(Direction.EAST) shouldBe 0
+                h.output(Direction.UP) shouldBe 0
+                tickAt(h, 4)
+                (h.output(Direction.EAST) > 0) shouldBe true
+                h.output(Direction.UP) shouldBe 0
+                tickAt(h, 7)
+                (h.output(Direction.UP) > 0) shouldBe true
+            }
         }
 
-        @Test
-        fun rcaInputChannelFlowsThroughTick() {
-            val h = TestHooks()
-            assertTrue(h.setCode("do0=di0+di1"))
-            h.setRcaInput(0, 3)
-            h.setRcaInput(1, 5)
-            h.tick()
-            assertEquals(8, h.getRcaOutput(0))
+        describe("counter") {
+            it("counter with single arg increments on positive input") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                h.tick()
+                h.tick()
+                (h.output(Direction.EAST) > 0) shouldBe true
+            }
+
+            it("counter with five args clears on reset") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d, u, 0, 15, r)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.tick()
+                h.tick()
+                h.setInput(Direction.NORTH, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("counter three args clamps between zero and max") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d, u, 5)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 0)
+                repeat(10) { h.tick() }
+                h.output(Direction.EAST) shouldBe 5
+            }
+
+            it("counter rising edge increments across clock ticks") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d, u)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 0)
+                tickAt(h, 0)
+                h.setInput(Direction.DOWN, 1)
+                tickAt(h, 1)
+                val afterRise = h.output(Direction.EAST)
+                (afterRise > 0) shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 1)
+                tickAt(h, 2)
+                val afterFall = h.output(Direction.EAST)
+                (afterFall <= afterRise) shouldBe true
+            }
+
+            it("counter four args clamps between explicit min and max") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d, u, 2, 8)") shouldBe true
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 1)
+                repeat(10) { h.tick() }
+                h.output(Direction.EAST) shouldBe 2
+                h.setInput(Direction.UP, 0)
+                h.setInput(Direction.DOWN, 1)
+                repeat(10) { h.tick() }
+                h.output(Direction.EAST) shouldBe 8
+            }
         }
 
-        @Test
-        fun rcaOutputMaskLimitsOutOfRangeValue() {
-            val h = TestHooks()
-            assertTrue(h.setCode("do0=di0"))
-            h.setRcaInput(0, 15)
-            h.tick()
-            assertEquals(15, h.getRcaOutput(0))
-            h.setRcaInput(0, 0)
-            h.tick()
-            assertEquals(0, h.getRcaOutput(0))
-        }
+        describe("rca") {
+            it("rca input channels are recognised") {
+                TestHooks().setCode("b=di0+di1") shouldBe true
+            }
 
-        @Test
-        fun rcaOutputDataIsZeroWhenNotAssigned() {
-            val h = TestHooks()
-            assertTrue(h.setCode("b=di0"))
-            h.setRcaInput(0, 7)
-            h.tick()
-            assertEquals(0, h.rcaOutputData())
+            it("rca output channels are recognised") { TestHooks().setCode("do0=d") shouldBe true }
+
+            it("rca channel out of range still parses") {
+                TestHooks().setCode("b=di20") shouldBe true
+            }
+
+            it("rca input channel flows through tick") {
+                val h = TestHooks()
+                h.setCode("do0=di0+di1") shouldBe true
+                h.setRcaInput(0, 3)
+                h.setRcaInput(1, 5)
+                h.tick()
+                h.getRcaOutput(0) shouldBe 8
+            }
+
+            it("rca output mask limits out of range value") {
+                val h = TestHooks()
+                h.setCode("do0=di0") shouldBe true
+                h.setRcaInput(0, 15)
+                h.tick()
+                h.getRcaOutput(0) shouldBe 15
+                h.setRcaInput(0, 0)
+                h.tick()
+                h.getRcaOutput(0) shouldBe 0
+            }
+
+            it("rca output data is zero when not assigned") {
+                val h = TestHooks()
+                h.setCode("b=di0") shouldBe true
+                h.setRcaInput(0, 7)
+                h.tick()
+                h.rcaOutputData() shouldBe 0
+            }
         }
-    }
-}
+    })
