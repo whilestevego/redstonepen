@@ -6,6 +6,14 @@
 # Note for reviewers/clones: This file is a auxiliary script for my setup.
 # It's not needed to build the mod.
 #
+TOOLS_DIR    := $(HOME)/.local/analysis-tools
+KTFMT_JAR    := $(TOOLS_DIR)/ktfmt.jar
+KTLINT_BIN   := $(TOOLS_DIR)/ktlint
+DETEKT_JAR   := $(TOOLS_DIR)/detekt.jar
+KTFMT_VERSION  := 0.62
+KTLINT_VERSION := 1.5.0
+DETEKT_VERSION := 1.23.8
+
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))
 export JAVA_HOME=$(JDK_HOME_22_0)
@@ -25,7 +33,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze
 
 default: mod
 
@@ -108,3 +116,54 @@ coverage:
 
 verify:
 	@$(GRADLE) jacocoTestCoverageVerification
+
+# --- Analysis tools (ktfmt, ktlint, detekt) ----------------------------------
+# Tools are downloaded on first use to $(TOOLS_DIR) and cached there.
+# 'check' mirrors what CI runs; 'format-fix' and 'lint-fix' apply corrections.
+
+$(KTFMT_JAR):
+	@mkdir -p $(TOOLS_DIR)
+	@echo "Downloading ktfmt $(KTFMT_VERSION)..."
+	@curl -sSLo $@ https://github.com/facebook/ktfmt/releases/download/v$(KTFMT_VERSION)/ktfmt-$(KTFMT_VERSION)-with-dependencies.jar
+
+$(KTLINT_BIN):
+	@mkdir -p $(TOOLS_DIR)
+	@echo "Downloading ktlint $(KTLINT_VERSION)..."
+	@curl -sSLo $@ https://github.com/pinterest/ktlint/releases/download/$(KTLINT_VERSION)/ktlint
+	@chmod a+x $@
+
+$(DETEKT_JAR):
+	@mkdir -p $(TOOLS_DIR)
+	@echo "Downloading detekt $(DETEKT_VERSION)..."
+	@curl -sSLo $@ https://github.com/detekt/detekt/releases/download/v$(DETEKT_VERSION)/detekt-cli-$(DETEKT_VERSION)-all.jar
+
+check: format lint analyze
+
+format: $(KTFMT_JAR)
+	@echo "Checking formatting (ktfmt)..."
+	@java -jar $(KTFMT_JAR) --kotlinlang-style --dry-run --set-exit-if-changed \
+	  $$(find . -name "*.kt" -not -path "*/build/*" -not -path "*/bin/*")
+
+format-fix: $(KTFMT_JAR)
+	@echo "Applying formatting (ktfmt)..."
+	@java -jar $(KTFMT_JAR) --kotlinlang-style \
+	  $$(find . -name "*.kt" -not -path "*/build/*" -not -path "*/bin/*")
+
+lint: $(KTLINT_BIN)
+	@echo "Linting (ktlint)..."
+	@$(KTLINT_BIN) --reporter=plain '**/*.kt' '!**/build/**' '!**/bin/**'
+
+lint-fix: $(KTLINT_BIN)
+	@echo "Auto-correcting lint (ktlint)..."
+	@$(KTLINT_BIN) --format --reporter=plain '**/*.kt' '!**/build/**' '!**/bin/**'
+
+analyze: $(DETEKT_JAR)
+	@echo "Analyzing common..."
+	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
+	  --baseline config/detekt/baseline-common.xml --input common/src --parallel
+	@echo "Analyzing neoforge..."
+	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
+	  --baseline config/detekt/baseline-neoforge.xml --input neoforge/src --parallel
+	@echo "Analyzing fabric..."
+	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
+	  --baseline config/detekt/baseline-fabric.xml --input fabric/src --parallel
