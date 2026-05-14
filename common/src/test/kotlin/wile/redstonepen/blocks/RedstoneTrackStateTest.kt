@@ -1,5 +1,6 @@
 package wile.redstonepen.blocks
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
@@ -17,9 +18,11 @@ class RedstoneTrackStateTest :
 
         describe("mask constants") {
             it("masks don't overlap") {
-                (STATE_FLAG_WIR_MASK and STATE_FLAG_CON_MASK) shouldBe 0L
-                (STATE_FLAG_WIR_MASK and STATE_FLAG_PWR_MASK) shouldBe 0L
-                (STATE_FLAG_CON_MASK and STATE_FLAG_PWR_MASK) shouldBe 0L
+                assertSoftly {
+                    (STATE_FLAG_WIR_MASK and STATE_FLAG_CON_MASK) shouldBe 0L
+                    (STATE_FLAG_WIR_MASK and STATE_FLAG_PWR_MASK) shouldBe 0L
+                    (STATE_FLAG_CON_MASK and STATE_FLAG_PWR_MASK) shouldBe 0L
+                }
             }
         }
 
@@ -110,9 +113,11 @@ class RedstoneTrackStateTest :
                     val th = h()
                     for (d in dirs) th.setSidePower(d, 15)
                     th.setSidePower(dirs[i], 0)
-                    for (j in dirs.indices) {
-                        val expected = if (j == i) 0 else 15
-                        th.getSidePower(dirs[j]) shouldBe expected
+                    assertSoftly {
+                        for (j in dirs.indices) {
+                            val expected = if (j == i) 0 else 15
+                            th.getSidePower(dirs[j]) shouldBe expected
+                        }
                     }
                 }
             }

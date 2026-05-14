@@ -1,10 +1,12 @@
 package wile.redstonepen.detail
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.matchers.types.shouldNotBeSameInstanceAs
+import io.kotest.property.checkAll
 import java.util.UUID
 import net.minecraft.nbt.CompoundTag
 import wile.redstonepen.detail.RcaSync.CommonRca
@@ -17,16 +19,20 @@ class RcaSyncDataTest :
 
             it("with non-zero UUID is valid") { RcaData(UUID.randomUUID()).isValid() shouldBe true }
 
-            it("client inputs round-trip") {
-                val data = RcaData(UUID.randomUUID())
-                data.client_inputs(0xDEADBEEFCAFEBABEuL.toLong())
-                data.client_inputs() shouldBe 0xDEADBEEFCAFEBABEuL.toLong()
+            it("client inputs round-trip for any value") {
+                checkAll<Long> { v ->
+                    val data = RcaData(UUID.randomUUID())
+                    data.client_inputs(v)
+                    data.client_inputs() shouldBe v
+                }
             }
 
-            it("server outputs round-trip") {
-                val data = RcaData(UUID.randomUUID())
-                data.server_outputs(0x0102030405060708L)
-                data.server_outputs() shouldBe 0x0102030405060708L
+            it("server outputs round-trip for any value") {
+                checkAll<Long> { v ->
+                    val data = RcaData(UUID.randomUUID())
+                    data.server_outputs(v)
+                    data.server_outputs() shouldBe v
+                }
             }
 
             it("toString contains hex client inputs") {
@@ -92,10 +98,12 @@ class RcaSyncDataTest :
                 val nbt = CompoundTag()
                 nbt.putLong("i", 0xDEADL)
                 val result = CommonRca.applyRcaUpdate(uid, nbt)
-                result shouldBe true
-                rca.client_inputs() shouldBe 0xDEADL
-                nbt.contains("i") shouldBe false
-                nbt.getLong("o") shouldBe 0xCAFEL
+                assertSoftly {
+                    result shouldBe true
+                    rca.client_inputs() shouldBe 0xDEADL
+                    nbt.contains("i") shouldBe false
+                    nbt.getLong("o") shouldBe 0xCAFEL
+                }
             }
         }
     })

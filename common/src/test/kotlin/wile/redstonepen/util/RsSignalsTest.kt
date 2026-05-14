@@ -2,6 +2,9 @@ package wile.redstonepen.util
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -47,6 +50,15 @@ class RsSignalsTest :
                 val at5 = SimpleContainer(1)
                 at5.setItem(0, ItemStack(Items.REDSTONE, 5))
                 RsSignals.fromContainer(at5) shouldBe 2
+            }
+
+            it("output is always in 0..15 for any container fill") {
+                checkAll(Arb.int(1..27), Arb.int(0..64)) { slots, count ->
+                    val c = SimpleContainer(slots)
+                    c.setItem(0, ItemStack(Items.REDSTONE, count))
+                    val signal = RsSignals.fromContainer(c)
+                    (signal in 0..15) shouldBe true
+                }
             }
         }
     })

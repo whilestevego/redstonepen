@@ -2,6 +2,9 @@ package wile.redstonepen.blocks
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import net.minecraft.core.Direction
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity.TestHooks
 
@@ -318,6 +321,15 @@ class ControlBoxTest :
                 h.setInput(Direction.DOWN, 9)
                 h.tick()
                 h.output(Direction.EAST) shouldBe 0
+            }
+
+            it("port output is always clamped to 0..15 for any constant expression") {
+                checkAll(Arb.int(-1000..1000)) { n ->
+                    val h = TestHooks()
+                    h.setCode("b=$n")
+                    h.tick()
+                    (h.output(Direction.EAST) in 0..15) shouldBe true
+                }
             }
         }
 

@@ -1,9 +1,13 @@
 package wile.redstonepen.util
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.util.NoSuchElementException
@@ -174,12 +178,14 @@ class AuxiliariesTest :
         describe("BlockPosRange") {
             it("normalizes endpoints") {
                 val r = Auxiliaries.BlockPosRange(5, 8, 3, 1, 2, 9)
-                r.getXSize() shouldBe 5
-                r.getYSize() shouldBe 7
-                r.getZSize() shouldBe 7
-                r.getArea() shouldBe 5 * 7
-                r.getHeight() shouldBe 7
-                r.getVolume() shouldBe 5 * 7 * 7
+                assertSoftly(r) {
+                    getXSize() shouldBe 5
+                    getYSize() shouldBe 7
+                    getZSize() shouldBe 7
+                    getArea() shouldBe 5 * 7
+                    getHeight() shouldBe 7
+                    getVolume() shouldBe 5 * 7 * 7
+                }
             }
 
             it("of AABB floors bounds and shrinks upper") {
@@ -191,11 +197,13 @@ class AuxiliariesTest :
 
             it("byXZYIndex walks X first then Z then Y") {
                 val r = Auxiliaries.BlockPosRange(0, 0, 0, 1, 1, 1)
-                r.byXZYIndex(0) shouldBe BlockPos(0, 0, 0)
-                r.byXZYIndex(1) shouldBe BlockPos(1, 0, 0)
-                r.byXZYIndex(2) shouldBe BlockPos(0, 0, 1)
-                r.byXZYIndex(3) shouldBe BlockPos(1, 0, 1)
-                r.byXZYIndex(4) shouldBe BlockPos(0, 1, 0)
+                assertSoftly {
+                    r.byXZYIndex(0) shouldBe BlockPos(0, 0, 0)
+                    r.byXZYIndex(1) shouldBe BlockPos(1, 0, 0)
+                    r.byXZYIndex(2) shouldBe BlockPos(0, 0, 1)
+                    r.byXZYIndex(3) shouldBe BlockPos(1, 0, 1)
+                    r.byXZYIndex(4) shouldBe BlockPos(0, 1, 0)
+                }
             }
 
             it("byXZIndex adds Y offset") {
@@ -233,6 +241,34 @@ class AuxiliariesTest :
             it("byXZYIndex last returns max corner") {
                 val r = Auxiliaries.BlockPosRange(0, 0, 0, 2, 1, 1)
                 r.byXZYIndex(r.getVolume() - 1) shouldBe BlockPos(2, 1, 1)
+            }
+
+            it("volume equals product of dimensions for any range") {
+                checkAll(
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                ) { x1, y1, z1, x2, y2, z2 ->
+                    val r = Auxiliaries.BlockPosRange(x1, y1, z1, x2, y2, z2)
+                    r.getVolume() shouldBe r.getXSize() * r.getYSize() * r.getZSize()
+                }
+            }
+
+            it("stream count equals volume for any range") {
+                checkAll(
+                    Arb.int(0..5),
+                    Arb.int(0..5),
+                    Arb.int(0..5),
+                    Arb.int(0..5),
+                    Arb.int(0..5),
+                    Arb.int(0..5),
+                ) { x1, y1, z1, x2, y2, z2 ->
+                    val r = Auxiliaries.BlockPosRange(x1, y1, z1, x2, y2, z2)
+                    r.stream().count() shouldBe r.getVolume().toLong()
+                }
             }
         }
 
