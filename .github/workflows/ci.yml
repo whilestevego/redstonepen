@@ -7,45 +7,43 @@ on:
       - main
 
 jobs:
-  verify:
+  static-analysis:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Temurin JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
-          cache: gradle
 
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Check formatting
-        run: ./gradlew format
+      - name: Check formatting, lint, and static analysis
+        run: ./gradlew format lint analyze
 
-      - name: Check lint
-        run: ./gradlew lint
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Static analysis
-        run: ./gradlew analyze
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build all modules
         run: ./gradlew build
 
-      - name: Common unit tests
-        run: ./gradlew :common:test
-
-      - name: NeoForge GameTests
-        timeout-minutes: 5
-        run: ./gradlew :neoforge:runGameTestServer
-
-      - name: Fabric GameTests
-        timeout-minutes: 5
-        run: ./gradlew :fabric:runGameTestServer
+      - name: Common unit tests and GameTests
+        timeout-minutes: 12
+        run: ./gradlew :common:test :neoforge:runGameTestServer :fabric:runGameTestServer
 
       - name: Verify coverage
         run: ./gradlew verifyCoverage
