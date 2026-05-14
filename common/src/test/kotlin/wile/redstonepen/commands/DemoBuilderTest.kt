@@ -1,8 +1,12 @@
 package wile.redstonepen.commands
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import net.minecraft.core.BlockPos
 
 class DemoBuilderTest :
@@ -15,11 +19,13 @@ class DemoBuilderTest :
 
             it("advances across columns before advancing row") {
                 val origin = BlockPos(0, 0, 0)
-                DemoBuilder.cellOrigin(origin, 1, 4, 3) shouldBe BlockPos(3, 0, 0)
-                DemoBuilder.cellOrigin(origin, 2, 4, 3) shouldBe BlockPos(6, 0, 0)
-                DemoBuilder.cellOrigin(origin, 3, 4, 3) shouldBe BlockPos(9, 0, 0)
-                DemoBuilder.cellOrigin(origin, 4, 4, 3) shouldBe BlockPos(0, 0, 3)
-                DemoBuilder.cellOrigin(origin, 5, 4, 3) shouldBe BlockPos(3, 0, 3)
+                assertSoftly {
+                    DemoBuilder.cellOrigin(origin, 1, 4, 3) shouldBe BlockPos(3, 0, 0)
+                    DemoBuilder.cellOrigin(origin, 2, 4, 3) shouldBe BlockPos(6, 0, 0)
+                    DemoBuilder.cellOrigin(origin, 3, 4, 3) shouldBe BlockPos(9, 0, 0)
+                    DemoBuilder.cellOrigin(origin, 4, 4, 3) shouldBe BlockPos(0, 0, 3)
+                    DemoBuilder.cellOrigin(origin, 5, 4, 3) shouldBe BlockPos(3, 0, 3)
+                }
             }
 
             it("preserves y coordinate") {
@@ -47,15 +53,26 @@ class DemoBuilderTest :
 
         describe("regionVolume") {
             it("is inclusive on both ends") {
-                DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos.ZERO) shouldBe 1
-                DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos(1, 1, 1)) shouldBe 8
-                DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos(2, 2, 2)) shouldBe 27
+                assertSoftly {
+                    DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos.ZERO) shouldBe 1
+                    DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos(1, 1, 1)) shouldBe 8
+                    DemoBuilder.regionVolume(BlockPos.ZERO, BlockPos(2, 2, 2)) shouldBe 27
+                }
             }
 
-            it("is order independent") {
-                val a = BlockPos(5, 5, 5)
-                val b = BlockPos(0, 0, 0)
-                DemoBuilder.regionVolume(a, b) shouldBe DemoBuilder.regionVolume(b, a)
+            it("is order independent for any coordinates") {
+                checkAll(
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                    Arb.int(-100..100),
+                ) { x1, y1, z1, x2, y2, z2 ->
+                    val a = BlockPos(x1, y1, z1)
+                    val b = BlockPos(x2, y2, z2)
+                    DemoBuilder.regionVolume(a, b) shouldBe DemoBuilder.regionVolume(b, a)
+                }
             }
         }
     })

@@ -1,5 +1,6 @@
 package wile.redstonepen.util
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -23,17 +24,21 @@ class InventoryRangeTest :
             it("clamps offset and size to container bounds") {
                 val c = container(9)
                 val r = Inventories.InventoryRange(c, 100, 100, 1)
-                (r.size() <= 9) shouldBe true
-                (r.offset() >= 0) shouldBe true
-                r.inventory() shouldBe c
+                assertSoftly {
+                    (r.size() <= 9) shouldBe true
+                    (r.offset() >= 0) shouldBe true
+                    r.inventory() shouldBe c
+                }
             }
 
             it("single arg constructor wraps entire container") {
                 val c = container(7)
                 val r = Inventories.InventoryRange(c)
-                r.size() shouldBe 7
-                r.offset() shouldBe 0
-                r.containerSize shouldBe 7
+                assertSoftly {
+                    r.size() shouldBe 7
+                    r.offset() shouldBe 0
+                    r.containerSize shouldBe 7
+                }
             }
 
             it("two arg constructor defaults rows to one") {
@@ -44,8 +49,10 @@ class InventoryRangeTest :
                 val c = container(9)
                 val r = Inventories.InventoryRange(c, 3, 4, 1)
                 r.set(0, ItemStack(Items.REDSTONE, 2))
-                c.getItem(3).item shouldBe Items.REDSTONE
-                r.get(0).count shouldBe 2
+                assertSoftly {
+                    c.getItem(3).item shouldBe Items.REDSTONE
+                    r.get(0).count shouldBe 2
+                }
             }
 
             it("maxStackSize is bounded and at least one") {
@@ -84,16 +91,20 @@ class InventoryRangeTest :
                 val c = filled(2, 4)
                 val r = Inventories.InventoryRange(c)
                 val out = r.removeItemNoUpdate(0)
-                out.count shouldBe 4
-                r.getItem(0).isEmpty shouldBe true
+                assertSoftly {
+                    out.count shouldBe 4
+                    r.getItem(0).isEmpty shouldBe true
+                }
             }
 
             it("removeItem splits stack") {
                 val c = filled(2, 5)
                 val r = Inventories.InventoryRange(c)
                 val out = r.removeItem(0, 3)
-                out.count shouldBe 3
-                r.getItem(0).count shouldBe 2
+                assertSoftly {
+                    out.count shouldBe 3
+                    r.getItem(0).count shouldBe 2
+                }
             }
 
             it("stillValid delegates to inventory") {
@@ -118,8 +129,10 @@ class InventoryRangeTest :
                     seen.add(i)
                     s.`is`(Items.COAL)
                 }
-                matched shouldBe true
-                seen shouldBe listOf(0, 1)
+                assertSoftly {
+                    matched shouldBe true
+                    seen shouldBe listOf(0, 1)
+                }
             }
 
             it("iterate returns false when nothing matches") {
@@ -130,9 +143,11 @@ class InventoryRangeTest :
                 val c = container(3)
                 c.setItem(2, ItemStack(Items.REDSTONE, 1))
                 val r = Inventories.InventoryRange(c)
-                r.contains(ItemStack(Items.REDSTONE, 1)) shouldBe true
-                r.indexOf(ItemStack(Items.REDSTONE, 1)) shouldBe 2
-                r.indexOf(ItemStack(Items.COAL, 1)) shouldBe -1
+                assertSoftly {
+                    r.contains(ItemStack(Items.REDSTONE, 1)) shouldBe true
+                    r.indexOf(ItemStack(Items.REDSTONE, 1)) shouldBe 2
+                    r.indexOf(ItemStack(Items.COAL, 1)) shouldBe -1
+                }
             }
 
             it("find returns first present result") {
@@ -188,8 +203,10 @@ class InventoryRangeTest :
                 c.setItem(1, ItemStack(Items.COAL, 5))
                 c.setItem(3, ItemStack(Items.REDSTONE, 7))
                 val r = Inventories.InventoryRange(c)
-                r.stackMatchCount(ItemStack(Items.REDSTONE, 3)) shouldBe 2
-                r.totalMatchingItemCount(ItemStack(Items.REDSTONE, 3)) shouldBe 10
+                assertSoftly {
+                    r.stackMatchCount(ItemStack(Items.REDSTONE, 3)) shouldBe 2
+                    r.totalMatchingItemCount(ItemStack(Items.REDSTONE, 3)) shouldBe 10
+                }
             }
         }
 
@@ -203,9 +220,11 @@ class InventoryRangeTest :
                 val c = container(3)
                 c.setItem(2, ItemStack(Items.REDSTONE, 10))
                 val r = Inventories.InventoryRange(c)
-                r.insert(ItemStack(Items.REDSTONE, 5)).isEmpty shouldBe true
-                c.getItem(2).count shouldBe 15
-                c.getItem(0).isEmpty shouldBe true
+                assertSoftly {
+                    r.insert(ItemStack(Items.REDSTONE, 5)).isEmpty shouldBe true
+                    c.getItem(2).count shouldBe 15
+                    c.getItem(0).isEmpty shouldBe true
+                }
             }
 
             it("returns overflow when no capacity") {
@@ -219,17 +238,21 @@ class InventoryRangeTest :
                 c.setItem(0, ItemStack(Items.REDSTONE, 60))
                 val r = Inventories.InventoryRange(c)
                 val remaining = r.insert(ItemStack(Items.REDSTONE, 10), true, 0, false, false)
-                c.getItem(0).count shouldBe 64
-                remaining.count shouldBe 6
-                c.getItem(1).isEmpty shouldBe true
+                assertSoftly {
+                    c.getItem(0).count shouldBe 64
+                    remaining.count shouldBe 6
+                    c.getItem(1).isEmpty shouldBe true
+                }
             }
 
             it("uses empty slot when no match exists") {
                 val c = container(3)
                 val r = Inventories.InventoryRange(c)
                 r.insert(ItemStack(Items.REDSTONE, 4)).isEmpty shouldBe true
-                c.getItem(0).item shouldBe Items.REDSTONE
-                c.getItem(0).count shouldBe 4
+                assertSoftly {
+                    c.getItem(0).item shouldBe Items.REDSTONE
+                    c.getItem(0).count shouldBe 4
+                }
             }
 
             it("reverse fills from the end") {
@@ -242,8 +265,10 @@ class InventoryRangeTest :
             it("simulate does not mutate") {
                 val c = container(2)
                 val r = Inventories.InventoryRange(c)
-                r.insert(ItemStack(Items.REDSTONE, 4), true).isEmpty shouldBe true
-                c.getItem(0).isEmpty shouldBe true
+                assertSoftly {
+                    r.insert(ItemStack(Items.REDSTONE, 4), true).isEmpty shouldBe true
+                    c.getItem(0).isEmpty shouldBe true
+                }
             }
 
             it("simulate reports leftover when full") {
@@ -259,15 +284,19 @@ class InventoryRangeTest :
                 c.setItem(0, ItemStack(Items.REDSTONE, 60))
                 val r = Inventories.InventoryRange(c)
                 val remaining = r.insert(0, ItemStack(Items.REDSTONE, 10))
-                c.getItem(0).count shouldBe 64
-                remaining.count shouldBe 6
+                assertSoftly {
+                    c.getItem(0).count shouldBe 64
+                    remaining.count shouldBe 6
+                }
             }
 
             it("at index into empty places full stack") {
                 val c = container(2)
                 val r = Inventories.InventoryRange(c)
-                r.insert(0, ItemStack(Items.REDSTONE, 10)).isEmpty shouldBe true
-                c.getItem(0).count shouldBe 10
+                assertSoftly {
+                    r.insert(0, ItemStack(Items.REDSTONE, 10)).isEmpty shouldBe true
+                    c.getItem(0).count shouldBe 10
+                }
             }
 
             it("at index into mismatched slot returns input unchanged") {
@@ -275,8 +304,10 @@ class InventoryRangeTest :
                 c.setItem(0, ItemStack(Items.COAL, 4))
                 val r = Inventories.InventoryRange(c)
                 val remaining = r.insert(0, ItemStack(Items.REDSTONE, 3))
-                remaining.count shouldBe 3
-                remaining.item shouldBe Items.REDSTONE
+                assertSoftly(remaining) {
+                    count shouldBe 3
+                    item shouldBe Items.REDSTONE
+                }
             }
 
             it("at index empty input returns empty") {
@@ -295,8 +326,10 @@ class InventoryRangeTest :
                 c.setItem(1, ItemStack(Items.REDSTONE, 10))
                 val r = Inventories.InventoryRange(c)
                 val out = r.extract(4)
-                out.count shouldBe 4
-                c.getItem(1).count shouldBe 6
+                assertSoftly {
+                    out.count shouldBe 4
+                    c.getItem(1).count shouldBe 6
+                }
             }
 
             it("aggregates across identical stacks") {
@@ -306,19 +339,23 @@ class InventoryRangeTest :
                 c.setItem(2, ItemStack(Items.REDSTONE, 2))
                 val r = Inventories.InventoryRange(c)
                 val out = r.extract(5)
-                out.item shouldBe Items.REDSTONE
-                out.count shouldBe 5
-                c.getItem(0).isEmpty shouldBe true
-                c.getItem(2).isEmpty shouldBe true
-                c.getItem(1).count shouldBe 8
+                assertSoftly {
+                    out.item shouldBe Items.REDSTONE
+                    out.count shouldBe 5
+                    c.getItem(0).isEmpty shouldBe true
+                    c.getItem(2).isEmpty shouldBe true
+                    c.getItem(1).count shouldBe 8
+                }
             }
 
             it("simulate does not mutate") {
                 val c = container(2)
                 c.setItem(0, ItemStack(Items.REDSTONE, 5))
                 val r = Inventories.InventoryRange(c)
-                r.extract(2, false, true).count shouldBe 2
-                c.getItem(0).count shouldBe 5
+                assertSoftly {
+                    r.extract(2, false, true).count shouldBe 2
+                    c.getItem(0).count shouldBe 5
+                }
             }
 
             it("by stack returns empty for empty request") {
@@ -339,9 +376,11 @@ class InventoryRangeTest :
                 c.setItem(2, ItemStack(Items.REDSTONE, 3))
                 val r = Inventories.InventoryRange(c)
                 val out = r.extract(ItemStack(Items.REDSTONE, 50), true)
-                out.count shouldBe 7
-                c.getItem(0).count shouldBe 4
-                c.getItem(2).count shouldBe 3
+                assertSoftly {
+                    out.count shouldBe 7
+                    c.getItem(0).count shouldBe 4
+                    c.getItem(2).count shouldBe 3
+                }
             }
 
             it("by stack returns empty when no match") {
@@ -359,9 +398,11 @@ class InventoryRangeTest :
                 val dst = container(2)
                 val srcR = Inventories.InventoryRange(src)
                 val dstR = Inventories.InventoryRange(dst)
-                srcR.move(0, dstR) shouldBe true
-                src.getItem(0).isEmpty shouldBe true
-                dst.getItem(0).count shouldBe 5
+                assertSoftly {
+                    srcR.move(0, dstR) shouldBe true
+                    src.getItem(0).isEmpty shouldBe true
+                    dst.getItem(0).count shouldBe 5
+                }
             }
 
             it("slot with empty source returns false") {
@@ -386,9 +427,11 @@ class InventoryRangeTest :
                 val dst = container(3)
                 val srcR = Inventories.InventoryRange(src)
                 val dstR = Inventories.InventoryRange(dst)
-                srcR.move(dstR) shouldBe true
-                src.getItem(0).isEmpty shouldBe true
-                src.getItem(2).isEmpty shouldBe true
+                assertSoftly {
+                    srcR.move(dstR) shouldBe true
+                    src.getItem(0).isEmpty shouldBe true
+                    src.getItem(2).isEmpty shouldBe true
+                }
             }
 
             it("range returns false when source empty") {

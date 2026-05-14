@@ -1,5 +1,6 @@
 package wile.redstonepen.client
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import net.minecraft.client.renderer.Rect2i
@@ -31,8 +32,10 @@ class GuiTextEditingDisplayCacheTest :
 
             it("has cursor at origin") {
                 val c = GuiTextEditing.MultiLineTextBox.DisplayCache.EMPTY.cursor
-                c.x shouldBe 0
-                c.y shouldBe 0
+                assertSoftly(c) {
+                    x shouldBe 0
+                    y shouldBe 0
+                }
             }
         }
 
