@@ -23,8 +23,6 @@ dependencies {
   // so common code can annotate client-only methods without a fabric runtime dep.
   modCompileOnly "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
-  testImplementation platform('org.junit:junit-bom:5.10.2')
-  testImplementation 'org.junit.jupiter:junit-jupiter'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
   testImplementation 'io.mockk:mockk:1.13.12'
   testImplementation 'io.kotest:kotest-runner-junit5-jvm:5.9.1'

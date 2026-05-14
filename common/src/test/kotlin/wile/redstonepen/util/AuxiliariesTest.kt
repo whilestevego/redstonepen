@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
-import org.junit.jupiter.api.Assumptions
 
 class AuxiliariesTest :
     DescribeSpec({
@@ -36,13 +35,6 @@ class AuxiliariesTest :
                 Auxiliaries.logInfo("info-msg")
                 Auxiliaries.logWarn("warn-msg")
                 Auxiliaries.logError("error-msg")
-            }
-
-            it("is mod loaded returns false for unknown mod") {
-                Assumptions.assumeTrue(
-                    false,
-                    "PlatformHelper not available in unit-test environment",
-                )
             }
         }
 
