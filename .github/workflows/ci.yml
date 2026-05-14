@@ -18,67 +18,26 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Cache analysis tools
+      - name: Cache ktfmt
         uses: actions/cache@v4
         with:
-          path: ~/.local/analysis-tools
-          key: analysis-tools-ktfmt-0.62-ktlint-1.5.0-detekt-1.23.8
+          path: ~/.local/analysis-tools/ktfmt.jar
+          key: ktfmt-0.62
 
-      - name: Install analysis tools
-        run: |
-          mkdir -p ~/.local/analysis-tools
-          if [ ! -f ~/.local/analysis-tools/ktfmt.jar ]; then
-            curl -sSLo ~/.local/analysis-tools/ktfmt.jar \
-              https://github.com/facebook/ktfmt/releases/download/v0.62/ktfmt-0.62-with-dependencies.jar
-          fi
-          if [ ! -f ~/.local/analysis-tools/ktlint ]; then
-            curl -sSLo ~/.local/analysis-tools/ktlint \
-              https://github.com/pinterest/ktlint/releases/download/1.5.0/ktlint
-            chmod a+x ~/.local/analysis-tools/ktlint
-          fi
-          if [ ! -f ~/.local/analysis-tools/detekt.jar ]; then
-            curl -sSLo ~/.local/analysis-tools/detekt.jar \
-              https://github.com/detekt/detekt/releases/download/v1.23.8/detekt-cli-1.23.8-all.jar
-          fi
+      - name: Cache ktlint
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/analysis-tools/ktlint
+          key: ktlint-1.5.0
 
-      - name: Check formatting (ktfmt)
-        run: |
-          java -jar ~/.local/analysis-tools/ktfmt.jar \
-            --kotlinlang-style --dry-run --set-exit-if-changed \
-            $(find . -name "*.kt" -not -path "*/build/*" -not -path "*/bin/*")
+      - name: Cache detekt
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/analysis-tools/detekt.jar
+          key: detekt-1.23.8
 
-      - name: Lint (ktlint)
-        run: |
-          ~/.local/analysis-tools/ktlint \
-            --reporter=plain \
-            '**/*.kt' '!**/build/**' '!**/bin/**'
-
-      - name: Static analysis — common
-        run: |
-          java -jar ~/.local/analysis-tools/detekt.jar \
-            --config config/detekt/detekt.yml \
-            --build-upon-default-config \
-            --baseline config/detekt/baseline-common.xml \
-            --input common/src \
-            --parallel
-
-      - name: Static analysis — neoforge
-        run: |
-          java -jar ~/.local/analysis-tools/detekt.jar \
-            --config config/detekt/detekt.yml \
-            --build-upon-default-config \
-            --baseline config/detekt/baseline-neoforge.xml \
-            --input neoforge/src \
-            --parallel
-
-      - name: Static analysis — fabric
-        run: |
-          java -jar ~/.local/analysis-tools/detekt.jar \
-            --config config/detekt/detekt.yml \
-            --build-upon-default-config \
-            --baseline config/detekt/baseline-fabric.xml \
-            --input fabric/src \
-            --parallel
+      - name: Check formatting, lint, and static analysis
+        run: make check
 
   build-and-test:
     runs-on: ubuntu-latest

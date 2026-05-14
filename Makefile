@@ -16,8 +16,10 @@ DETEKT_VERSION := 1.23.8
 
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))
+ifneq ($(JDK_HOME_22_0),)
 export JAVA_HOME=$(JDK_HOME_22_0)
 export JDK_HOME=$(JDK_HOME_22_0)
+endif
 
 ifeq ($(OS),Windows_NT)
 GRADLE=gradlew.bat --no-daemon
