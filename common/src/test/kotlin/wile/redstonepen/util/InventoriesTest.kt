@@ -1,5 +1,6 @@
 package wile.redstonepen.util
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldNotBeSameInstanceAs
@@ -106,9 +107,11 @@ class InventoriesTest :
                 source.setItem(0, ItemStack(Items.REDSTONE, 3))
                 val copy = Inventories.copyOf(source) as SimpleContainer
                 copy.getItem(0).count = 1
-                source.getItem(0).count shouldBe 3
-                copy.getItem(0).count shouldBe 1
-                copy.getItem(0) shouldNotBeSameInstanceAs source.getItem(0)
+                assertSoftly {
+                    source.getItem(0).count shouldBe 3
+                    copy.getItem(0).count shouldBe 1
+                    copy.getItem(0) shouldNotBeSameInstanceAs source.getItem(0)
+                }
             }
 
             it("preserves container size") {

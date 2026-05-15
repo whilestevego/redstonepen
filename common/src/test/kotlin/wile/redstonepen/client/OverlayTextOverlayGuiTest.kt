@@ -1,5 +1,6 @@
 package wile.redstonepen.client
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import net.minecraft.network.chat.Component
@@ -12,8 +13,10 @@ class OverlayTextOverlayGuiTest :
             it("zeros deadline and clears text") {
                 Overlay.TextOverlayGui.show("hello", 5000)
                 Overlay.TextOverlayGui.hide()
-                Overlay.TextOverlayGui.deadline() shouldBe 0
-                Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+                assertSoftly {
+                    Overlay.TextOverlayGui.deadline() shouldBe 0
+                    Overlay.TextOverlayGui.text() shouldBe Overlay.TextOverlayGui.EMPTY_TEXT
+                }
             }
         }
 

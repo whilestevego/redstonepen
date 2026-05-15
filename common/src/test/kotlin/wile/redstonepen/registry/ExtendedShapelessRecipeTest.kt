@@ -1,5 +1,6 @@
 package wile.redstonepen.registry
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -138,8 +139,10 @@ class ExtendedShapelessRecipeTest :
                         CompoundTag(),
                     )
                 val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
-                out.item shouldBe Items.IRON_PICKAXE
-                out.damageValue shouldBe 0
+                assertSoftly(out) {
+                    item shouldBe Items.IRON_PICKAXE
+                    damageValue shouldBe 0
+                }
             }
 
             it("assemble applies initial_durability") {
@@ -206,8 +209,10 @@ class ExtendedShapelessRecipeTest :
                 aspects.putInt("tool_damage", 3)
                 val inv = CraftingInput.of(1, 1, listOf(ItemStack(Items.IRON_PICKAXE)))
                 val out = recipe(1, aspects).getRemainingItems(inv)[0]
-                out.item shouldBe Items.IRON_PICKAXE
-                out.damageValue shouldBe 3
+                assertSoftly(out) {
+                    item shouldBe Items.IRON_PICKAXE
+                    damageValue shouldBe 3
+                }
             }
 
             it("consumes tool when damage exceeds max") {
@@ -236,8 +241,10 @@ class ExtendedShapelessRecipeTest :
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(120)
                 val out = r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null)
-                out.item shouldBe Items.IRON_PICKAXE
-                (out.damageValue < 120) shouldBe true
+                assertSoftly(out) {
+                    item shouldBe Items.IRON_PICKAXE
+                    (damageValue < 120) shouldBe true
+                }
             }
 
             it("getRemainingItems consumes repair item") {
