@@ -2,6 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
+    <ID>ComplexCondition:Parser.kt$LineParser$pos &lt; line.length &amp;&amp; (c == ' ' || c == '\t' || c == '#')</ID>
     <ID>CyclomaticComplexMethod:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock.Companion$fun mappedShape(state: BlockState, aabb: Array&lt;AABB&gt;): VoxelShape</ID>
     <ID>CyclomaticComplexMethod:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>CyclomaticComplexMethod:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
@@ -14,6 +15,7 @@
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$private fun propagateEdit(face: Direction, originalPos: BlockPos, initialSidePower: Int)</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun discoverWireNeighbours( j: Int, side: Direction, routeFlags: Long, intSides: MutableSet&lt;Direction&gt;, pwrSides: MutableList&lt;Direction&gt;, positions: MutableList&lt;BlockPos&gt;, extSides: MutableList&lt;Direction&gt;, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, )</ID>
+    <ID>LargeClass:CblScriptTest.kt$CblScriptTest : DescribeSpec</ID>
     <ID>LargeClass:ControlBoxTest.kt$ControlBoxTest : DescribeSpec</ID>
     <ID>LargeClass:RelayTests.kt$RelayTests</ID>
     <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
@@ -58,6 +60,13 @@
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock$0.3f</ID>
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.1</ID>
     <ID>MagicNumber:BasicLever.kt$BasicLever.BasicLeverBlock.Companion$0.2</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$0x7fffffff</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$15</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$16.0</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$20</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$3</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$4</ID>
+    <ID>MagicNumber:BuiltinFunctions.kt$5</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$15</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BistableRelayBlock$16</ID>
     <ID>MagicNumber:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$15</ID>
@@ -139,14 +148,6 @@
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$3</ID>
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$4</ID>
     <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic$40</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$0x7fffffff</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$15</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$16.0</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$20</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$3</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$4</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.Companion$5</ID>
-    <ID>MagicNumber:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$127</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$18</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$183</ID>
     <ID>MagicNumber:ControlBoxUiContainer.kt$ControlBoxUiContainer$28</ID>
@@ -214,6 +215,7 @@
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$0x00ffaa00</ID>
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$15</ID>
     <ID>MagicNumber:Overlay.kt$Overlay.TextOverlayGui$3</ID>
+    <ID>MagicNumber:Parser.kt$LineParser$127</ID>
     <ID>MagicNumber:RedstoneClientAdapter.kt$RedstoneClientAdapter$4</ID>
     <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$0.5f</ID>
     <ID>MagicNumber:RedstonePenItem.kt$RedstonePenItem$10.0</ID>
@@ -278,31 +280,30 @@
     <ID>MagicNumber:TrackNetworkCalculator.kt$TrackNetworkCalculator$4</ID>
     <ID>MagicNumber:TrackNetworkCalculator.kt$TrackNetworkCalculator$5</ID>
     <ID>MagicNumber:TrackNetworkCalculator.kt$TrackNetworkCalculator$6</ID>
+    <ID>NestedBlockDepth:CBLScript.kt$CBLScript$fun compile( code: String, policy: SignalPolicy = SignalPolicy.DEFAULT, functions: List&lt;FunctionDef&gt; = emptyList(), validSymbolSuffixes: Set&lt;String&gt;? = STANDARD_SYMBOL_SUFFIXES, outputClamp: (symbol: String, value: Int) -&gt; Int = { _, v -&gt; v }, ): Program</ID>
     <ID>NestedBlockDepth:CircuitComponents.kt$CircuitComponents.BridgeRelayBlock$protected open fun getInputPower( world: Level, relayPos: BlockPos, redstoneSide: Direction, ): Int</ID>
     <ID>NestedBlockDepth:ControlBoxBlockEntity.kt$ControlBoxBlockEntity$override fun tick()</ID>
     <ID>NestedBlockDepth:ControlBoxGui.kt$ControlBoxGui$override fun containerTick()</ID>
     <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic$fun tick()</ID>
-    <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
-    <ID>NestedBlockDepth:ControlBoxLogic.kt$ControlBoxLogic.MultiLineMathExpr.Companion$@JvmStatic fun of( code: String, assignment_variable: String, functions: Collection&lt;MathExpr.ExprFuncDef&gt;, ): MultiLineMathExpr</ID>
     <ID>NestedBlockDepth:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$override fun getRemainingItems(inv: CraftingInput): NonNullList&lt;ItemStack&gt;</ID>
     <ID>NestedBlockDepth:Inventories.kt$Inventories.InventoryRange$fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack</ID>
     <ID>NestedBlockDepth:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
     <ID>NestedBlockDepth:ModRenderers.kt$ModRenderers.TrackTer$@Suppress("DEPRECATION") override fun render( te: TrackBlockEntity, unused1: Float, mxs: PoseStack, buf: MultiBufferSource, combinedLightIn: Int, combinedOverlayIn: Int, )</ID>
+    <ID>NestedBlockDepth:Parser.kt$LineParser$private fun parseFactor(): Expression</ID>
     <ID>NestedBlockDepth:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
     <ID>NestedBlockDepth:RelayTests.kt$RelayTests$@JvmStatic fun forwardThenReverseStateMappedFacingIsIdentity(helper: GameTestHelper)</ID>
     <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
     <ID>NestedBlockDepth:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun buildNets( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, currentSidePowers: IntArray, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, ): Pair&lt;List&lt;TrackNet&gt;, Set&lt;Direction&gt;&gt;</ID>
     <ID>NestedBlockDepth:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
-    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_interval_function( sym: String, x: Array&lt;MathExpr.Expr&gt;, m: MutableMap&lt;String, Int&gt;, ): Int</ID>
-    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_off_function( sym: String, x: Array&lt;MathExpr.Expr&gt;, m: MutableMap&lt;String, Int&gt;, ): Int</ID>
-    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_on_function( sym: String, x: Array&lt;MathExpr.Expr&gt;, m: MutableMap&lt;String, Int&gt;, ): Int</ID>
-    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.Companion$private fun timer_pulse_function( sym: String, x: Array&lt;MathExpr.Expr&gt;, m: MutableMap&lt;String, Int&gt;, ): Int</ID>
-    <ID>ReturnCount:ControlBoxLogic.kt$ControlBoxLogic.MathExpr.ParsedLine$private fun arith_fact(): Expr</ID>
+    <ID>ReturnCount:BuiltinFunctions.kt$private fun timerOff( sym: String, x: Array&lt;Expression&gt;, m: MutableMap&lt;String, Int&gt;, policy: SignalPolicy, ): Int</ID>
+    <ID>ReturnCount:BuiltinFunctions.kt$private fun timerOn( sym: String, x: Array&lt;Expression&gt;, m: MutableMap&lt;String, Int&gt;, policy: SignalPolicy, ): Int</ID>
+    <ID>ReturnCount:BuiltinFunctions.kt$private fun timerPulse( sym: String, x: Array&lt;Expression&gt;, m: MutableMap&lt;String, Int&gt;, policy: SignalPolicy, ): Int</ID>
     <ID>ReturnCount:ExtendedShapelessRecipe.kt$ExtendedShapelessRecipe$private fun getRepaired(inv: CraftingInput): Tuple&lt;ItemStack, NonNullList&lt;ItemStack&gt;&gt;</ID>
     <ID>ReturnCount:GuiTextEditing.kt$GuiTextEditing.MultiLineTextBox$private fun specialKeyMatched(key: Int): Boolean</ID>
     <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun extract(requestStack: ItemStack, simulate: Boolean): ItemStack</ID>
     <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
     <ID>ReturnCount:Inventories.kt$Inventories.InventoryRange$fun insert(inputStack: ItemStack, simulate: Boolean): ItemStack</ID>
+    <ID>ReturnCount:Parser.kt$LineParser$private fun parseFactor(): Expression</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
     <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun modifySegments( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
