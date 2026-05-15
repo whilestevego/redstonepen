@@ -85,8 +85,8 @@ class ControlBoxGui(
         super.init()
         textbox
             .init(this, Guis.Coord2d.of(29, 12))
-            .setFontColor(0xdddddd)
-            .setCursorColor(0xdddddd)
+            .setFontColor(COLOR_TEXT)
+            .setCursorColor(COLOR_TEXT)
             .setLineHeight(7)
             .onValueChanged { push_code(textbox.getValue()) }
         addRenderableWidget(textbox)
@@ -149,8 +149,8 @@ class ControlBoxGui(
             val tb = port_stati[i]
             tb.setEditable(false)
             tb.setBordered(false)
-            tb.setTextColor(0xffdddddd.toInt())
-            tb.setTextColorUneditable(0xffdddddd.toInt())
+            tb.setTextColor(COLOR_TEXT_ARGB)
+            tb.setTextColorUneditable(COLOR_TEXT_ARGB)
             tb.setValue(
                 String.format(Locale.ROOT, "%1s=00", Defs.PORT_NAMES[i].uppercase(Locale.ROOT))
             )
@@ -405,7 +405,7 @@ class ControlBoxGui(
         start_stop.active = errors_.isEmpty() && runtimeError_.isEmpty()
         if (!start_stop.active) start_stop.checked(false) else cb_error_indicator.visible = false
         textbox.active = !start_stop.checked()
-        textbox.setFontColor(if (textbox.active) 0xeeeeee else 0x999999)
+        textbox.setFontColor(if (textbox.active) COLOR_TEXT_ACTIVE else COLOR_TEXT_INACTIVE)
         cb_paste_all.visible = textbox.active && textbox.getValue().trim().isEmpty()
         cb_copy_all.visible = !cb_paste_all.visible
         if (focus_editor_) {
@@ -424,8 +424,8 @@ class ControlBoxGui(
     }
 
     override fun renderLabels(gg: GuiGraphics, x: Int, y: Int) {
-        gg.drawString(font, title, titleLabelX + 1, titleLabelY + 1, 0x303030)
-        gg.drawString(font, title, titleLabelX, titleLabelY, 0x707070)
+        gg.drawString(font, title, titleLabelX + 1, titleLabelY + 1, COLOR_TITLE_SHADOW)
+        gg.drawString(font, title, titleLabelX, titleLabelY, COLOR_TITLE)
     }
 
     override fun slotClicked(
@@ -439,5 +439,16 @@ class ControlBoxGui(
         val nbt = CompoundTag()
         nbt.putString("code", text)
         onGuiAction("codeupdate", nbt)
+    }
+
+    companion object {
+        private const val COLOR_TITLE_SHADOW = 0x303030 // dark grey drop shadow behind the title
+        private const val COLOR_TITLE = 0x707070 // medium grey title label text
+        private const val COLOR_TEXT = 0xdddddd // light grey editor font and cursor
+        private const val COLOR_TEXT_ACTIVE = 0xeeeeee // near-white font when editor is editable
+        private const val COLOR_TEXT_INACTIVE = 0x999999 // dimmed font when editor is read-only
+        @Suppress("MagicNumber")
+        private val COLOR_TEXT_ARGB =
+            (0xff shl 24) or COLOR_TEXT // fully opaque ARGB form of COLOR_TEXT
     }
 }
