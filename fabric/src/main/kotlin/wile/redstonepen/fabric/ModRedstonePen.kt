@@ -42,7 +42,7 @@ class ModRedstonePen : ModInitializer {
         private val CREATIVE_TAB: CreativeModeTab =
             FabricItemGroup.builder()
                 .title(Component.translatable("itemGroup.tab${ModConstants.MODID}"))
-                .icon { ItemStack(Registries.getItem("pen")) }
+                .icon { ItemStack(Registries.requireItem("pen")) }
                 .displayItems { _, reg ->
                     Registries.getRegisteredItems().forEach {
                         if (it !is BlockItem || it.block != ModContent.References.TRACK_BLOCK) {
