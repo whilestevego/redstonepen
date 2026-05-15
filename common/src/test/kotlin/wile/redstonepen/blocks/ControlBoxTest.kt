@@ -1,8 +1,11 @@
 package wile.redstonepen.blocks
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.maps.shouldBeEmpty
+import io.kotest.matchers.maps.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -156,6 +159,21 @@ class ControlBoxTest :
                 val h = TestHooks()
                 h.setCode("b=d.bad") shouldBe false
                 h.errors().isEmpty() shouldBe false
+            }
+
+            it("errors map is empty for valid code") {
+                val h = TestHooks()
+                h.setCode("b=d+5") shouldBe true
+                h.errors().shouldBeEmpty()
+            }
+
+            it("error key reflects character offset not line index for second-line error") {
+                val h = TestHooks()
+                val firstLine = "x=5"
+                h.setCode("$firstLine\nb=nosuch()") shouldBe false
+                val errs = h.errors()
+                errs.shouldNotBeEmpty()
+                errs.keys.all { it > firstLine.length } shouldBe true
             }
 
             it("empty code is valid with no masks") {
@@ -1049,6 +1067,34 @@ class ControlBoxTest :
                 h.setInput(Direction.DOWN, 1)
                 repeat(10) { h.tick() }
                 h.output(Direction.EAST) shouldBe 8
+            }
+
+            it("counter two args decrements output on each tick with down signal high") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d, u)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 0)
+                repeat(5) { h.tick() }
+                val afterIncrement = h.output(Direction.EAST)
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 1)
+                h.tick()
+                h.output(Direction.EAST) shouldBe afterIncrement - 1
+            }
+
+            it("cnt1 and cnt2 maintain independent counts") {
+                val h = TestHooks()
+                h.setCode("b=cnt1(d)\ng=cnt2(u)") shouldBe true
+                h.setInput(Direction.DOWN, 1)
+                h.setInput(Direction.UP, 0)
+                repeat(3) { h.tick() }
+                h.setInput(Direction.DOWN, 0)
+                h.setInput(Direction.UP, 1)
+                h.tick()
+                assertSoftly {
+                    h.output(Direction.EAST) shouldBe 3 // b = cnt1, only incremented by d
+                    h.output(Direction.WEST) shouldBe 1 // g = cnt2, only incremented by u
+                }
             }
         }
 
