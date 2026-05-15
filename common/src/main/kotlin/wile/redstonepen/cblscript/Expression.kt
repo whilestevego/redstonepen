@@ -49,7 +49,7 @@ internal class NotExpression(
     private val falseValue: Int,
 ) : Expression() {
     override fun calc(mem: Map<String, Int>): Int =
-        if (operand.calc(mem) == 0) trueValue else falseValue
+        if (operand.calc(mem) <= 0) trueValue else falseValue
 }
 
 internal class MulExpression(private val left: Expression, private val right: Expression) :

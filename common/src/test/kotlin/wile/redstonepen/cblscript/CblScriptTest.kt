@@ -224,6 +224,38 @@ class CblScriptTest :
                     eval("r = !a", mapOf("a" to 5))["r"] shouldBe 0
                 }
             }
+
+            it("or is commutative: (a or b) == (b or a)") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val ab = eval("r = a or b", mapOf("a" to a, "b" to b))["r"]
+                    val ba = eval("r = b or a", mapOf("a" to a, "b" to b))["r"]
+                    ab shouldBe ba
+                }
+            }
+
+            it("and is commutative: (a and b) == (b and a)") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val ab = eval("r = a and b", mapOf("a" to a, "b" to b))["r"]
+                    val ba = eval("r = b and a", mapOf("a" to a, "b" to b))["r"]
+                    ab shouldBe ba
+                }
+            }
+
+            it("De Morgan's: not(a or b) == (not a) and (not b)") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val lhs = eval("r = !(a or b)", mapOf("a" to a, "b" to b))["r"]
+                    val rhs = eval("r = (!a) and (!b)", mapOf("a" to a, "b" to b))["r"]
+                    lhs shouldBe rhs
+                }
+            }
+
+            it("De Morgan's: not(a and b) == (not a) or (not b)") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val lhs = eval("r = !(a and b)", mapOf("a" to a, "b" to b))["r"]
+                    val rhs = eval("r = (!a) or (!b)", mapOf("a" to a, "b" to b))["r"]
+                    lhs shouldBe rhs
+                }
+            }
         }
 
         describe("comparison operators") {
@@ -261,6 +293,31 @@ class CblScriptTest :
                 assertSoftly {
                     p.evaluate(mutableMapOf("a" to 5))["r"] shouldBe 15
                     p.evaluate(mutableMapOf("a" to 2))["r"] shouldBe 0
+                }
+            }
+
+            it("(a > b) == (b < a) for all integer pairs") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val gt = eval("r = a > b", mapOf("a" to a, "b" to b))["r"]
+                    val lt = eval("r = b < a", mapOf("a" to a, "b" to b))["r"]
+                    gt shouldBe lt
+                }
+            }
+
+            it("(a >= b) == (b <= a) for all integer pairs") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val ge = eval("r = a >= b", mapOf("a" to a, "b" to b))["r"]
+                    val le = eval("r = b <= a", mapOf("a" to a, "b" to b))["r"]
+                    ge shouldBe le
+                }
+            }
+
+            it("exactly one of (a < b), (a == b), (a > b) is true for any two integers") {
+                checkAll(Arb.int(-50..50), Arb.int(-50..50)) { a, b ->
+                    val lt = eval("r = a < b", mapOf("a" to a, "b" to b))["r"]!!
+                    val eq = eval("r = a == b", mapOf("a" to a, "b" to b))["r"]!!
+                    val gt = eval("r = a > b", mapOf("a" to a, "b" to b))["r"]!!
+                    (lt + eq + gt) shouldBe 1
                 }
             }
         }
@@ -359,6 +416,13 @@ class CblScriptTest :
                         p.evaluate(mutableMapOf("a" to 3))["r"] shouldBe 12
                     }
                 }
+
+                it("inv(inv(x)) == x for all values in 0..trueValue") {
+                    val p = compile("r = inv(inv(a))", SignalPolicy.REDSTONE)
+                    checkAll(Arb.int(0..15)) { a ->
+                        p.evaluate(mutableMapOf("a" to a))["r"] shouldBe a.coerceIn(0, 15)
+                    }
+                }
             }
 
             describe("max / min") {
@@ -375,6 +439,24 @@ class CblScriptTest :
                     assertSoftly {
                         eval("r = min(a, b)", mapOf("a" to 3, "b" to 8))["r"] shouldBe 3
                         eval("r = min(a)", mapOf("a" to 7))["r"] shouldBe 7
+                    }
+                }
+
+                it("max(a,b) + min(a,b) == a + b") {
+                    checkAll(Arb.int(-100..100), Arb.int(-100..100)) { a, b ->
+                        val mx = eval("r = max(a, b)", mapOf("a" to a, "b" to b))["r"]!!
+                        val mn = eval("r = min(a, b)", mapOf("a" to a, "b" to b))["r"]!!
+                        mx + mn shouldBe a + b
+                    }
+                }
+
+                it("max(a,b) >= a and max(a,b) >= b") {
+                    checkAll(Arb.int(-100..100), Arb.int(-100..100)) { a, b ->
+                        val mx = eval("r = max(a, b)", mapOf("a" to a, "b" to b))["r"]!!
+                        assertSoftly {
+                            (mx >= a) shouldBe true
+                            (mx >= b) shouldBe true
+                        }
                     }
                 }
             }
@@ -401,6 +483,28 @@ class CblScriptTest :
 
                 it("inverted range clamps to the upper bound") {
                     eval("r = lim(a, 8, 3)", mapOf("a" to 5))["r"] shouldBe 3
+                }
+
+                it("result is always within lo..hi for well-ordered range") {
+                    checkAll(Arb.int(-100..100), Arb.int(-50..50), Arb.int(-50..50)) { v, lo, hi ->
+                        val lo2 = minOf(lo, hi)
+                        val hi2 = maxOf(lo, hi)
+                        val r =
+                            eval("r = lim(v, lo, hi)", mapOf("v" to v, "lo" to lo2, "hi" to hi2))[
+                                "r"]!!
+                        assertSoftly {
+                            (r >= lo2) shouldBe true
+                            (r <= hi2) shouldBe true
+                        }
+                    }
+                }
+
+                it("result equals v when v is already within lo..hi") {
+                    checkAll(Arb.int(0..10), Arb.int(0..5), Arb.int(5..15)) { v, lo, hi ->
+                        val inRange = v.coerceIn(lo, hi)
+                        eval("r = lim(v, lo, hi)", mapOf("v" to inRange, "lo" to lo, "hi" to hi))[
+                            "r"] shouldBe inRange
+                    }
                 }
             }
 
