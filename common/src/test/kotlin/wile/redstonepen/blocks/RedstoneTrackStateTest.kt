@@ -5,6 +5,9 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import net.minecraft.core.Direction
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_CON_MASK
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_PWR_MASK
@@ -148,6 +151,40 @@ class RedstoneTrackStateTest :
                 val th = h()
                 th.state = (1L shl k) - 1
                 th.getRedstoneDustCount() shouldBe k
+            }
+        }
+
+        describe("side power all values") {
+            context("round trips for all values 0..15") {
+                withData(Direction.values().toList()) { dir ->
+                    checkAll(Arb.int(0..15)) { v ->
+                        val th = h()
+                        th.setSidePower(dir, v)
+                        th.getSidePower(dir) shouldBe v
+                    }
+                }
+            }
+
+            it("all six directions hold distinct values simultaneously") {
+                val dirs = Direction.values()
+                val th = h()
+                dirs.forEachIndexed { i, dir -> th.setSidePower(dir, i + 1) }
+                assertSoftly {
+                    dirs.forEachIndexed { i, dir -> th.getSidePower(dir) shouldBe i + 1 }
+                }
+            }
+        }
+
+        describe("connection flags by direction") {
+            it("CONNECTION_BIT_ORDER index matches getConnectionFlag(index)") {
+                assertSoftly {
+                    connections.CONNECTION_BIT_ORDER.forEachIndexed { i, dir ->
+                        val th = h()
+                        th.state = 1L shl (24 + i)
+                        th.getConnectionFlag(i) shouldBe true
+                        connections.CONNECTION_BIT_ORDER_REV[dir] shouldBe i
+                    }
+                }
             }
         }
 

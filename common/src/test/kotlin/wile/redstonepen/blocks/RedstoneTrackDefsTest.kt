@@ -161,5 +161,27 @@ class RedstoneTrackDefsTest :
             it("REDSTONE_UPDATE_DIRECTIONS contains all six faces") {
                 RedstoneTrackDefs.REDSTONE_UPDATE_DIRECTIONS.size shouldBe 6
             }
+
+            it("getWireElementsOnFace masks are disjoint across all faces") {
+                val masks = Direction.values().map { connections.getWireElementsOnFace(it) }
+                assertSoftly {
+                    for (i in masks.indices) {
+                        for (j in masks.indices) {
+                            if (i != j) (masks[i] and masks[j]) shouldBe 0L
+                        }
+                    }
+                }
+            }
+
+            it("getAllElementsOnFace masks are disjoint across all faces") {
+                val masks = Direction.values().map { connections.getAllElementsOnFace(it) }
+                assertSoftly {
+                    for (i in masks.indices) {
+                        for (j in masks.indices) {
+                            if (i != j) (masks[i] and masks[j]) shouldBe 0L
+                        }
+                    }
+                }
+            }
         }
     })
