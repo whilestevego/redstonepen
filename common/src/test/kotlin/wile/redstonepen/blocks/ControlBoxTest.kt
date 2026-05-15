@@ -1,7 +1,13 @@
 package wile.redstonepen.blocks
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
@@ -279,12 +285,11 @@ class ControlBoxTest :
                 h.output(Direction.EAST) shouldBe 4
             }
 
-            it("division by zero returns zero") {
+            it("division by zero throws ArithmeticException") {
                 val h = TestHooks()
                 h.setCode("b=d/0") shouldBe true
                 h.setInput(Direction.DOWN, 6)
-                h.tick()
-                h.output(Direction.EAST) shouldBe 0
+                shouldThrow<ArithmeticException> { h.tick() }
             }
 
             it("port assignment clamps overflow to fifteen") {
@@ -315,12 +320,11 @@ class ControlBoxTest :
                 h.output(Direction.EAST) shouldBe 0
             }
 
-            it("modulo by zero returns zero") {
+            it("modulo by zero throws ArithmeticException") {
                 val h = TestHooks()
                 h.setCode("b=d%0") shouldBe true
                 h.setInput(Direction.DOWN, 9)
-                h.tick()
-                h.output(Direction.EAST) shouldBe 0
+                shouldThrow<ArithmeticException> { h.tick() }
             }
 
             it("port output is always clamped to 0..15 for any constant expression") {
@@ -1086,6 +1090,73 @@ class ControlBoxTest :
                 h.setRcaInput(0, 7)
                 h.tick()
                 h.rcaOutputData() shouldBe 0
+            }
+        }
+
+        describe("tick error handling") {
+            it("division by zero throws ArithmeticException via simulateTick") {
+                val h = TestHooks()
+                h.setCode("b=1/0") shouldBe true
+                h.simulateTick()
+                h.tickErrorMessage() shouldNotBe null
+                h.tickErrorMessage() shouldContain "zero"
+            }
+
+            it("no error message before any error occurs") {
+                val h = TestHooks()
+                h.setCode("b=5")
+                h.tickErrorMessage().shouldBeNull()
+                h.simulateTick()
+                h.tickErrorMessage().shouldBeNull()
+            }
+
+            it("simulateTick stores error message when tick throws") {
+                val h = TestHooks()
+                h.injectTickError("/ by zero")
+                h.tickErrorMessage().shouldNotBeNull() shouldContain "zero"
+            }
+
+            it("simulateTick is a no-op after error is set") {
+                val h = TestHooks()
+                h.setCode("b=5")
+                h.injectTickError("something went wrong")
+                val msgBefore = h.tickErrorMessage()
+                h.simulateTick()
+                h.tickErrorMessage() shouldBe msgBefore
+            }
+
+            it("output does not change while in error state") {
+                val h = TestHooks()
+                h.setCode("b=5")
+                h.simulateTick()
+                val outputBefore = h.outputData()
+                h.injectTickError("something went wrong")
+                h.simulateTick()
+                h.outputData() shouldBe outputBefore
+            }
+
+            it("setCode does not clear error state — player must resume explicitly") {
+                val h = TestHooks()
+                h.injectTickError("something went wrong")
+                h.setCode("b=7")
+                h.tickErrorMessage().shouldNotBeNull()
+            }
+
+            it("resumeAfterError clears error state") {
+                val h = TestHooks()
+                h.injectTickError("something went wrong")
+                h.tickErrorMessage().shouldNotBeNull()
+                h.resumeAfterError()
+                h.tickErrorMessage().shouldBeNull()
+            }
+
+            it("ticking resumes after resumeAfterError") {
+                val h = TestHooks()
+                h.setCode("b=7")
+                h.injectTickError("something went wrong")
+                h.resumeAfterError()
+                shouldNotThrowAny { h.simulateTick() }
+                h.output(Direction.EAST) shouldBe 7
             }
         }
     })
