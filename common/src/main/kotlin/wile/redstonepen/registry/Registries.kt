@@ -22,7 +22,7 @@ import wile.redstonepen.ModConstants
 import wile.redstonepen.util.Auxiliaries
 
 /** Common game registry handling. */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "TooManyFunctions")
 object Registries {
 
     fun interface BlockEntityFactory<T : BlockEntity> {
@@ -116,6 +116,14 @@ object Registries {
 
     @JvmStatic fun getItem(name: String): Item? = registeredItems[name]
 
+    @JvmStatic
+    fun requireItem(name: String): Item =
+        registeredItems[name] ?: error("Item '$name' not found in registry")
+
+    @JvmStatic
+    fun requireBlock(name: String): Block =
+        registeredBlocks[name] ?: error("Block '$name' not found in registry")
+
     @JvmStatic fun getEntityType(name: String): EntityType<*>? = registeredEntityTypes[name]
 
     @JvmStatic
@@ -204,7 +212,7 @@ object Registries {
                                     }
                             }
                             .toTypedArray()
-                    @Suppress("SpreadOperator")
+                    @Suppress("SpreadOperator", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
                     BlockEntityType.Builder.of(ctor::create, *blocks).build(null)
                 },
             )

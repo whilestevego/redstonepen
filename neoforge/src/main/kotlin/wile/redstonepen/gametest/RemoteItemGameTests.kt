@@ -38,7 +38,7 @@ object RemoteItemGameTests {
     @JvmStatic
     @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteBarNotVisible(helper: GameTestHelper) {
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         if (remote.item.isBarVisible(remote)) helper.fail("remote item must hide damage bar")
         helper.succeed()
     }
@@ -46,7 +46,7 @@ object RemoteItemGameTests {
     @JvmStatic
     @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteHasHighDestroySpeed(helper: GameTestHelper) {
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         val speed = remote.item.getDestroySpeed(remote, Blocks.STONE.defaultBlockState())
         if (speed < 100f) helper.fail("remote destroy speed must be high (got $speed)")
         helper.succeed()
@@ -56,7 +56,7 @@ object RemoteItemGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteUseUnlinkedReturnsFail(helper: GameTestHelper) {
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         player.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val result = remote.item.use(helper.level, player, InteractionHand.MAIN_HAND)
         if (result.result != InteractionResult.FAIL) {
@@ -70,7 +70,7 @@ object RemoteItemGameTests {
     fun remoteCanAttackBlockAlwaysReturnsFalse(helper: GameTestHelper) {
         placeLever(helper, POS)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         player.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         val ls = helper.level.getBlockState(leverAbs)
@@ -84,7 +84,7 @@ object RemoteItemGameTests {
     fun remoteOnBlockStartBreakDoesNotThrow(helper: GameTestHelper) {
         placeLever(helper, POS)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         player.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         val result =
@@ -96,7 +96,7 @@ object RemoteItemGameTests {
     @JvmStatic
     @GameTest(template = EMPTY, timeoutTicks = 5)
     fun remoteDoesNotSneakBypassUse(helper: GameTestHelper) {
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
         if (remote.item.doesSneakBypassUse(remote, helper.level, helper.absolutePos(POS), player)) {
             helper.fail("remote must not bypass sneak use")
@@ -109,11 +109,11 @@ object RemoteItemGameTests {
     fun remoteAttackLinksToLeverWithServerPlayer(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
-        if (Auxiliaries.getItemStackNbt(remote, "remote") == null) {
+        if (Auxiliaries.getItemStackNbt(remote, "remote").isEmpty) {
             helper.fail("remote must have link data after attack on lever")
         }
         helper.succeed()
@@ -124,7 +124,7 @@ object RemoteItemGameTests {
     fun remoteTriggerLinkedLeverViaUse(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
@@ -140,7 +140,7 @@ object RemoteItemGameTests {
     fun remoteOnItemUseFirstConsumeWhenLinked(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
@@ -158,7 +158,7 @@ object RemoteItemGameTests {
     fun remoteTriggerLinkedButRemovedBlockTakesFailPath(helper: GameTestHelper) {
         placeLever(helper, POS)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val leverAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(leverAbs), helper.level, leverAbs, fp)
@@ -173,7 +173,7 @@ object RemoteItemGameTests {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, Blocks.STONE_BUTTON)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val buttonAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(
@@ -192,7 +192,7 @@ object RemoteItemGameTests {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, ModContent.References.CONTROLBOX_BLOCK)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val cbAbs = helper.absolutePos(POS)
         remote.item.canAttackBlock(helper.level.getBlockState(cbAbs), helper.level, cbAbs, fp)
@@ -211,7 +211,7 @@ object RemoteItemGameTests {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, Blocks.OBSERVER)
         val fp = FakePlayerFactory.getMinecraft(helper.level)
-        val remote = ItemStack(Registries.getItem("remote"))
+        val remote = ItemStack(Registries.requireItem("remote"))
         fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
         val obsAbs = helper.absolutePos(POS)
         val nbt = CompoundTag()

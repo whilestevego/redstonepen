@@ -51,6 +51,7 @@ class ExtendedShapelessRecipe(
 
     override fun isSpecial(): Boolean = isRepair() || aspects.getBoolean("dynamic")
 
+    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun getResultItem(ra: HolderLookup.Provider?): ItemStack =
         if (isSpecial()) ItemStack.EMPTY else result
 
@@ -86,13 +87,14 @@ class ExtendedShapelessRecipe(
                         if (rstack.damageValue < rstack.maxDamage) remaining[i] = rstack
                     }
                 } else if (stack.item.hasCraftingRemainingItem()) {
-                    remaining[i] = ItemStack(stack.item.craftingRemainingItem, stack.count)
+                    remaining[i] = ItemStack(stack.item.craftingRemainingItem!!, stack.count)
                 }
             }
             return remaining
         }
     }
 
+    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun matches(input: CraftingInput, world: Level?): Boolean {
         val stacked = StackedContents()
         var i = 0
@@ -105,6 +107,7 @@ class ExtendedShapelessRecipe(
         return (i == ingredients.size) && stacked.canCraft(this, null)
     }
 
+    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun assemble(inv: CraftingInput, ra: HolderLookup.Provider?): ItemStack {
         if (isRepair()) return getRepaired(inv).a
         val rstack = result.copy()
@@ -175,7 +178,7 @@ class ExtendedShapelessRecipe(
             if (Auxiliaries.getResourceLocation(stack.item).toString() == toolName) continue
             remaining[i] =
                 if (stack.item.hasCraftingRemainingItem()) {
-                    ItemStack(stack.item.craftingRemainingItem, stack.count)
+                    ItemStack(stack.item.craftingRemainingItem!!, stack.count)
                 } else {
                     stack.copy()
                 }

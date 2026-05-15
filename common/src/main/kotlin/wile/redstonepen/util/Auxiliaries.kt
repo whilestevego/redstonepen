@@ -195,7 +195,7 @@ object Auxiliaries {
     }
 
     @JvmStatic
-    fun join(components: Collection<out Component>, separator: String): MutableComponent =
+    fun join(components: Collection<Component>, separator: String): MutableComponent =
         ComponentUtils.formatList(components, Component.literal(separator), Function.identity())
 
     @JvmStatic
@@ -290,7 +290,7 @@ object Auxiliaries {
 
     @JvmStatic
     fun serializeTextComponent(tc: Component?, ra: HolderLookup.Provider?): String =
-        if (tc == null) "" else Component.Serializer.toJson(tc, ra)
+        if (tc == null) "" else Component.Serializer.toJson(tc, ra!!)
 
     // -------------------------------------------------------------------------------------------------------------------
     // Tag Handling

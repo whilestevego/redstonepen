@@ -40,7 +40,7 @@ object GuiTextEditing {
         private var last_index_: Int = -1
         private val edit_: TextFieldHelper
         private var text_: String = ""
-        private var font_: Font? = null
+        private lateinit var font_: Font
         private var line_height_: Int = NORM_LINE_HEIGHT
         private var font_scale_: Float = 1f
         private var max_text_size_: Int = 1024
@@ -60,7 +60,7 @@ object GuiTextEditing {
                     this::setClipboard,
                 ) { s ->
                     s.length < max_text_size_ &&
-                        font_!!.wordWrapHeight(s, width * NORM_LINE_HEIGHT / line_height_) <=
+                        font_.wordWrapHeight(s, width * NORM_LINE_HEIGHT / line_height_) <=
                             (height * NORM_LINE_HEIGHT / line_height_)
                 }
         }
@@ -96,7 +96,7 @@ object GuiTextEditing {
             return this
         }
 
-        fun getFont(): Font? = font_
+        fun getFont(): Font? = if (::font_.isInitialized) font_ else null
 
         fun setFont(fnt: Font): MultiLineTextBox {
             font_ = fnt
@@ -136,18 +136,18 @@ object GuiTextEditing {
         }
 
         fun getIndexUnderMouse(mouseX: Double, mouseY: Double): Int =
-            if (font_ == null) {
+            if (!::font_.isInitialized) {
                 0
             } else {
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_!!,
+                        font_,
                         screenCoordinates(Guis.Coord2d.of(mouseX.toInt(), mouseY.toInt()), false),
                     )
             }
 
         fun getCoordinatesAtIndex(textIndex: Int): Guis.Coord2d {
-            if (font_ == null) return Guis.Coord2d.ORIGIN
+            if (!::font_.isInitialized) return Guis.Coord2d.ORIGIN
             var idx = Mth.clamp(textIndex, 0, getDisplayCache().fullText.length)
             val lindex = findLineFromPos(getDisplayCache().lineStarts, idx)
             if (lindex < 0 || lindex >= getDisplayCache().lineStarts.size) {
@@ -155,7 +155,7 @@ object GuiTextEditing {
             }
             val li = getDisplayCache().lines[lindex]
             idx = Mth.clamp(idx - getDisplayCache().lineStarts[lindex], 0, li.contents.length)
-            val ox = font_!!.splitter.stringWidth(li.contents.substring(0, idx)).toInt()
+            val ox = font_.splitter.stringWidth(li.contents.substring(0, idx)).toInt()
             val oy = getDisplayCache().lines[0].y
             return Guis.Coord2d.of(
                 li.x + (ox * line_height_ / NORM_LINE_HEIGHT),
@@ -186,7 +186,7 @@ object GuiTextEditing {
             val index =
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_!!,
+                        font_,
                         Guis.Coord2d.of(
                             sc.x * NORM_LINE_HEIGHT / line_height_,
                             sc.y * NORM_LINE_HEIGHT / line_height_,
@@ -226,7 +226,7 @@ object GuiTextEditing {
             edit_.setCursorPos(
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_!!,
+                        font_,
                         Guis.Coord2d.of(
                             sc.x * NORM_LINE_HEIGHT / line_height_,
                             sc.y * NORM_LINE_HEIGHT / line_height_,
@@ -437,7 +437,7 @@ object GuiTextEditing {
             val lineInfos: MutableList<LineInfo> = Lists.newArrayList()
             val lineNo = MutableInt()
             val lineTerminated = MutableBoolean()
-            val ssp = font_!!.splitter
+            val ssp = font_.splitter
             ssp.splitLines(fullText, width * NORM_LINE_HEIGHT / line_height_, Style.EMPTY, true) {
                 text,
                 spos,
@@ -457,7 +457,7 @@ object GuiTextEditing {
                 ppos = Guis.Coord2d(0, lineInfos.size * NORM_LINE_HEIGHT)
             } else {
                 val lno = findLineFromPos(lineStarts, curPos)
-                val lpx = font_!!.width(fullText.substring(lineStarts[lno], curPos))
+                val lpx = font_.width(fullText.substring(lineStarts[lno], curPos))
                 ppos = Guis.Coord2d(lpx, lno * NORM_LINE_HEIGHT)
             }
             val selectionBlocks: MutableList<Rect2i> = Lists.newArrayList()

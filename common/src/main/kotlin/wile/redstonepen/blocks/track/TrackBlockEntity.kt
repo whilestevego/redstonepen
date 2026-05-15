@@ -103,10 +103,10 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     override fun writenbt(
         hlp: HolderLookup.Provider,
         nbt: CompoundTag,
-        sync_packet: Boolean,
+        syncPacket: Boolean,
     ): CompoundTag {
         nbt.putLong("sflags", state_flags_)
-        if (sync_packet) return nbt
+        if (syncPacket) return nbt
         if (nets_.isNotEmpty()) {
             val lst = ListTag()
             for (net in nets_) {

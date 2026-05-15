@@ -614,7 +614,7 @@ object DemoTests {
     private fun assertModBlockAt(helper: GameTestHelper, localPos: BlockPos, modBlockName: String) {
         val abs = helper.absolutePos(localPos)
         val actual = helper.level.getBlockState(abs)
-        if (actual.block != Registries.getBlock(modBlockName)!!) {
+        if (actual.block != Registries.requireBlock(modBlockName)) {
             helper.fail(
                 "expected mod block $modBlockName at $localPos but found ${actual.block}",
                 localPos,

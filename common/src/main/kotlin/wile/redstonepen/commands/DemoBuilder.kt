@@ -86,11 +86,7 @@ object DemoBuilder {
 
     private fun configureSign(be: SignBlockEntity, lines: Array<out String>) {
         val msgs =
-            Array(4) { i ->
-                Component.literal(
-                    if (i < lines.size && lines[i] != null) truncate(lines[i]) else ""
-                )
-            }
+            Array(4) { i -> Component.literal(if (i < lines.size) truncate(lines[i]) else "") }
         be.updateText(
             { text ->
                 text

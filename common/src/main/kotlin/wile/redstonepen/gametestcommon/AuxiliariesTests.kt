@@ -26,7 +26,7 @@ object AuxiliariesTests {
     @JvmStatic
     fun getFakePlayerOnServerLevelReturnsPresent(helper: GameTestHelper) {
         val result = Auxiliaries.getFakePlayer(helper.level)
-        if (result == null) helper.fail("getFakePlayer must not return null Optional")
+        if (result.isEmpty) helper.fail("getFakePlayer must return a present Optional")
         helper.succeed()
     }
 
@@ -44,7 +44,7 @@ object AuxiliariesTests {
                 Component.literal("hello"),
                 helper.level.registryAccess(),
             )
-        if (serialized == null || serialized.isEmpty()) {
+        if (serialized.isEmpty()) {
             helper.fail("serialize of non-null component must return non-empty string")
         }
         helper.succeed()

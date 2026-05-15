@@ -185,12 +185,14 @@ object Overlay {
 
             @JvmStatic
             @Synchronized
-            private fun state_pos(): Optional<Tuple<BlockState, BlockPos>> =
-                if (state_deadline_ < System.currentTimeMillis() || state_ === EMPTY_STATE) {
+            private fun state_pos(): Optional<Tuple<BlockState, BlockPos>> {
+                val s = state_
+                return if (state_deadline_ < System.currentTimeMillis() || s == null) {
                     Optional.empty()
                 } else {
-                    Optional.of(Tuple(state_, pos_))
+                    Optional.of(Tuple(s, pos_))
                 }
+            }
         }
     }
 }

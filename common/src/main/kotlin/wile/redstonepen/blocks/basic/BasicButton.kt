@@ -47,7 +47,7 @@ object BasicButton {
             state: BlockState,
             world: Level,
             pos: BlockPos,
-            player: Player?,
+            player: Player,
             brh: BlockHitResult,
         ): InteractionResult {
             if (state.getValue(POWERED)) return InteractionResult.CONSUME

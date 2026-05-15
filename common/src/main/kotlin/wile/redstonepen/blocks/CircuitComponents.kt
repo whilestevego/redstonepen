@@ -427,17 +427,17 @@ object CircuitComponents {
 
         override fun getShape(
             state: BlockState,
-            world: BlockGetter,
+            source: BlockGetter,
             pos: BlockPos,
-            context: CollisionContext,
+            selectionContext: CollisionContext,
         ): VoxelShape = shapes_.getOrDefault(state, Shapes.block())
 
         override fun getCollisionShape(
             state: BlockState,
             world: BlockGetter,
             pos: BlockPos,
-            context: CollisionContext,
-        ): VoxelShape = getShape(state, world, pos, context)
+            selectionContext: CollisionContext,
+        ): VoxelShape = getShape(state, world, pos, selectionContext)
 
         override fun getOcclusionShape(
             state: BlockState,

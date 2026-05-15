@@ -28,7 +28,8 @@ object BasicLeverButtonTests {
         helper.setBlock(SUPPORT, Blocks.STONE)
         helper.setBlock(
             POS,
-            Registries.getBlock("basic_lever")!!.defaultBlockState()
+            Registries.requireBlock("basic_lever")
+                .defaultBlockState()
                 .setValue(LeverBlock.FACE, AttachFace.FLOOR)
                 .setValue(LeverBlock.FACING, Direction.NORTH),
         )
@@ -38,7 +39,7 @@ object BasicLeverButtonTests {
         }
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
-        before.useWithoutItem(helper.level, null, hit)
+        before.useWithoutItem(helper.level, helper.makeMockPlayer(GameType.SURVIVAL), hit)
         helper.runAfterDelay(2) {
             val after = helper.getBlockState(POS)
             if (!after.getValue(BlockStateProperties.POWERED)) {
@@ -53,14 +54,16 @@ object BasicLeverButtonTests {
         helper.setBlock(SUPPORT, Blocks.STONE)
         helper.setBlock(
             POS,
-            Registries.getBlock("basic_lever")!!.defaultBlockState()
+            Registries.requireBlock("basic_lever")
+                .defaultBlockState()
                 .setValue(LeverBlock.FACE, AttachFace.FLOOR)
                 .setValue(LeverBlock.FACING, Direction.NORTH),
         )
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
-        helper.getBlockState(POS).useWithoutItem(helper.level, null, hit)
-        helper.getBlockState(POS).useWithoutItem(helper.level, null, hit)
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        helper.getBlockState(POS).useWithoutItem(helper.level, player, hit)
+        helper.getBlockState(POS).useWithoutItem(helper.level, player, hit)
         helper.runAfterDelay(2) {
             if (helper.getBlockState(POS).getValue(BlockStateProperties.POWERED)) {
                 helper.fail("expected unpowered after two toggles")
@@ -74,7 +77,8 @@ object BasicLeverButtonTests {
         helper.setBlock(SUPPORT, Blocks.STONE)
         helper.setBlock(
             POS,
-            Registries.getBlock("basic_button")!!.defaultBlockState()
+            Registries.requireBlock("basic_button")
+                .defaultBlockState()
                 .setValue(ButtonBlock.FACE, AttachFace.FLOOR)
                 .setValue(ButtonBlock.FACING, Direction.NORTH),
         )
@@ -84,7 +88,7 @@ object BasicLeverButtonTests {
         }
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
-        before.useWithoutItem(helper.level, null, hit)
+        before.useWithoutItem(helper.level, helper.makeMockPlayer(GameType.SURVIVAL), hit)
         helper.runAfterDelay(1) {
             if (!helper.getBlockState(POS).getValue(BlockStateProperties.POWERED)) {
                 helper.fail("expected button powered after press")
@@ -98,14 +102,18 @@ object BasicLeverButtonTests {
         helper.setBlock(SUPPORT, Blocks.STONE)
         helper.setBlock(
             POS,
-            Registries.getBlock("basic_button")!!.defaultBlockState()
+            Registries.requireBlock("basic_button")
+                .defaultBlockState()
                 .setValue(ButtonBlock.FACE, AttachFace.FLOOR)
                 .setValue(ButtonBlock.FACING, Direction.NORTH)
                 .setValue(BlockStateProperties.POWERED, true),
         )
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
-        val result = helper.getBlockState(POS).useWithoutItem(helper.level, null, hit)
+        val result =
+            helper
+                .getBlockState(POS)
+                .useWithoutItem(helper.level, helper.makeMockPlayer(GameType.SURVIVAL), hit)
         if (result == null) helper.fail("expected non-null InteractionResult")
         helper.succeed()
     }
@@ -115,13 +123,16 @@ object BasicLeverButtonTests {
         helper.setBlock(SUPPORT, Blocks.STONE)
         helper.setBlock(
             POS,
-            Registries.getBlock("basic_pulse_button")!!.defaultBlockState()
+            Registries.requireBlock("basic_pulse_button")
+                .defaultBlockState()
                 .setValue(ButtonBlock.FACE, AttachFace.FLOOR)
                 .setValue(ButtonBlock.FACING, Direction.NORTH),
         )
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
-        helper.getBlockState(POS).useWithoutItem(helper.level, null, hit)
+        helper
+            .getBlockState(POS)
+            .useWithoutItem(helper.level, helper.makeMockPlayer(GameType.SURVIVAL), hit)
         helper.runAfterDelay(20) {
             if (helper.getBlockState(POS).getValue(BlockStateProperties.POWERED)) {
                 helper.fail("pulse button should revert after its active period")
@@ -132,7 +143,7 @@ object BasicLeverButtonTests {
 
     @JvmStatic
     fun gaugeReadsZeroWhenNoSignal(helper: GameTestHelper) {
-        helper.setBlock(POS, Registries.getBlock("basic_gauge")!!.defaultBlockState())
+        helper.setBlock(POS, Registries.requireBlock("basic_gauge").defaultBlockState())
         helper.runAfterDelay(2) {
             val power = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
             if (power != 0) helper.fail("expected gauge power=0 with no signal, got $power")
@@ -142,7 +153,7 @@ object BasicLeverButtonTests {
 
     @JvmStatic
     fun gaugeReadsSignalFromAdjacentRedstoneBlock(helper: GameTestHelper) {
-        helper.setBlock(POS, Registries.getBlock("basic_gauge")!!.defaultBlockState())
+        helper.setBlock(POS, Registries.requireBlock("basic_gauge").defaultBlockState())
         helper.setBlock(POS.east(), Blocks.REDSTONE_BLOCK)
         helper.succeedWhen {
             val power = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
@@ -154,8 +165,8 @@ object BasicLeverButtonTests {
 
     @JvmStatic
     fun gaugeShouldCheckWeakPowerReturnsFalse(helper: GameTestHelper) {
-        helper.setBlock(POS, Registries.getBlock("basic_gauge")!!.defaultBlockState())
-        val block = Registries.getBlock("basic_gauge")!! as BasicGauge.BasicGaugeBlock
+        helper.setBlock(POS, Registries.requireBlock("basic_gauge").defaultBlockState())
+        val block = Registries.requireBlock("basic_gauge") as BasicGauge.BasicGaugeBlock
         val result =
             block.shouldCheckWeakPower(
                 helper.getBlockState(POS),
@@ -169,7 +180,7 @@ object BasicLeverButtonTests {
 
     @JvmStatic
     fun gaugeGetStateForPlacementReturnsNonNull(helper: GameTestHelper) {
-        val block: Block = Registries.getBlock("basic_gauge")!!
+        val block: Block = Registries.requireBlock("basic_gauge")
         val stack = ItemStack(block)
         val abs = helper.absolutePos(POS)
         val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)

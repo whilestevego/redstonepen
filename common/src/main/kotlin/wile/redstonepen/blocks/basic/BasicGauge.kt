@@ -74,14 +74,14 @@ object BasicGauge {
 
         override fun updateShape(
             state: BlockState,
-            dir: Direction,
-            fromState: BlockState,
-            worldAccessor: LevelAccessor,
+            facing: Direction,
+            facingState: BlockState,
+            world: LevelAccessor,
             pos: BlockPos,
-            fromPos: BlockPos,
+            facingPos: BlockPos,
         ): BlockState {
-            if (worldAccessor !is ServerLevel) return state
-            return state.setValue(POWER, worldAccessor.getBestNeighborSignal(pos))
+            if (world !is ServerLevel) return state
+            return state.setValue(POWER, world.getBestNeighborSignal(pos))
         }
 
         @Suppress("FunctionOnlyReturningConstant")
