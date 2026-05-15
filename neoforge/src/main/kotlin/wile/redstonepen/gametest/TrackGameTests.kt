@@ -277,4 +277,29 @@ object TrackGameTests {
     @GameTest(template = TEMPLATE, timeoutTicks = 10)
     fun verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper: GameTestHelper) =
         TrackTests.verticalFaceTrackPowerPreservedAfterBottomSegmentRemoveAndReplace(helper)
+
+    @JvmStatic
+    @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun calculatorIsolatedTrackProducesEmptyResult(helper: GameTestHelper) =
+        TrackTests.calculatorIsolatedTrackProducesEmptyResult(helper)
+
+    @JvmStatic
+    @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun calculatorZerosUnusedSidePowersInNewStateFlags(helper: GameTestHelper) =
+        TrackTests.calculatorZerosUnusedSidePowersInNewStateFlags(helper)
+
+    @JvmStatic
+    @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun calculatorDetectsAdjacentTrackWireConnection(helper: GameTestHelper) =
+        TrackTests.calculatorDetectsAdjacentTrackWireConnection(helper)
+
+    @JvmStatic
+    @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun calculatorRedstoneBlockNeighbourAppearsInNets(helper: GameTestHelper) =
+        TrackTests.calculatorRedstoneBlockNeighbourAppearsInNets(helper)
+
+    @JvmStatic
+    @GameTest(template = TEMPLATE, timeoutTicks = 5)
+    fun calculatorPreviouslyConnectedTrackQueuedWhenWireRemoved(helper: GameTestHelper) =
+        TrackTests.calculatorPreviouslyConnectedTrackQueuedWhenWireRemoved(helper)
 }

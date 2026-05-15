@@ -20,8 +20,11 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import wile.redstonepen.blocks.track.RedstoneTrackBlock
+import wile.redstonepen.blocks.track.RedstoneTrackDefs
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
 import wile.redstonepen.blocks.track.TrackBlockEntity
 import wile.redstonepen.blocks.track.TrackNet
+import wile.redstonepen.blocks.track.TrackNetworkCalculator
 import wile.redstonepen.registry.Registries
 
 object TrackTests {
@@ -882,6 +885,146 @@ object TrackTests {
                     "safety-net call in the add branch."
             )
             return
+        }
+        helper.succeed()
+    }
+
+    // TrackNetworkCalculator tests
+
+    @JvmStatic
+    fun calculatorIsolatedTrackProducesEmptyResult(helper: GameTestHelper) {
+        placeTrack(helper)
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        val result =
+            TrackNetworkCalculator(helper.level, helper.absolutePos(TRACK_POS), 0L, block, false)
+                .calculate(emptyList())
+        if (result.nets.isNotEmpty()) {
+            helper.fail("isolated track (no wires) must produce no nets, got ${result.nets.size}")
+        }
+        if (result.trackConnectionUpdates.isNotEmpty()) {
+            helper.fail("isolated track must have no track connection updates")
+        }
+        if (result.neighboursToNotify.isNotEmpty()) {
+            helper.fail("isolated track must have no neighbours to notify")
+        }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun calculatorZerosUnusedSidePowersInNewStateFlags(helper: GameTestHelper) {
+        placeTrack(helper)
+        val te = getTrack(helper)!!
+        te.setSidePower(Direction.NORTH, 12)
+        te.setSidePower(Direction.SOUTH, 7)
+        val stateFlags = te.getStateFlags()
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        val result =
+            TrackNetworkCalculator(
+                    helper.level,
+                    helper.absolutePos(TRACK_POS),
+                    stateFlags,
+                    block,
+                    false,
+                )
+                .calculate(emptyList())
+        if ((result.newStateFlags and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) != 0L) {
+            helper.fail(
+                "all power bits must be zeroed when no wires are present, newStateFlags=${result.newStateFlags}"
+            )
+        }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun calculatorDetectsAdjacentTrackWireConnection(helper: GameTestHelper) {
+        placeTrack(helper)
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        // flags=16 (UPDATE_SUPPRESS_DROPS) also suppresses updateNeighbourShapes, preventing
+        // the cascade that would remove a wire-less track when a neighbour block changes.
+        helper.level.setBlock(helper.absolutePos(TRACK_POS.east()), block.defaultBlockState(), 16)
+        val wireBitA = connections.getWireBit(Direction.DOWN, Direction.EAST)
+        val wireBitB = connections.getWireBit(Direction.DOWN, Direction.WEST)
+        val teB =
+            RedstoneTrackBlock.tile(helper.level, helper.absolutePos(TRACK_POS.east())).orElse(null)
+                ?: run {
+                    helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
+                    return
+                }
+        teB.addWireFlags(wireBitB)
+        val result =
+            TrackNetworkCalculator(
+                    helper.level,
+                    helper.absolutePos(TRACK_POS),
+                    wireBitA,
+                    block,
+                    false,
+                )
+                .calculate(emptyList())
+        if (!result.trackConnectionUpdates.contains(teB)) {
+            helper.fail(
+                "expected adjacent track B in trackConnectionUpdates when both have matching wire bits"
+            )
+        }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun calculatorRedstoneBlockNeighbourAppearsInNets(helper: GameTestHelper) {
+        placeTrack(helper)
+        helper.setBlock(TRACK_POS.east(), Blocks.REDSTONE_BLOCK)
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        val wireBit = connections.getWireBit(Direction.DOWN, Direction.EAST)
+        val result =
+            TrackNetworkCalculator(
+                    helper.level,
+                    helper.absolutePos(TRACK_POS),
+                    wireBit,
+                    block,
+                    false,
+                )
+                .calculate(emptyList())
+        if (result.nets.isEmpty()) {
+            helper.fail("expected at least one net when wire connects to redstone block")
+            return
+        }
+        val absEast = helper.absolutePos(TRACK_POS.east())
+        if (result.nets.none { it.neighbour_positions.contains(absEast) }) {
+            helper.fail("redstone block at east must appear in net neighbour_positions")
+        }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun calculatorPreviouslyConnectedTrackQueuedWhenWireRemoved(helper: GameTestHelper) {
+        placeTrack(helper)
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        // flags=16 (UPDATE_SUPPRESS_DROPS) also suppresses updateNeighbourShapes, preventing
+        // the cascade that would remove a wire-less track when a neighbour block changes.
+        helper.level.setBlock(helper.absolutePos(TRACK_POS.east()), block.defaultBlockState(), 16)
+        val absEast = helper.absolutePos(TRACK_POS.east())
+        val teB =
+            RedstoneTrackBlock.tile(helper.level, absEast).orElse(null)
+                ?: run {
+                    helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
+                    return
+                }
+        val previousNets =
+            listOf(
+                TrackNet(
+                    listOf(absEast),
+                    listOf(Direction.EAST),
+                    listOf(Direction.DOWN),
+                    listOf(Direction.EAST),
+                    0,
+                )
+            )
+        val result =
+            TrackNetworkCalculator(helper.level, helper.absolutePos(TRACK_POS), 0L, block, false)
+                .calculate(previousNets)
+        if (!result.trackConnectionUpdates.contains(teB)) {
+            helper.fail(
+                "previously connected track B must be queued for update when wire is removed"
+            )
         }
         helper.succeed()
     }

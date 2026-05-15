@@ -291,157 +291,159 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         ) {
             return 0
         }
-        val flip_mask: Long
         val face = clicked_face.opposite
-        run {
-            val hit_r = hitvec.subtract(Vec3.atCenterOf(pos))
-            val hit =
-                when (clicked_face) {
-                    Direction.WEST,
-                    Direction.EAST -> hit_r.multiply(0.0, 1.0, 1.0)
-                    Direction.SOUTH,
-                    Direction.NORTH -> hit_r.multiply(1.0, 1.0, 0.0)
-                    else -> hit_r.multiply(1.0, 0.0, 1.0)
-                }
-            val dir = Direction.getNearest(hit.x(), hit.y(), hit.z())
-            val face_is_empty =
-                (getWireFlags() and
-                    RedstoneTrackDefs.connections.getAllElementsOnFace(face).toInt()) == 0
-            val shouldBulkConnect =
-                !no_bulk &&
-                    !face_is_empty &&
-                    hit.length() < 0.10 &&
-                    (!no_add || getConnectionFlags() != 0)
-            flip_mask =
-                if (shouldBulkConnect) {
-                    RedstoneTrackDefs.connections.getBulkConnectorBit(face)
-                } else if (no_add || hit.length() > 0.11) {
-                    var m = RedstoneTrackDefs.connections.getWireBit(face, dir)
-                    if (!no_add) {
-                        if (isAdjacentWireSegmentAddable(face, dir.opposite)) {
-                            m = m or RedstoneTrackDefs.connections.getWireBit(face, dir.opposite)
-                        }
-                        if (isAdjacentWireSegmentAddable(face, dir.getClockWise(face.axis))) {
-                            m =
-                                m or
-                                    RedstoneTrackDefs.connections.getWireBit(
-                                        face,
-                                        dir.getClockWise(face.axis),
-                                    )
-                        }
-                        if (
-                            isAdjacentWireSegmentAddable(face, dir.getCounterClockWise(face.axis))
-                        ) {
-                            m =
-                                m or
-                                    RedstoneTrackDefs.connections.getWireBit(
-                                        face,
-                                        dir.getCounterClockWise(face.axis),
-                                    )
-                        }
-                    }
-                    m
-                } else {
-                    0L
-                }
-        }
-        var material_use = 0
-        run {
-            if ((state_flags_ and flip_mask) != 0L) {
-                if (!no_remove) {
-                    state_flags_ = state_flags_ and flip_mask.inv()
-                    material_use -= 1
-                    val bc = RedstoneTrackDefs.connections.getBulkConnectorBit(face)
-                    if (
-                        (state_flags_ and
-                            RedstoneTrackDefs.connections.getAllElementsOnFace(face)) == bc
-                    ) {
-                        state_flags_ = state_flags_ and bc.inv()
-                        material_use -= 1
-                    }
-                    if (getWireFlags() == 0) {
-                        material_use -= getRedstoneDustCount()
-                        state_flags_ = 0
-                    }
-                }
-            } else if (!no_add) {
-                for (i in 0 until RedstoneTrackDefs.STATE_FLAG_PWR_POS) {
-                    val mask = 1L shl i
-                    if ((flip_mask and mask) == 0L || (getStateFlags() and mask) != 0L) continue
-                    if (!RedstonePenItem.hasEnoughRedstone(used_stack, material_use + 1, player)) {
-                        break
-                    }
-                    state_flags_ = state_flags_ or mask
-                    material_use += 1
-                }
-            }
-        }
+        val flip_mask = computeFlipMask(clicked_face, face, hitvec, no_add, no_bulk)
+        val material_use = applyWireMutation(flip_mask, face, no_add, no_remove, player, used_stack)
         if (material_use != 0) {
-            val connected: MutableList<BlockPos>
-            val disconnected: MutableList<BlockPos>
-            val initial_side_power = getSidePower(face)
-            run {
-                setSidePower(face, 0)
-                val change_notifications_before = updateAllPowerValuesFromAdjacent()
-                val net_neighbours_before: Set<BlockPos> =
-                    nets_
-                        .firstOrNull { it.internal_sides.contains(face) }
-                        ?.neighbour_positions
-                        ?.let { HashSet(it) } ?: HashSet()
-                updateConnections(1)
-                setSidePower(face, 0)
-                val change_notifications_after = updateAllPowerValuesFromAdjacent()
-                disconnected =
-                    change_notifications_before.keys
-                        .filter { !change_notifications_after.containsKey(it) }
-                        .toMutableList()
-                connected =
-                    change_notifications_after.keys
-                        .filter { !change_notifications_before.containsKey(it) }
-                        .toMutableList()
-                if (
-                    connected.isEmpty() &&
-                        disconnected.isEmpty() &&
-                        RedstoneTrackDefs.connections.hasBulkConnection(getStateFlags(), face)
-                ) {
-                    val net_neighbours_after: Set<BlockPos> =
-                        nets_
-                            .firstOrNull { it.internal_sides.contains(face) }
-                            ?.neighbour_positions
-                            ?.let { HashSet(it) } ?: HashSet()
-                    for (p in net_neighbours_after) {
-                        if (!net_neighbours_before.contains(p)) connected.add(p)
-                    }
-                    for (p in net_neighbours_before) {
-                        if (!net_neighbours_after.contains(p)) disconnected.add(p)
-                    }
-                }
-            }
-            if (connected.isEmpty() && disconnected.isEmpty()) {
-                setSidePower(face, initial_side_power)
-            } else {
-                setSidePower(face, 0)
-                nets_.forEach { net -> if (net.internal_sides.contains(face)) net.power = 0 }
-                disconnected.forEach { p ->
-                    val te = getLevel()!!.getBlockEntity(p)
-                    getLevel()!!
-                        .getBlockState(p)
-                        .handleNeighborChanged(getLevel()!!, p, getBlock(), pos, false)
-                    if (te is TrackBlockEntity) te.updateConnections(1)
-                }
-                connected.forEach { p ->
-                    val te = getLevel()!!.getBlockEntity(p)
-                    if (te is TrackBlockEntity) te.updateConnections(1)
-                    getLevel()!!
-                        .getBlockState(p)
-                        .handleNeighborChanged(getLevel()!!, p, getBlock(), pos, false)
-                    getBlock()
-                        .neighborChanged(blockState, getLevel()!!, blockPos, getBlock(), p, false)
-                }
-            }
+            propagateEdit(face, pos, getSidePower(face))
             sync(true)
         }
         return material_use
+    }
+
+    private fun computeFlipMask(
+        clickedFace: Direction,
+        face: Direction,
+        hitvec: Vec3,
+        noAdd: Boolean,
+        noBulk: Boolean,
+    ): Long {
+        val hitR = hitvec.subtract(Vec3.atCenterOf(blockPos))
+        val hit =
+            when (clickedFace) {
+                Direction.WEST,
+                Direction.EAST -> hitR.multiply(0.0, 1.0, 1.0)
+                Direction.SOUTH,
+                Direction.NORTH -> hitR.multiply(1.0, 1.0, 0.0)
+                else -> hitR.multiply(1.0, 0.0, 1.0)
+            }
+        val dir = Direction.getNearest(hit.x(), hit.y(), hit.z())
+        val faceIsEmpty =
+            (getWireFlags() and RedstoneTrackDefs.connections.getAllElementsOnFace(face).toInt()) ==
+                0
+        val shouldBulkConnect =
+            !noBulk && !faceIsEmpty && hit.length() < 0.10 && (!noAdd || getConnectionFlags() != 0)
+        return if (shouldBulkConnect) {
+            RedstoneTrackDefs.connections.getBulkConnectorBit(face)
+        } else if (noAdd || hit.length() > 0.11) {
+            var m = RedstoneTrackDefs.connections.getWireBit(face, dir)
+            if (!noAdd) {
+                if (isAdjacentWireSegmentAddable(face, dir.opposite)) {
+                    m = m or RedstoneTrackDefs.connections.getWireBit(face, dir.opposite)
+                }
+                if (isAdjacentWireSegmentAddable(face, dir.getClockWise(face.axis))) {
+                    m =
+                        m or
+                            RedstoneTrackDefs.connections.getWireBit(
+                                face,
+                                dir.getClockWise(face.axis),
+                            )
+                }
+                if (isAdjacentWireSegmentAddable(face, dir.getCounterClockWise(face.axis))) {
+                    m =
+                        m or
+                            RedstoneTrackDefs.connections.getWireBit(
+                                face,
+                                dir.getCounterClockWise(face.axis),
+                            )
+                }
+            }
+            m
+        } else {
+            0L
+        }
+    }
+
+    private fun applyWireMutation(
+        flipMask: Long,
+        face: Direction,
+        noAdd: Boolean,
+        noRemove: Boolean,
+        player: Player,
+        usedStack: ItemStack,
+    ): Int {
+        var materialUse = 0
+        if ((state_flags_ and flipMask) != 0L) {
+            if (!noRemove) {
+                state_flags_ = state_flags_ and flipMask.inv()
+                materialUse -= 1
+                val bc = RedstoneTrackDefs.connections.getBulkConnectorBit(face)
+                if (
+                    (state_flags_ and RedstoneTrackDefs.connections.getAllElementsOnFace(face)) ==
+                        bc
+                ) {
+                    state_flags_ = state_flags_ and bc.inv()
+                    materialUse -= 1
+                }
+                if (getWireFlags() == 0) {
+                    materialUse -= getRedstoneDustCount()
+                    state_flags_ = 0
+                }
+            }
+        } else if (!noAdd) {
+            for (i in 0 until RedstoneTrackDefs.STATE_FLAG_PWR_POS) {
+                val mask = 1L shl i
+                if ((flipMask and mask) == 0L || (getStateFlags() and mask) != 0L) continue
+                if (!RedstonePenItem.hasEnoughRedstone(usedStack, materialUse + 1, player)) break
+                state_flags_ = state_flags_ or mask
+                materialUse += 1
+            }
+        }
+        return materialUse
+    }
+
+    private fun propagateEdit(face: Direction, originalPos: BlockPos, initialSidePower: Int) {
+        setSidePower(face, 0)
+        val changesBefore = updateAllPowerValuesFromAdjacent()
+        val netNeighboursBefore: Set<BlockPos> =
+            nets_
+                .firstOrNull { it.internal_sides.contains(face) }
+                ?.neighbour_positions
+                ?.let { HashSet(it) } ?: HashSet()
+        updateConnections(1)
+        setSidePower(face, 0)
+        val changesAfter = updateAllPowerValuesFromAdjacent()
+        val disconnected =
+            changesBefore.keys.filter { !changesAfter.containsKey(it) }.toMutableList()
+        val connected = changesAfter.keys.filter { !changesBefore.containsKey(it) }.toMutableList()
+        if (
+            connected.isEmpty() &&
+                disconnected.isEmpty() &&
+                RedstoneTrackDefs.connections.hasBulkConnection(getStateFlags(), face)
+        ) {
+            val netNeighboursAfter: Set<BlockPos> =
+                nets_
+                    .firstOrNull { it.internal_sides.contains(face) }
+                    ?.neighbour_positions
+                    ?.let { HashSet(it) } ?: HashSet()
+            for (p in netNeighboursAfter) {
+                if (!netNeighboursBefore.contains(p)) connected.add(p)
+            }
+            for (p in netNeighboursBefore) {
+                if (!netNeighboursAfter.contains(p)) disconnected.add(p)
+            }
+        }
+        if (connected.isEmpty() && disconnected.isEmpty()) {
+            setSidePower(face, initialSidePower)
+        } else {
+            setSidePower(face, 0)
+            nets_.forEach { net -> if (net.internal_sides.contains(face)) net.power = 0 }
+            disconnected.forEach { p ->
+                val te = getLevel()!!.getBlockEntity(p)
+                getLevel()!!
+                    .getBlockState(p)
+                    .handleNeighborChanged(getLevel()!!, p, getBlock(), originalPos, false)
+                if (te is TrackBlockEntity) te.updateConnections(1)
+            }
+            connected.forEach { p ->
+                val te = getLevel()!!.getBlockEntity(p)
+                if (te is TrackBlockEntity) te.updateConnections(1)
+                getLevel()!!
+                    .getBlockState(p)
+                    .handleNeighborChanged(getLevel()!!, p, getBlock(), originalPos, false)
+                getBlock().neighborChanged(blockState, getLevel()!!, blockPos, getBlock(), p, false)
+            }
+        }
     }
 
     private fun isAdjacentWireSegmentAddable(face: Direction, dir: Direction): Boolean {
@@ -743,366 +745,45 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         sync(true)
     }
 
-    @Suppress("ALL")
-    private fun isRedstoneInsulator(state: BlockState, pos: BlockPos): Boolean =
-        state.`is`(Blocks.GLASS) || state.`is`(Blocks.AIR)
-
     internal fun updateConnections(recursion_left: Int) {
-        val all_neighbours = HashSet<BlockPos>()
-        val current_side_powers = IntArray(6)
-        val track_connection_updates = mutableSetOf<TrackBlockEntity>()
-        val internal_connected_sides = LongArray(6)
-        val external_connected_routes = LongArray(6)
-
-        run {
-            nets_.forEach { net ->
-                net.internal_sides.forEach { ps -> current_side_powers[ps.ordinal] = net.power }
-                all_neighbours.addAll(net.neighbour_positions)
-            }
-            if (trace_) {
-                Auxiliaries.logWarn(
-                    String.format(
-                        Locale.ROOT,
-                        "UCON: %s SIDPW: [%01x %01x %01x %01x %01x %01x]",
-                        posstr(blockPos),
-                        current_side_powers[0],
-                        current_side_powers[1],
-                        current_side_powers[2],
-                        current_side_powers[3],
-                        current_side_powers[4],
-                        current_side_powers[5],
-                    )
-                )
-            }
-            nets_.clear()
-        }
-
-        run {
-            var external_connection_flags =
-                getStateFlags() and
-                    (RedstoneTrackDefs.STATE_FLAG_WIR_MASK or RedstoneTrackDefs.STATE_FLAG_CON_MASK)
-            for ((wire_bit_pair, _) in
-                RedstoneTrackDefs.connections.INTERNAL_EDGE_CONNECTION_MAPPING) {
-                if ((getStateFlags() and wire_bit_pair) != wire_bit_pair) continue
-                external_connection_flags = external_connection_flags and wire_bit_pair.inv()
-                for (i in 0 until 6) {
-                    if (((0xfL shl (4 * i)) and wire_bit_pair) == 0L) continue
-                    internal_connected_sides[i] = internal_connected_sides[i] or wire_bit_pair
-                }
-            }
-            if (trace_) {
-                Auxiliaries.logWarn(
-                    String.format(
-                        Locale.ROOT,
-                        "UCON: %s CONFL: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]",
-                        posstr(blockPos),
-                        external_connection_flags,
-                        internal_connected_sides[0],
-                        internal_connected_sides[1],
-                        internal_connected_sides[2],
-                        internal_connected_sides[3],
-                        internal_connected_sides[4],
-                        internal_connected_sides[5],
-                    )
-                )
-            }
-            for (k in 0 until 2) {
-                for (i in 0 until 6) {
-                    if (internal_connected_sides[i] == 0L) continue
-                    for (j in i + 1 until 6) {
-                        if ((internal_connected_sides[i] and internal_connected_sides[j]) == 0L) {
-                            continue
-                        }
-                        internal_connected_sides[i] =
-                            internal_connected_sides[i] or internal_connected_sides[j]
-                        internal_connected_sides[j] = 0L
-                    }
-                }
-            }
-            for (i in 0 until 6) {
-                if (internal_connected_sides[i] != 0L) {
-                    for (j in i until 6) {
-                        val mask = 0xfL shl (4 * j)
-                        if ((internal_connected_sides[i] and mask) == 0L) continue
-                        val bulk = 0x1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + j)
-                        external_connected_routes[i] =
-                            external_connected_routes[i] or
-                                (external_connection_flags and (mask or bulk))
-                        external_connection_flags =
-                            external_connection_flags and (mask or bulk).inv()
-                    }
-                } else {
-                    val mask = 0xfL shl (4 * i)
-                    val bulk = 0x1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + i)
-                    external_connected_routes[i] =
-                        external_connected_routes[i] or
-                            (external_connection_flags and (mask or bulk))
-                    external_connection_flags = external_connection_flags and (mask or bulk).inv()
-                }
-            }
-            if (trace_) {
-                Auxiliaries.logWarn(
-                    String.format(
-                        Locale.ROOT,
-                        "UCON: %s CONSD: ext:%08x | int:[%08x %08x %08x %08x %08x %08x]",
-                        posstr(blockPos),
-                        external_connection_flags,
-                        internal_connected_sides[0],
-                        internal_connected_sides[1],
-                        internal_connected_sides[2],
-                        internal_connected_sides[3],
-                        internal_connected_sides[4],
-                        internal_connected_sides[5],
-                    )
-                )
-                Auxiliaries.logWarn(
-                    String.format(
-                        Locale.ROOT,
-                        "UCON: %s CONRT: ext:%08x | ext:[%08x %08x %08x %08x %08x %08x]",
-                        posstr(blockPos),
-                        external_connection_flags,
-                        external_connected_routes[0],
-                        external_connected_routes[1],
-                        external_connected_routes[2],
-                        external_connected_routes[3],
-                        external_connected_routes[4],
-                        external_connected_routes[5],
-                    )
-                )
-            }
-        }
-
-        run {
-            val used_sides = mutableSetOf<Direction>()
-            for (i in 0 until 6) {
-                if (external_connected_routes[i] == 0L) continue
-                val int_sides = mutableSetOf<Direction>()
-                val pwr_sides = ArrayList<Direction>(6)
-                val positions = ArrayList<BlockPos>(6)
-                val ext_sides = ArrayList<Direction>(6)
-                for (j in 0 until 6) {
-                    val mask = 0xfL shl (4 * j)
-                    val bulk = 0x1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + j)
-                    val side = connections.CONNECTION_BIT_ORDER[j]
-                    if ((internal_connected_sides[i] and mask) != 0L) {
-                        int_sides.add(side)
-                    }
-                    if ((external_connected_routes[i] and mask) != 0L) {
-                        for (k in 0 until 4) {
-                            val wire_bit = 0x1L shl (4 * j + k)
-                            if ((external_connected_routes[i] and wire_bit) == 0L) continue
-                            val tsd =
-                                RedstoneTrackDefs.connections.getWireBitSideAndDirection(wire_bit)
-                            val tsid = tsd.getA()
-                            val tdir = tsd.getB()
-                            val wire_pos = blockPos.relative(tdir)
-                            val wire_state = getLevel()!!.getBlockState(wire_pos)
-                            var diagonal_check = false
-                            if (wire_state.`is`(getBlock())) {
-                                val adjacent_mask =
-                                    RedstoneTrackDefs.connections.getWireBit(tsid, tdir.opposite)
-                                val adj_te =
-                                    RedstoneTrackBlock.tile(getLevel()!!, wire_pos).orElse(null)
-                                if (
-                                    adj_te == null ||
-                                        (adj_te.getStateFlags() and adjacent_mask) != adjacent_mask
-                                ) {
-                                    diagonal_check = true
-                                } else {
-                                    positions.add(wire_pos)
-                                    ext_sides.add(tsid)
-                                    int_sides.add(side)
-                                    pwr_sides.add(tdir)
-                                    track_connection_updates.add(adj_te)
-                                    continue
-                                }
-                            }
-                            if (!diagonal_check && wire_state.`is`(Blocks.REDSTONE_WIRE)) {
-                                if (side != Direction.DOWN) {
-                                    diagonal_check = true
-                                } else {
-                                    positions.add(wire_pos)
-                                    ext_sides.add(tdir.opposite)
-                                    int_sides.add(side)
-                                    pwr_sides.add(tdir)
-                                    continue
-                                }
-                            }
-                            if (!diagonal_check && wire_state.isSignalSource) {
-                                positions.add(wire_pos)
-                                ext_sides.add(tdir.opposite)
-                                int_sides.add(side)
-                                pwr_sides.add(tdir)
-                                continue
-                            }
-                            run {
-                                val track_pos = wire_pos.relative(tsid)
-                                val track_state = getLevel()!!.getBlockState(track_pos)
-                                if (track_state.`is`(getBlock())) {
-                                    val adjacent_mask =
-                                        RedstoneTrackDefs.connections.getWireBit(
-                                            tdir.opposite,
-                                            tsid.opposite,
-                                        )
-                                    val adj_te =
-                                        RedstoneTrackBlock.tile(getLevel()!!, track_pos)
-                                            .orElse(null)
-                                    if (
-                                        adj_te == null ||
-                                            (adj_te.getStateFlags() and adjacent_mask) !=
-                                                adjacent_mask
-                                    ) {
-                                        return@run
-                                    }
-                                    positions.add(track_pos)
-                                    ext_sides.add(tdir.opposite)
-                                    int_sides.add(side)
-                                    pwr_sides.add(tdir)
-                                    track_connection_updates.add(adj_te)
-                                    return@run
-                                }
-                            }
-                            if (!isRedstoneInsulator(wire_state, wire_pos)) {
-                                positions.add(wire_pos)
-                                ext_sides.add(tdir.opposite)
-                                int_sides.add(side)
-                                pwr_sides.add(tdir)
-                            }
-                        }
-                    }
-                    if ((external_connected_routes[i] and bulk) != 0L) {
-                        val bulk_pos = blockPos.relative(side)
-                        val bulk_state = getLevel()!!.getBlockState(bulk_pos)
-                        if (isRedstoneInsulator(bulk_state, bulk_pos)) continue
-                        positions.add(bulk_pos)
-                        ext_sides.add(side.opposite)
-                        int_sides.add(side)
-                        pwr_sides.add(side)
-                    }
-                }
-                if (positions.isNotEmpty()) {
-                    val net =
-                        TrackNet(positions, ext_sides, ArrayList(int_sides), ArrayList(pwr_sides))
-                    net.power =
-                        net.internal_sides.maxOfOrNull { current_side_powers[it.ordinal] } ?: 0
-                    nets_.add(net)
-                    used_sides.addAll(int_sides)
-                }
-            }
-            Direction.values().filter { !used_sides.contains(it) }.forEach { setSidePower(it, 0) }
-            setChanged()
-        }
-
-        run {
-            val disconnected_neighbours = HashSet<BlockPos>(all_neighbours)
-            val connected_neighbours = HashSet<BlockPos>()
-            nets_.forEach { net ->
-                net.neighbour_positions.forEach { disconnected_neighbours.remove(it) }
-            }
-            nets_.forEach { net -> connected_neighbours.addAll(net.neighbour_positions) }
-            all_neighbours.forEach { connected_neighbours.remove(it) }
-            if (trace_) {
-                val poss = posstr(blockPos)
-                for (net in nets_) {
-                    val ss = ArrayList<String>()
-                    for (i in 0 until net.neighbour_positions.size) {
-                        ss.add(
-                            posstr(net.neighbour_positions[i]) +
-                                ":" +
-                                net.neighbour_sides[i].toString()
-                        )
-                    }
-                    val int_sides = net.internal_sides.joinToString(",") { it.toString() }
-                    val pwr_sides = net.power_sides.joinToString(",") { it.toString() }
-                    Auxiliaries.logWarn(
-                        String.format(
-                            Locale.ROOT,
-                            "UCON: %s adj:%s | ints:%s | pwrs:%s",
-                            poss,
-                            ss.joinToString(", "),
-                            int_sides,
-                            pwr_sides,
-                        )
-                    )
-                }
-                if (disconnected_neighbours.isNotEmpty()) {
-                    Auxiliaries.logWarn(
-                        String.format(
-                            Locale.ROOT,
-                            "UCON: %s DISCONNECTED NEIGHBOURS: %s",
-                            posstr(blockPos),
-                            disconnected_neighbours.joinToString(",") { posstr(it) },
-                        )
-                    )
-                }
-                if (connected_neighbours.isNotEmpty()) {
-                    Auxiliaries.logWarn(
-                        String.format(
-                            Locale.ROOT,
-                            "UCON: %s CONNECTED NEIGHBOURS: %s",
-                            posstr(blockPos),
-                            connected_neighbours.joinToString(",") { posstr(it) },
-                        )
-                    )
-                }
-            }
-            HashSet(disconnected_neighbours).forEach { p ->
-                RedstoneTrackBlock.tile(getLevel()!!, p).ifPresent { te ->
-                    track_connection_updates.add(te)
-                    disconnected_neighbours.remove(p)
-                }
-            }
-            if (trace_ && disconnected_neighbours.isNotEmpty()) {
-                Auxiliaries.logWarn(
-                    String.format(
-                        Locale.ROOT,
-                        "UCON: %s DISCONNECTED NONTRACK: %s",
-                        posstr(blockPos),
-                        disconnected_neighbours.joinToString(",") { posstr(it) },
-                    )
-                )
-            }
-        }
-
-        run {
-            if (recursion_left > 0) {
-                for (te in track_connection_updates) {
-                    if (trace_) {
-                        Auxiliaries.logWarn(
-                            String.format(
-                                Locale.ROOT,
-                                "UCON: %s UPDATE NET OF %s",
-                                posstr(blockPos),
-                                posstr(te.blockPos),
-                            )
-                        )
-                    }
-                    te.updateConnections(recursion_left - 1)
-                }
-            }
-        }
-
-        run {
-            nets_
-                .filter { it.power > 0 }
-                .forEach { net -> all_neighbours.addAll(net.neighbour_positions) }
-            val world = getLevel()!!
-            val state = blockState
-            all_neighbours.forEach { pos ->
-                val st = world.getBlockState(pos)
+        val result =
+            TrackNetworkCalculator(getLevel()!!, blockPos, state_flags_, getBlock(), trace_)
+                .calculate(nets_)
+        state_flags_ = result.newStateFlags
+        nets_.clear()
+        nets_.addAll(result.nets)
+        setChanged()
+        if (recursion_left > 0) {
+            for (te in result.trackConnectionUpdates) {
                 if (trace_) {
                     Auxiliaries.logWarn(
                         String.format(
                             Locale.ROOT,
-                            "UCON: %s UPDATE TRACK CHANGES TO %s.",
+                            "UCON: %s UPDATE NET OF %s",
                             posstr(blockPos),
-                            posstr(pos),
+                            posstr(te.blockPos),
                         )
                     )
                 }
-                st.handleNeighborChanged(world, pos, state.block, blockPos, false)
-                world.updateNeighborsAt(pos, st.block)
+                te.updateConnections(recursion_left - 1)
             }
+        }
+        val world = getLevel()!!
+        val state = blockState
+        result.neighboursToNotify.forEach { pos ->
+            val st = world.getBlockState(pos)
+            if (trace_) {
+                Auxiliaries.logWarn(
+                    String.format(
+                        Locale.ROOT,
+                        "UCON: %s UPDATE TRACK CHANGES TO %s.",
+                        posstr(blockPos),
+                        posstr(pos),
+                    )
+                )
+            }
+            st.handleNeighborChanged(world, pos, state.block, blockPos, false)
+            world.updateNeighborsAt(pos, st.block)
         }
     }
 }
