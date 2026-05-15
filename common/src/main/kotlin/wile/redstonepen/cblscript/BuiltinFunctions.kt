@@ -1,5 +1,15 @@
 package wile.redstonepen.cblscript
 
+/**
+ * TON (timer-on delay): output is true after [inp] has been continuously high for [pt] ticks.
+ *
+ * When [inp] goes low the timer resets immediately. If [pt] is zero, the output is true as soon as
+ * [inp] is high. Timer state is stored in [m] under keys prefixed with [sym], so each `ton1`
+ * through `ton5` instance is independent.
+ *
+ * @param sym Unique symbol name for this timer instance (e.g. `"ton1"`).
+ * @param x Argument expressions: x[0] = input signal, x[1] = preset time in ticks.
+ */
 private fun timerOn(
     sym: String,
     x: Array<Expression>,
@@ -45,6 +55,16 @@ private fun timerOn(
     }
 }
 
+/**
+ * TOF (timer-off delay): output is true while [inp] is high, and remains true for [pt] ticks after
+ * [inp] goes low.
+ *
+ * If [pt] is zero, the output follows [inp] with no delay. Timer state is stored in [m] under keys
+ * prefixed with [sym], so each `tof1` through `tof5` instance is independent.
+ *
+ * @param sym Unique symbol name for this timer instance (e.g. `"tof1"`).
+ * @param x Argument expressions: x[0] = input signal, x[1] = preset time in ticks.
+ */
 private fun timerOff(
     sym: String,
     x: Array<Expression>,
@@ -90,6 +110,16 @@ private fun timerOff(
     }
 }
 
+/**
+ * TP (pulse timer): fires a fixed-width output pulse of [pt] ticks on each rising edge of [inp].
+ *
+ * A new pulse cannot start until [inp] drops low and the current pulse has ended. Timer state is
+ * stored in [m] under keys prefixed with [sym], so each `tp1` through `tp5` instance is
+ * independent.
+ *
+ * @param sym Unique symbol name for this timer instance (e.g. `"tp1"`).
+ * @param x Argument expressions: x[0] = input signal, x[1] = pulse width in ticks.
+ */
 private fun timerPulse(
     sym: String,
     x: Array<Expression>,
@@ -133,6 +163,16 @@ private fun timerPulse(
     }
 }
 
+/**
+ * TIV (interval timer): fires true for one tick every [pt] ticks while [en] is high.
+ *
+ * The interval is measured from the last fire time stored in `$sym.clk`. Requires `pt > 2`; smaller
+ * values always return false to avoid flooding the tick scheduler. Timer state is stored in [m]
+ * under keys prefixed with [sym], so each `tiv1` through `tiv3` instance is independent.
+ *
+ * @param sym Unique symbol name for this timer instance (e.g. `"tiv1"`).
+ * @param x Argument expressions: x[0] = period in ticks, x[1] (optional) = enable signal.
+ */
 private fun timerInterval(
     sym: String,
     x: Array<Expression>,
@@ -162,6 +202,23 @@ private fun timerInterval(
     }
 }
 
+/**
+ * CNT (counter): increments or decrements a persistent integer counter with optional clamping and
+ * reset.
+ *
+ * Argument forms:
+ * - `cnt(up)` — increments when `up > 0`
+ * - `cnt(up, dn)` — increments on rising edge of `up`, decrements on rising edge of `dn`
+ * - `cnt(up, dn, max)` — clamps to `0..max`
+ * - `cnt(up, dn, min, max)` — clamps to `min..max`
+ * - `cnt(up, dn, min, max, rst)` — resets to 0 when `rst > 0`
+ *
+ * Counter state is stored in [m] under [sym] directly, so each `cnt1` through `cnt5` instance is
+ * independent.
+ *
+ * @param sym Unique symbol name for this counter instance (e.g. `"cnt1"`).
+ * @param x Argument expressions as described above.
+ */
 private fun counter(sym: String, x: Array<Expression>, m: MutableMap<String, Int>): Int {
     val nargs = x.size
     if (nargs <= 0) return 0
@@ -185,6 +242,13 @@ private fun counter(sym: String, x: Array<Expression>, m: MutableMap<String, Int
     return q
 }
 
+/**
+ * Builds the full list of standard CBLScript built-in functions for the given [policy].
+ *
+ * All boolean-valued functions (timers, comparators, `inv`, `if`) use [SignalPolicy.trueValue] and
+ * [SignalPolicy.falseValue] as their return values so that the same source code works under both
+ * `DEFAULT` (1/0) and `REDSTONE` (15/0) policies.
+ */
 internal fun standardFunctions(policy: SignalPolicy): List<FunctionDef> =
     listOf(
         FunctionDef("inv", 1) { x, m ->

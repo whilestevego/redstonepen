@@ -4,6 +4,8 @@ import wile.redstonepen.cblscript.CBLScript
 import wile.redstonepen.cblscript.Program
 import wile.redstonepen.cblscript.SignalPolicy
 
+private val RCA_SYMBOL_REGEX = Regex("^d[io][1]?[\\d][\\d]?\$")
+
 internal class ControlBoxLogic {
 
     var input_mask = 0x00000000
@@ -71,20 +73,29 @@ internal class ControlBoxLogic {
                 } -> input_mask = input_mask or bit
             }
         }
+        computeRcaMasks()
+        clearStaleIoData()
+        return program_.isValid
+    }
+
+    private fun computeRcaMasks() {
         for (sym in program_.referencedSymbols) {
-            if (!sym.matches(Regex("^d[io][1]?[\\d][\\d]?\$"))) continue
+            if (!sym.matches(RCA_SYMBOL_REGEX)) continue
             val ch = sym.substring(2).toInt()
             if (ch > 15) continue
-            if (sym[1] == 'i') rca_input_mask = rca_input_mask or (0xfL shl (ch * 4))
+            val isInput = sym[1] == 'i'
+            if (isInput) rca_input_mask = rca_input_mask or (0xfL shl (ch * 4))
             else rca_output_mask = rca_output_mask or (0xfL shl (ch * 4))
         }
-        // Ports/channels no longer referenced by the new program lose their mask bits; AND the
-        // cached data with the updated masks so stale values from old code don't persist.
+    }
+
+    // Ports/channels no longer referenced by the new program lose their mask bits; AND the
+    // cached data with the updated masks so stale values from old code don't persist.
+    private fun clearStaleIoData() {
         rca_input_data = rca_input_data and rca_input_mask
         rca_output_data = rca_output_data and rca_output_mask
         output_data = output_data and output_mask
         input_data = input_data and input_mask
-        return program_.isValid
     }
 
     fun tick() {
