@@ -121,10 +121,6 @@ class ControlBoxUiContainer(
                 )
                 sync = 2
             }
-            "resume" -> {
-                te.resumeAfterError()
-                sync = 2
-            }
         }
         if (sync > 0) {
             Networking.PacketContainerSyncServerToClient.sendToListeners(

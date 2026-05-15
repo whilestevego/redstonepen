@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -1098,8 +1097,7 @@ class ControlBoxTest :
                 val h = TestHooks()
                 h.setCode("b=1/0") shouldBe true
                 h.simulateTick()
-                h.tickErrorMessage() shouldNotBe null
-                h.tickErrorMessage() shouldContain "zero"
+                h.tickErrorMessage().shouldNotBeNull() shouldContain "zero"
             }
 
             it("no error message before any error occurs") {
@@ -1135,26 +1133,19 @@ class ControlBoxTest :
                 h.outputData() shouldBe outputBefore
             }
 
-            it("setCode does not clear error state — player must resume explicitly") {
+            it("setCode clears error state") {
                 val h = TestHooks()
                 h.injectTickError("something went wrong")
+                h.tickErrorMessage().shouldNotBeNull()
                 h.setCode("b=7")
-                h.tickErrorMessage().shouldNotBeNull()
-            }
-
-            it("resumeAfterError clears error state") {
-                val h = TestHooks()
-                h.injectTickError("something went wrong")
-                h.tickErrorMessage().shouldNotBeNull()
-                h.resumeAfterError()
                 h.tickErrorMessage().shouldBeNull()
             }
 
-            it("ticking resumes after resumeAfterError") {
+            it("ticking resumes after setCode clears the error") {
                 val h = TestHooks()
                 h.setCode("b=7")
                 h.injectTickError("something went wrong")
-                h.resumeAfterError()
+                h.setCode("b=7")
                 shouldNotThrowAny { h.simulateTick() }
                 h.output(Direction.EAST) shouldBe 7
             }

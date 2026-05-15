@@ -94,14 +94,10 @@ class ControlBoxGui(
             .init(this, Guis.Coord2d.of(196, 14))
             .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.runstop"))
         start_stop.onclick { _ ->
-            if (runtimeError_.isNotEmpty()) {
-                onGuiAction("resume")
-            } else {
-                val nbt = CompoundTag()
-                val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance()
-                if (rca != null && rca.isOpen()) nbt.putBoolean("withrca", true)
-                onGuiAction("enabled", nbt)
-            }
+            val nbt = CompoundTag()
+            val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance()
+            if (rca != null && rca.isOpen()) nbt.putBoolean("withrca", true)
+            onGuiAction("enabled", nbt)
             focus_editor_ = true
         }
         addRenderableWidget(start_stop)
@@ -406,9 +402,8 @@ class ControlBoxGui(
             }
         }
 
-        start_stop.active = errors_.isEmpty()
-        if (!start_stop.active || runtimeError_.isNotEmpty()) start_stop.checked(false)
-        if (errors_.isEmpty() && runtimeError_.isEmpty()) cb_error_indicator.visible = false
+        start_stop.active = errors_.isEmpty() && runtimeError_.isEmpty()
+        if (!start_stop.active) start_stop.checked(false) else cb_error_indicator.visible = false
         textbox.active = !start_stop.checked()
         textbox.setFontColor(if (textbox.active) 0xeeeeee else 0x999999)
         cb_paste_all.visible = textbox.active && textbox.getValue().trim().isEmpty()

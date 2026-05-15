@@ -219,6 +219,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
             activating_player_?.let { uuid ->
                 world.getPlayerByUUID(uuid)?.let { Auxiliaries.playerChatMessage(it, msg) }
             }
+            setEnabled(false)
             setChanged()
             return
         }
@@ -282,12 +283,8 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     fun getCode(): String = logic_.code()
 
     fun setCode(text: String) {
-        logic_.code(text)
-    }
-
-    fun resumeAfterError() {
         tickErrorMessage_ = null
-        tick_timer_ = 0
+        logic_.code(text)
     }
 
     fun getOutputSignal(internalSide: Direction): Int =
@@ -362,11 +359,8 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         private var tickErrorMessage_: String? = null
 
         fun setCode(text: String): Boolean {
-            return logic_.code(text)
-        }
-
-        fun resumeAfterError() {
             tickErrorMessage_ = null
+            return logic_.code(text)
         }
 
         fun valid(): Boolean = logic_.valid()
