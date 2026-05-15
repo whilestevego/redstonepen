@@ -559,7 +559,7 @@ object DemoSections {
         RedstoneTrackDefs.connections.getWireBit(face, wireDirection)
 
     private fun placePenTrack(level: Level, pos: BlockPos, wireFlags: Long) {
-        level.setBlock(pos, Registries.getBlock("track")!!.defaultBlockState(), FLAGS)
+        level.setBlock(pos, Registries.requireBlock("track").defaultBlockState(), FLAGS)
         (level.getBlockEntity(pos) as? TrackBlockEntity)?.also { te ->
             te.addWireFlags(wireFlags)
             te.handleShapeUpdate(

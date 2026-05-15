@@ -95,13 +95,13 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
-        redstone_side: Direction,
+        redstoneSide: Direction,
     ): Int {
         val cb = world.getBlockEntity(pos) as? ControlBoxBlockEntity ?: return 0
         val internal_side =
             CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(
                 state,
-                redstone_side.opposite,
+                redstoneSide.opposite,
             )
         return cb.getOutputSignal(internal_side)
     }
@@ -110,19 +110,16 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
-        redstone_side: Direction,
-    ): Int = getSignal(state, world, pos, redstone_side)
+        redstoneSide: Direction,
+    ): Int = getSignal(state, world, pos, redstoneSide)
 
     override fun useWithoutItem(
         state: BlockState,
         world: Level,
         pos: BlockPos,
-        player: Player?,
+        player: Player,
         brh: BlockHitResult,
-    ): InteractionResult {
-        if (player == null) return InteractionResult.PASS
-        return useOpenGui(state, world, pos, player)
-    }
+    ): InteractionResult = useOpenGui(state, world, pos, player)
 
     override fun useItemOn(
         stack: ItemStack,

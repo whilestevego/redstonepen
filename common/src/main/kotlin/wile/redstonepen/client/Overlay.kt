@@ -189,7 +189,7 @@ object Overlay {
                 if (state_deadline_ < System.currentTimeMillis() || state_ === EMPTY_STATE) {
                     Optional.empty()
                 } else {
-                    Optional.of(Tuple(state_, pos_))
+                    Optional.of(Tuple(state_!!, pos_))
                 }
         }
     }

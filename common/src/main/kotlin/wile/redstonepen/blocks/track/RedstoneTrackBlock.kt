@@ -113,11 +113,11 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
 
     public override fun getShape(
         state: BlockState,
-        world: BlockGetter,
+        source: BlockGetter,
         pos: BlockPos,
-        context: CollisionContext,
+        selectionContext: CollisionContext,
     ): VoxelShape {
-        val wires = tile(world, pos).map { it.getWireFlags() }.orElse(0)
+        val wires = tile(source, pos).map { it.getWireFlags() }.orElse(0)
         val faces =
             (if ((wires and 0x00000f) != 0) 0x01 else 0) or
                 (if ((wires and 0x0000f0) != 0) 0x02 else 0) or
@@ -132,7 +132,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
-        context: CollisionContext,
+        selectionContext: CollisionContext,
     ): VoxelShape = Shapes.empty()
 
     public override fun propagatesSkylightDown(
@@ -189,7 +189,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
 
     override fun shouldCheckWeakPower(
         state: BlockState,
-        level: LevelReader,
+        world: LevelReader,
         pos: BlockPos,
         side: Direction,
     ): Boolean = false

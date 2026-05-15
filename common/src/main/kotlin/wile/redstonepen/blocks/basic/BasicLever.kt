@@ -43,7 +43,7 @@ object BasicLever {
             state: BlockState,
             world: Level,
             pos: BlockPos,
-            player: Player?,
+            player: Player,
             brh: BlockHitResult,
         ): InteractionResult {
             if (world.isClientSide) {

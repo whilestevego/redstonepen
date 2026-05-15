@@ -22,11 +22,11 @@ object RelayTests {
 
     @JvmStatic
     fun relayActivatesFromRedstone(helper: GameTestHelper) {
-        placePoweredInput(helper, Registries.getBlock("relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("relay"))
         helper.succeedWhen {
             assertRelayState(
                 helper,
-                Registries.getBlock("relay")!!,
+                Registries.requireBlock("relay"),
                 true,
                 0,
                 "expected relay to become powered from adjacent redstone input",
@@ -36,11 +36,11 @@ object RelayTests {
 
     @JvmStatic
     fun invertedRelayRegistersPoweredInput(helper: GameTestHelper) {
-        placePoweredInput(helper, Registries.getBlock("inverted_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("inverted_relay"))
         helper.succeedWhen {
             assertRelayState(
                 helper,
-                Registries.getBlock("inverted_relay")!!,
+                Registries.requireBlock("inverted_relay"),
                 true,
                 0,
                 "expected inverted relay to register its powered input",
@@ -50,11 +50,11 @@ object RelayTests {
 
     @JvmStatic
     fun pulseRelayClearsItsPulseAfterTick(helper: GameTestHelper) {
-        placePoweredInput(helper, Registries.getBlock("pulse_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("pulse_relay"))
         helper.runAtTickTime(1) {
             assertRelayState(
                 helper,
-                Registries.getBlock("pulse_relay")!!,
+                Registries.requireBlock("pulse_relay"),
                 true,
                 1,
                 "expected pulse relay to enter its pulsing state",
@@ -63,7 +63,7 @@ object RelayTests {
         helper.runAtTickTime(4) {
             assertRelayState(
                 helper,
-                Registries.getBlock("pulse_relay")!!,
+                Registries.requireBlock("pulse_relay"),
                 true,
                 0,
                 "expected pulse relay to clear its pulse after the scheduled tick",
@@ -75,12 +75,12 @@ object RelayTests {
     @JvmStatic
     fun pulseRelaySetsPoweredFalseWhenInputRemoved(helper: GameTestHelper) {
         helper.setBlock(RELAY_POS.north(), Blocks.STONE)
-        placePoweredInput(helper, Registries.getBlock("pulse_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("pulse_relay"))
         helper.runAtTickTime(8) { helper.setBlock(INPUT_POS, Blocks.AIR) }
         helper.runAtTickTime(10) {
             assertRelayState(
                 helper,
-                Registries.getBlock("pulse_relay")!!,
+                Registries.requireBlock("pulse_relay"),
                 false,
                 0,
                 "pulse relay must become POWERED=false when power source removed",
@@ -91,11 +91,11 @@ object RelayTests {
 
     @JvmStatic
     fun bistableRelayLatchesOnFirstRisingEdge(helper: GameTestHelper) {
-        placePoweredInput(helper, Registries.getBlock("bistable_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("bistable_relay"))
         helper.succeedWhen {
             assertRelayState(
                 helper,
-                Registries.getBlock("bistable_relay")!!,
+                Registries.requireBlock("bistable_relay"),
                 true,
                 1,
                 "expected bistable relay to latch on after the first rising edge",
@@ -105,7 +105,7 @@ object RelayTests {
 
     @JvmStatic
     fun relayDownFacingRotation0ActivatesFromEast(helper: GameTestHelper) {
-        val relayBlock = Registries.getBlock("relay")!!
+        val relayBlock = Registries.requireBlock("relay")
         helper.setBlock(RELAY_POS.east(), Blocks.REDSTONE_BLOCK)
         helper.setBlock(
             RELAY_POS,
@@ -127,7 +127,7 @@ object RelayTests {
 
     @JvmStatic
     fun relayDownFacingRotation0DoesNotActivateFromNorth(helper: GameTestHelper) {
-        val relayBlock = Registries.getBlock("relay")!!
+        val relayBlock = Registries.requireBlock("relay")
         helper.setBlock(RELAY_POS.north(), Blocks.REDSTONE_BLOCK)
         helper.setBlock(
             RELAY_POS,
@@ -149,7 +149,7 @@ object RelayTests {
 
     @JvmStatic
     fun relayDownFacingRotation1ShiftsOutputToEast(helper: GameTestHelper) {
-        val relayBlock = Registries.getBlock("relay")!!
+        val relayBlock = Registries.requireBlock("relay")
         helper.setBlock(RELAY_POS.east(), Blocks.REDSTONE_BLOCK)
         helper.setBlock(
             RELAY_POS,
@@ -171,7 +171,7 @@ object RelayTests {
 
     @JvmStatic
     fun relayDownFacingRotation1ActivatesFromNorth(helper: GameTestHelper) {
-        val relayBlock = Registries.getBlock("relay")!!
+        val relayBlock = Registries.requireBlock("relay")
         helper.setBlock(RELAY_POS.north(), Blocks.REDSTONE_BLOCK)
         helper.setBlock(
             RELAY_POS,
@@ -229,7 +229,7 @@ object RelayTests {
 
     @JvmStatic
     fun upFacingIsOppositeOfFacingForAllDirections(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             val s =
                 relay
@@ -247,7 +247,7 @@ object RelayTests {
 
     @JvmStatic
     fun downFacingMethodEqualsFacingPropertyForAllDirections(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             val s =
                 relay
@@ -264,7 +264,7 @@ object RelayTests {
 
     @JvmStatic
     fun rightFacingIsRotationPlusOneRelativeToFront(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             for (r in 0..3) {
                 val s =
@@ -291,7 +291,7 @@ object RelayTests {
 
     @JvmStatic
     fun backFacingIsRotationPlusTwoRelativeToFront(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             for (r in 0..3) {
                 val s =
@@ -318,7 +318,7 @@ object RelayTests {
 
     @JvmStatic
     fun leftFacingIsRotationPlusThreeRelativeToFront(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             for (r in 0..3) {
                 val s =
@@ -345,7 +345,7 @@ object RelayTests {
 
     @JvmStatic
     fun allSixMappedDirectionsAreDistinctForEveryState(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             for (r in 0..3) {
                 val s =
@@ -372,7 +372,7 @@ object RelayTests {
 
     @JvmStatic
     fun forwardThenReverseStateMappedFacingIsIdentity(helper: GameTestHelper) {
-        val relay = Registries.getBlock("relay")!!
+        val relay = Registries.requireBlock("relay")
         for (face in Direction.values()) {
             for (r in 0..3) {
                 val s =
@@ -603,7 +603,8 @@ object RelayTests {
         helper.setBlock(supportPos, Blocks.STONE)
         helper.setBlock(
             relayPos,
-            Registries.getBlock("relay")!!.defaultBlockState()
+            Registries.requireBlock("relay")
+                .defaultBlockState()
                 .setValue(CircuitComponents.DirectedComponentBlock.FACING, Direction.DOWN)
                 .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, 0),
         )
@@ -618,12 +619,12 @@ object RelayTests {
     @JvmStatic
     fun relayDeactivatesWhenPowerRemovedViaTick(helper: GameTestHelper) {
         helper.setBlock(RELAY_POS.north(), Blocks.STONE)
-        placePoweredInput(helper, Registries.getBlock("relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("relay"))
         helper.runAfterDelay(5) { helper.setBlock(INPUT_POS, Blocks.AIR) }
         helper.succeedWhen {
             assertRelayState(
                 helper,
-                Registries.getBlock("relay")!!,
+                Registries.requireBlock("relay"),
                 false,
                 0,
                 "relay must deactivate after power source removed",
@@ -634,12 +635,12 @@ object RelayTests {
     @JvmStatic
     fun bistableRelayDeactivatesOnFallingEdge(helper: GameTestHelper) {
         helper.setBlock(RELAY_POS.north(), Blocks.STONE)
-        placePoweredInput(helper, Registries.getBlock("bistable_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("bistable_relay"))
         helper.runAfterDelay(5) { helper.setBlock(INPUT_POS, Blocks.AIR) }
         helper.succeedWhen {
             assertRelayState(
                 helper,
-                Registries.getBlock("bistable_relay")!!,
+                Registries.requireBlock("bistable_relay"),
                 false,
                 1,
                 "bistable relay must set POWERED=false after power removed while STATE stays latched",
@@ -650,11 +651,11 @@ object RelayTests {
     @JvmStatic
     fun invertedRelayDeactivatesWhenPowerRemoved(helper: GameTestHelper) {
         helper.setBlock(RELAY_POS.north(), Blocks.STONE)
-        placePoweredInput(helper, Registries.getBlock("inverted_relay")!!)
+        placePoweredInput(helper, Registries.requireBlock("inverted_relay"))
         helper.runAtTickTime(4) {
             assertRelayState(
                 helper,
-                Registries.getBlock("inverted_relay")!!,
+                Registries.requireBlock("inverted_relay"),
                 true,
                 0,
                 "inverted relay must be POWERED=true before power removal",
@@ -664,7 +665,7 @@ object RelayTests {
         helper.runAtTickTime(6) {
             assertRelayState(
                 helper,
-                Registries.getBlock("inverted_relay")!!,
+                Registries.requireBlock("inverted_relay"),
                 false,
                 0,
                 "inverted relay must set POWERED=false immediately when power source removed",
@@ -675,7 +676,7 @@ object RelayTests {
 
     @JvmStatic
     fun bridgeRelayPlacedAndGetSignalDoesNotThrow(helper: GameTestHelper) {
-        helper.setBlock(RELAY_POS, Registries.getBlock("bridge_relay")!!.defaultBlockState())
+        helper.setBlock(RELAY_POS, Registries.requireBlock("bridge_relay").defaultBlockState())
         val abs = helper.absolutePos(RELAY_POS)
         for (d in Direction.values()) {
             val sig = helper.getBlockState(RELAY_POS).getSignal(helper.getLevel(), abs, d)
@@ -689,7 +690,7 @@ object RelayTests {
         val wirePos = RELAY_POS.east()
         helper.setBlock(wirePos.below(), Blocks.STONE)
         helper.setBlock(wirePos, Blocks.REDSTONE_WIRE)
-        helper.setBlock(RELAY_POS, Registries.getBlock("bridge_relay")!!.defaultBlockState())
+        helper.setBlock(RELAY_POS, Registries.requireBlock("bridge_relay").defaultBlockState())
         val sig =
             helper
                 .getBlockState(RELAY_POS)
@@ -703,7 +704,7 @@ object RelayTests {
         val leftPos = RELAY_POS.north()
         helper.setBlock(leftPos.below(), Blocks.STONE)
         helper.setBlock(leftPos, Blocks.REDSTONE_WIRE)
-        helper.setBlock(RELAY_POS, Registries.getBlock("bridge_relay")!!.defaultBlockState())
+        helper.setBlock(RELAY_POS, Registries.requireBlock("bridge_relay").defaultBlockState())
         val sig =
             helper
                 .getBlockState(RELAY_POS)
@@ -713,7 +714,8 @@ object RelayTests {
     }
 
     private fun relayState(facing: Direction, rotation: Int): BlockState =
-        Registries.getBlock("relay")!!.defaultBlockState()
+        Registries.requireBlock("relay")
+            .defaultBlockState()
             .setValue(CircuitComponents.DirectedComponentBlock.FACING, facing)
             .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, rotation)
 
@@ -728,11 +730,11 @@ object RelayTests {
         val clickLoc = Vec3.atCenterOf(placementAbs).add(clickOffset)
         val hit = BlockHitResult(clickLoc, clickedFace, surfaceAbs, false)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val relayItem = ItemStack(Registries.getItem("relay")!!)
+        val relayItem = ItemStack(Registries.requireItem("relay"))
         player.setItemInHand(InteractionHand.MAIN_HAND, relayItem)
         val uoc = UseOnContext(helper.getLevel(), player, InteractionHand.MAIN_HAND, relayItem, hit)
         val bpc = BlockPlaceContext(uoc)
-        return Registries.getBlock("relay")!!.getStateForPlacement(bpc)
+        return Registries.requireBlock("relay").getStateForPlacement(bpc)
     }
 
     private fun placePoweredInput(helper: GameTestHelper, relayBlock: Block) {

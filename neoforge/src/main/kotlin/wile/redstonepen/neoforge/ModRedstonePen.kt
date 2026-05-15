@@ -75,7 +75,7 @@ class ModRedstonePen(bus: IEventBus) {
                     CreativeModeTab.builder()
                         .title(Component.translatable("itemGroup.tabredstonepen"))
                         .withTabsBefore(CreativeModeTabs.COMBAT)
-                        .icon { ItemStack(Registries.getItem("pen")) }
+                        .icon { ItemStack(Registries.requireItem("pen")) }
                         .displayItems { _, output ->
                             Registries.getRegisteredItems().forEach {
                                 if (

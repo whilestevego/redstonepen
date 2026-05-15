@@ -276,7 +276,7 @@ object GuiTextEditing {
             mxs.translate(ox.toDouble(), oy.toDouble(), 0.0)
             mxs.scale(font_scale_, font_scale_, font_scale_)
             val cache = getDisplayCache()
-            for (li in cache.lines) gg.drawString(font_, li.asComponent, li.x, li.y, font_color_)
+            for (li in cache.lines) gg.drawString(font_!!, li.asComponent, li.x, li.y, font_color_)
             renderCursor(gg, cache.cursor, cache.cursorAtEnd)
             renderHighlight(gg, cache.selection)
             val xy = getMousePosition()
@@ -394,7 +394,7 @@ object GuiTextEditing {
             if (!atEnd) {
                 gg.fill(p.x, p.y - 1, p.x + 1, p.y + NORM_LINE_HEIGHT, cursor_color_)
             } else {
-                gg.drawString(font_, "_", p.x, p.y, cursor_color_)
+                gg.drawString(font_!!, "_", p.x, p.y, cursor_color_)
             }
         }
 

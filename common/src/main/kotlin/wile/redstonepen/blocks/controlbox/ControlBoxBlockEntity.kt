@@ -113,7 +113,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
             id,
             inventory,
             block_inventory_,
-            ContainerLevelAccess.create(level, worldPosition),
+            ContainerLevelAccess.create(level!!, worldPosition),
             SimpleContainerData(1),
         )
 

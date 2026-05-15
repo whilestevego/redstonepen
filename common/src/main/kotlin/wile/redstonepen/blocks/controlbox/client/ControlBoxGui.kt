@@ -419,12 +419,7 @@ class ControlBoxGui(
         gg.drawString(font, title, titleLabelX, titleLabelY, 0x707070)
     }
 
-    override fun slotClicked(
-        hoveredSlot: Slot?,
-        hoveredIndex: Int,
-        no: Int,
-        clickType: ClickType,
-    ) {}
+    override fun slotClicked(hoveredSlot: Slot, hoveredIndex: Int, no: Int, clickType: ClickType) {}
 
     private fun push_code(text: String) {
         val nbt = CompoundTag()

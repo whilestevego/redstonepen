@@ -169,7 +169,6 @@ object ControlBoxTests {
     fun getNameFallsBackToBlockTranslationKey(helper: GameTestHelper) {
         val te = placeControlBox(helper)
         if (te.hasCustomName()) helper.fail("default control box must not have custom name")
-        if (te.name == null) helper.fail("getName must not be null")
         helper.succeed()
     }
 
@@ -200,7 +199,7 @@ object ControlBoxTests {
         te.setCode("b=7")
         te.setEnabled(true)
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val signal =
             block.getSignal(
                 helper.getBlockState(CONTROL_BOX_POS),
@@ -218,7 +217,7 @@ object ControlBoxTests {
         te.setCode("b=5")
         te.setEnabled(true)
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
         val state = helper.getBlockState(CONTROL_BOX_POS)
         val sig = block.getSignal(state, helper.level, absPos, Direction.WEST)
@@ -233,7 +232,7 @@ object ControlBoxTests {
     fun dropListWithCodeSavesNbt(helper: GameTestHelper) {
         val te = placeControlBox(helper)
         te.setCode("b=3")
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val drops = block.dropList(helper.getBlockState(CONTROL_BOX_POS), helper.level, te, false)
         if (drops.size != 1) helper.fail("expected 1 drop, got ${drops.size}")
         if (!Auxiliaries.hasItemStackNbt(drops[0], "tedata")) {
@@ -245,7 +244,7 @@ object ControlBoxTests {
     @JvmStatic
     fun dropListWithNoCodeHasNoNbt(helper: GameTestHelper) {
         val te = placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val drops = block.dropList(helper.getBlockState(CONTROL_BOX_POS), helper.level, te, false)
         if (drops.size != 1) helper.fail("expected 1 drop")
         if (Auxiliaries.hasItemStackNbt(drops[0], "tedata")) {
@@ -259,10 +258,10 @@ object ControlBoxTests {
         val te = placeControlBox(helper)
         te.setCode("b=9")
         val tedata = te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
-        val stack = ItemStack(Registries.getItem("control_box")!!)
+        val stack = ItemStack(Registries.requireItem("control_box"))
         Auxiliaries.setItemStackNbt(stack, "tedata", tedata)
-        helper.setBlock(CONTROL_BOX_POS, Registries.getBlock("control_box")!!.defaultBlockState())
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        helper.setBlock(CONTROL_BOX_POS, Registries.requireBlock("control_box").defaultBlockState())
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         block.setPlacedBy(
             helper.level,
             helper.absolutePos(CONTROL_BOX_POS),
@@ -284,8 +283,8 @@ object ControlBoxTests {
     @JvmStatic
     fun setPlacedByWithEmptyNbtIsNoOp(helper: GameTestHelper) {
         placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
-        val stack = ItemStack(Registries.getItem("control_box")!!)
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
+        val stack = ItemStack(Registries.requireItem("control_box"))
         block.setPlacedBy(
             helper.level,
             helper.absolutePos(CONTROL_BOX_POS),
@@ -299,28 +298,25 @@ object ControlBoxTests {
     @JvmStatic
     fun updateWithNullFromPosResetsTickTimer(helper: GameTestHelper) {
         placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
-        val result = block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, null)
-        if (result == null) helper.fail("update must return non-null state")
+        block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, null)
         helper.succeed()
     }
 
     @JvmStatic
     fun updateWithNeighborPosTriggersSideScan(helper: GameTestHelper) {
         placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
-        val result =
-            block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, absPos.east())
-        if (result == null) helper.fail("update must return non-null state")
+        block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, absPos.east())
         helper.succeed()
     }
 
     @JvmStatic
     fun isBlockEntityTickingAlwaysTrue(helper: GameTestHelper) {
         placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         if (!block.isBlockEntityTicking(helper.level, helper.getBlockState(CONTROL_BOX_POS))) {
             helper.fail("isBlockEntityTicking must return true")
         }
@@ -336,7 +332,6 @@ object ControlBoxTests {
     @JvmStatic
     fun getDisplayNameReturnsNonNull(helper: GameTestHelper) {
         val te = placeControlBox(helper)
-        if (te.displayName == null) helper.fail("getDisplayName must not return null")
         helper.succeed()
     }
 
@@ -344,8 +339,7 @@ object ControlBoxTests {
     fun createMenuReturnsNonNull(helper: GameTestHelper) {
         val te = placeControlBox(helper)
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val menu = te.createMenu(0, player.inventory, player)
-        if (menu == null) helper.fail("createMenu must not return null")
+        te.createMenu(0, player.inventory, player)
         helper.succeed()
     }
 
@@ -399,7 +393,7 @@ object ControlBoxTests {
         te.setEnabled(true)
         te.tick()
         helper.setBlock(CONTROL_BOX_POS.west(), Blocks.REDSTONE_BLOCK)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
         block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, absPos.west())
         helper.succeed()
@@ -413,7 +407,7 @@ object ControlBoxTests {
         helper.setBlock(CONTROL_BOX_POS.west(), Blocks.REDSTONE_BLOCK)
         te.tick()
         helper.setBlock(CONTROL_BOX_POS.west(), Blocks.AIR)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
         block.update(helper.getBlockState(CONTROL_BOX_POS), helper.level, absPos, absPos.west())
         helper.succeed()
@@ -438,7 +432,7 @@ object ControlBoxTests {
     @JvmStatic
     fun controlBoxBuiltinFunctionsExercised(helper: GameTestHelper) {
         val te = placeControlBox(helper)
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val absPos = helper.absolutePos(CONTROL_BOX_POS)
         te.setEnabled(true)
 
@@ -518,7 +512,7 @@ object ControlBoxTests {
         te.setEnabled(true)
         te.tick()
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val sig =
             block.getSignal(
                 helper.getBlockState(CONTROL_BOX_POS),
@@ -537,7 +531,7 @@ object ControlBoxTests {
         te.setEnabled(true)
         te.tick()
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val sig =
             block.getSignal(
                 helper.getBlockState(CONTROL_BOX_POS),
@@ -562,7 +556,7 @@ object ControlBoxTests {
         te.setEnabled(true)
         te.tick()
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val sig =
             block.getSignal(
                 helper.getBlockState(CONTROL_BOX_POS),
@@ -580,7 +574,7 @@ object ControlBoxTests {
         te.setCode("b=tof1(0,0)\nb=tp1(0,5)")
         te.setEnabled(true)
         te.tick()
-        val block = Registries.getBlock("control_box")!! as ControlBoxBlock
+        val block = Registries.requireBlock("control_box") as ControlBoxBlock
         val sig =
             block.getSignal(
                 helper.getBlockState(CONTROL_BOX_POS),
@@ -603,7 +597,7 @@ object ControlBoxTests {
     }
 
     private fun placeControlBox(helper: GameTestHelper): ControlBoxBlockEntity {
-        helper.setBlock(CONTROL_BOX_POS, Registries.getBlock("control_box")!!.defaultBlockState())
+        helper.setBlock(CONTROL_BOX_POS, Registries.requireBlock("control_box").defaultBlockState())
         return getControlBox(helper) ?: error("expected control box block entity to be created")
     }
 
