@@ -659,14 +659,16 @@ internal class ControlBoxLogic {
         class ExprDiv(args: List<Expr>) : ExprOp(ExprType.DIV, args) {
             override fun calc(mem: Map<String, Int>): Int {
                 val b = arguments[1].calc(mem)
-                return if (b <= 0) 0 else arguments[0].calc(mem) / b
+                if (b == 0) throw ArithmeticException("division by zero")
+                return arguments[0].calc(mem) / b
             }
         }
 
         class ExprMod(args: List<Expr>) : ExprOp(ExprType.MOD, args) {
             override fun calc(mem: Map<String, Int>): Int {
                 val b = arguments[1].calc(mem)
-                return if (b <= 0) 0 else arguments[0].calc(mem) % b
+                if (b == 0) throw ArithmeticException("modulo by zero")
+                return arguments[0].calc(mem) % b
             }
         }
 

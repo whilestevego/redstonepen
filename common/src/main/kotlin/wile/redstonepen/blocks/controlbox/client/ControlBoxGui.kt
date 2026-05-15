@@ -49,6 +49,7 @@ class ControlBoxGui(
     private val port_stati_o_indicators: MutableList<Guis.Image> = ArrayList()
     private val symbols_: MutableMap<String, Int> = HashMap()
     private val errors_: MutableList<Tuple<Int, String>> = ArrayList()
+    private var runtimeError_: String = ""
     private var update_counter_: Int = 0
     private var focus_editor_: Boolean = false
     private var debug_enabled_: Boolean = false
@@ -371,6 +372,14 @@ class ControlBoxGui(
                     cb_error_indicator.setY(exy.y + textbox.getLineHeight())
                 }
             }
+            runtimeError_ = nbt.getString("runtimeError")
+            if (runtimeError_.isNotEmpty() && errors_.isEmpty()) {
+                val exy = textbox.getCoordinatesAtIndex(0)
+                cb_error_indicator.tooltip(Component.literal(runtimeError_))
+                cb_error_indicator.visible = true
+                cb_error_indicator.setX(exy.x)
+                cb_error_indicator.setY(exy.y + textbox.getLineHeight())
+            }
             if (nbt.contains("player", Tag.TAG_STRING.toInt())) {
                 val playerName = nbt.getString("player")
                 if (playerName.isEmpty()) {
@@ -393,7 +402,7 @@ class ControlBoxGui(
             }
         }
 
-        start_stop.active = errors_.isEmpty()
+        start_stop.active = errors_.isEmpty() && runtimeError_.isEmpty()
         if (!start_stop.active) start_stop.checked(false) else cb_error_indicator.visible = false
         textbox.active = !start_stop.checked()
         textbox.setFontColor(if (textbox.active) 0xeeeeee else 0x999999)
@@ -419,7 +428,12 @@ class ControlBoxGui(
         gg.drawString(font, title, titleLabelX, titleLabelY, 0x707070)
     }
 
-    override fun slotClicked(hoveredSlot: Slot, hoveredIndex: Int, no: Int, clickType: ClickType) {}
+    override fun slotClicked(
+        hoveredSlot: Slot?,
+        hoveredIndex: Int,
+        no: Int,
+        clickType: ClickType,
+    ) {}
 
     private fun push_code(text: String) {
         val nbt = CompoundTag()

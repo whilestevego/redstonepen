@@ -47,6 +47,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     private var trace_ = false
     private var tick_timer_ = 0
     private var tick_interval_ = 0
+    private var tickErrorMessage_: String? = null
 
     override fun readnbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag {
         if (nbt.contains("name", Tag.TAG_STRING.toInt())) {
@@ -123,10 +124,10 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         )
 
     override fun tick() {
-        if (--tick_timer_ > 0) return
+        if (tickErrorMessage_ != null || --tick_timer_ > 0) return
         tick_timer_ = if (tick_interval_ > 0) tick_interval_ else TICK_INTERVAL
         val tick = System.nanoTime()
-        val world = getLevel()!!
+        val world = getLevel() ?: return
         val device_state = blockState
         val device_pos = blockPos
         val device_enabled =
@@ -212,8 +213,14 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
                 }
             }
         } catch (ex: Throwable) {
-            Auxiliaries.logError("RLC tick exception!" + ex)
-            world.removeBlock(blockPos, true)
+            val msg = "ControlBox halted: ${ex.message ?: ex.javaClass.simpleName}"
+            Auxiliaries.logError(msg)
+            tickErrorMessage_ = msg
+            activating_player_?.let { uuid ->
+                world.getPlayerByUUID(uuid)?.let { Auxiliaries.playerChatMessage(it, msg) }
+            }
+            setEnabled(false)
+            setChanged()
             return
         }
         run {
@@ -236,7 +243,8 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun onServerPacketReceived(nbt: CompoundTag) {
-        readnbt(getLevel()!!.registryAccess(), nbt)
+        val world = getLevel() ?: return
+        readnbt(world.registryAccess(), nbt)
     }
 
     fun getEnabled(): Boolean =
@@ -245,12 +253,13 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
 
     fun setEnabled(en: Boolean) {
         if (en == getEnabled()) return
-        getLevel()!!.setBlock(
+        val world = getLevel() ?: return
+        world.setBlock(
             blockPos,
             blockState.setValue(CircuitComponents.DirectedComponentBlock.STATE, if (en) 1 else 0),
             1 or 2 or 16,
         )
-        getLevel()!!.setBlock(
+        world.setBlock(
             blockPos,
             blockState.setValue(CircuitComponents.DirectedComponentBlock.POWERED, en),
             1 or 2 or 16,
@@ -274,6 +283,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     fun getCode(): String = logic_.code()
 
     fun setCode(text: String) {
+        tickErrorMessage_ = null
         logic_.code(text)
     }
 
@@ -285,7 +295,6 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     internal fun collectSyncData(full: Boolean): CompoundTag {
-        val world = getLevel()!!
         val nbt = CompoundTag()
         nbt.putString("action", "serverdata")
         nbt.putBoolean("enabled", getEnabled())
@@ -307,11 +316,12 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         } else {
             nbt.put("errors", CompoundTag())
         }
+        tickErrorMessage_?.let { nbt.putString("runtimeError", it) }
         if (!full) return nbt
         nbt.putBoolean("debug", trace_enabled())
         nbt.putString("code", getCode())
         if (activating_player_ != null) {
-            val run_player = world.getPlayerByUUID(activating_player_!!)
+            val run_player = getLevel()?.getPlayerByUUID(activating_player_!!)
             nbt.putString("player", if (run_player == null) "" else run_player.scoreboardName)
         }
         return nbt
@@ -322,10 +332,10 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         val shift = 4 * from_mapped_side.ordinal
         val mask = 0xf shl shift
         if ((logic_.input_mask and mask) == 0) return
+        val world = getLevel() ?: return
         val signal_intr =
             mask and
-                (getLevel()!!.getSignal(blockPos.relative(from_world_side), from_world_side) shl
-                    shift)
+                (world.getSignal(blockPos.relative(from_world_side), from_world_side) shl shift)
         val signal_data = mask and logic_.input_data
         if (signal_intr == signal_data) return
         if (signal_intr != 0 && signal_data == 0) {
@@ -346,8 +356,12 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
 
     class TestHooks {
         private val logic_ = ControlBoxLogic()
+        private var tickErrorMessage_: String? = null
 
-        fun setCode(text: String): Boolean = logic_.code(text)
+        fun setCode(text: String): Boolean {
+            tickErrorMessage_ = null
+            return logic_.code(text)
+        }
 
         fun valid(): Boolean = logic_.valid()
 
@@ -372,6 +386,21 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
 
         fun tick() {
             logic_.tick()
+        }
+
+        fun simulateTick() {
+            if (tickErrorMessage_ != null) return
+            try {
+                logic_.tick()
+            } catch (ex: Throwable) {
+                tickErrorMessage_ = ex.message ?: ex.javaClass.simpleName
+            }
+        }
+
+        fun tickErrorMessage(): String? = tickErrorMessage_
+
+        fun injectTickError(message: String) {
+            tickErrorMessage_ = message
         }
 
         fun output(side: Direction): Int = (logic_.output_data shr (4 * side.ordinal)) and 0xf
