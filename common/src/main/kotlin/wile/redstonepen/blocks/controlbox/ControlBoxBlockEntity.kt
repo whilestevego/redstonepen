@@ -113,7 +113,12 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
             id,
             inventory,
             block_inventory_,
-            ContainerLevelAccess.create(level!!, worldPosition),
+            ContainerLevelAccess.create(
+                requireNotNull(level) {
+                    "BlockEntity must be attached to a level before createMenu is called"
+                },
+                worldPosition,
+            ),
             SimpleContainerData(1),
         )
 
