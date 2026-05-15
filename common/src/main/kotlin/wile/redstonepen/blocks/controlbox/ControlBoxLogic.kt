@@ -78,6 +78,8 @@ internal class ControlBoxLogic {
             if (sym[1] == 'i') rca_input_mask = rca_input_mask or (0xfL shl (ch * 4))
             else rca_output_mask = rca_output_mask or (0xfL shl (ch * 4))
         }
+        // Ports/channels no longer referenced by the new program lose their mask bits; AND the
+        // cached data with the updated masks so stale values from old code don't persist.
         rca_input_data = rca_input_data and rca_input_mask
         rca_output_data = rca_output_data and rca_output_mask
         output_data = output_data and output_mask
@@ -122,9 +124,11 @@ internal class ControlBoxLogic {
         }
         intr_redges = 0
         intr_fedges = 0
+        // Timer built-ins lower .deadline to the ticks until their next edge; the block entity
+        // uses the value to schedule early wakeups.  Initialize to 40 (max interval) so timers
+        // only need to reduce it — never increase it.
         symbol(".deadline", 40)
-        val assigned = program_.evaluate(state_)
-        assigned.forEach { (k, v) -> symbol(k, v) }
+        program_.evaluate(state_)
         output_data = 0
         for (i in 0 until Defs.PORT_NAMES.size) {
             output_data = output_data or ((symbol(Defs.PORT_NAMES[i]) and 0xf) shl (4 * i))

@@ -15,6 +15,7 @@
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$private fun propagateEdit(face: Direction, originalPos: BlockPos, initialSidePower: Int)</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun discoverWireNeighbours( j: Int, side: Direction, routeFlags: Long, intSides: MutableSet&lt;Direction&gt;, pwrSides: MutableList&lt;Direction&gt;, positions: MutableList&lt;BlockPos&gt;, extSides: MutableList&lt;Direction&gt;, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, )</ID>
+    <ID>LargeClass:CblScriptTest.kt$CblScriptTest : DescribeSpec</ID>
     <ID>LargeClass:ControlBoxTest.kt$ControlBoxTest : DescribeSpec</ID>
     <ID>LargeClass:RelayTests.kt$RelayTests</ID>
     <ID>LargeClass:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
