@@ -355,10 +355,9 @@ object PenItemGameTests {
 
     @JvmStatic
     @GameTest(template = EMPTY, timeoutTicks = 5)
-    @Suppress("DEPRECATION")
     fun penGetEnchantmentValueIsZero(helper: GameTestHelper) {
         val pen = ItemStack(Registries.requireItem("pen"))
-        if (pen.item.enchantmentValue != 0) helper.fail("pen enchantment value must be 0")
+        if (pen.item.getEnchantmentValue(pen) != 0) helper.fail("pen enchantment value must be 0")
         helper.succeed()
     }
 

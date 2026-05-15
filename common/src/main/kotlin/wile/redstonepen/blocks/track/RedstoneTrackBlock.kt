@@ -149,7 +149,6 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
     public override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean =
         true
 
-    @Deprecated("Deprecated in favour of canConnectRedstone in IForgeBlockState")
     fun canConnectRedstone(
         _state: BlockState,
         world: BlockGetter,

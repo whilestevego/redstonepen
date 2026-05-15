@@ -335,7 +335,6 @@ object TrackTests {
     }
 
     @JvmStatic
-    @Suppress("DEPRECATION")
     fun canConnectRedstoneFalseForUnconnectedTrack(helper: GameTestHelper) {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
@@ -351,7 +350,6 @@ object TrackTests {
     }
 
     @JvmStatic
-    @Suppress("DEPRECATION")
     fun canConnectRedstoneFalseForNullSide(helper: GameTestHelper) {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
