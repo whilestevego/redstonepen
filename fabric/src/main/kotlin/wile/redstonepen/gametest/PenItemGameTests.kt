@@ -26,7 +26,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun isPenTrueForPenItem(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (!RedstonePenItem.isPen(pen)) {
                 helper.fail("expected isPen to be true for pen ItemStack")
             }
@@ -39,7 +39,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun isFullRedstoneTrueForUndamagedPen(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (!RedstonePenItem.isFullRedstone(pen)) helper.fail("undamaged pen must report full")
             helper.succeed()
         }
@@ -47,7 +47,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun isFullRedstoneFalseForDamagedPen(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage > 0) {
                 pen.damageValue = 1
                 if (RedstonePenItem.isFullRedstone(pen)) {
@@ -78,7 +78,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun pushRedstoneIntoDamagedPenRepairs(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage <= 0) {
                 helper.succeed()
                 return
@@ -93,7 +93,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun pushRedstoneOverflowGoesToInventory(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage <= 0) {
                 helper.succeed()
                 return
@@ -108,7 +108,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun pushRedstoneIntoCreativePlayerNoOp(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage > 0) pen.damageValue = 5
             val dmg = pen.damageValue
             RedstonePenItem.pushRedstone(pen, 3, player)
@@ -120,7 +120,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun pushRedstoneZeroAmountIsNoOp(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage > 0) pen.damageValue = 5
             val dmg = pen.damageValue
             RedstonePenItem.pushRedstone(pen, 0, player)
@@ -142,7 +142,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun popRedstoneFromPenAccumulatesDamage(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage <= 0) {
                 helper.succeed()
                 return
@@ -158,7 +158,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun popRedstoneCreativeReturnsRequestedAmount(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (RedstonePenItem.popRedstone(pen, 5, player, InteractionHand.MAIN_HAND) != 5) {
                 helper.fail("creative pop should return requested amount")
             }
@@ -169,7 +169,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun popRedstoneZeroAmountReturnsZero(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (RedstonePenItem.popRedstone(pen, 0, player, InteractionHand.MAIN_HAND) != 0) {
                 helper.fail("zero pop must return zero")
             }
@@ -191,7 +191,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun hasEnoughRedstoneCreativeAlwaysTrue(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (!RedstonePenItem.hasEnoughRedstone(pen, 1000, player)) {
                 helper.fail("creative must always have enough")
             }
@@ -202,7 +202,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun hasEnoughRedstoneTrueForUndamagedPen(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage > 0) {
                 pen.damageValue = 0
                 if (!RedstonePenItem.hasEnoughRedstone(pen, 1, player)) {
@@ -242,7 +242,7 @@ class PenItemGameTests {
         fun useOnSolidBlockReturnsFailWhenFaceCannotHostTrack(helper: GameTestHelper) {
             helper.setBlock(POS, Blocks.AIR)
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val absolute = helper.absolutePos(POS)
             val hit = BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false)
@@ -267,7 +267,7 @@ class PenItemGameTests {
             helper.setBlock(POS, Blocks.STONE)
             helper.setBlock(POS.south(), Blocks.AIR)
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val absolute = helper.absolutePos(POS)
             val clickVec = Vec3.atCenterOf(absolute).add(0.0, 0.0, 0.5)
@@ -293,7 +293,7 @@ class PenItemGameTests {
             helper.setBlock(POS, Blocks.STONE)
             helper.setBlock(POS.south(), Blocks.AIR)
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val absolute = helper.absolutePos(POS)
             val clickVec = Vec3.atCenterOf(absolute).add(0.0, 0.0, 0.5)
@@ -336,7 +336,7 @@ class PenItemGameTests {
             helper.setBlock(POS, Blocks.STONE)
             helper.setBlock(POS.above(), Blocks.REDSTONE_WIRE)
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             pen.damageValue = 0
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val wireAbs = helper.absolutePos(POS.above())
@@ -355,7 +355,7 @@ class PenItemGameTests {
             helper.setBlock(POS, Blocks.STONE)
             helper.setBlock(POS.above(), Blocks.REDSTONE_WIRE)
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             pen.damageValue = 0
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val wireAbs = helper.absolutePos(POS.above())
@@ -370,7 +370,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penIsBarVisibleOnlyWhenDamaged(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.item.isBarVisible(pen)) helper.fail("undamaged pen must not show bar")
             if (pen.maxDamage > 0) {
                 pen.damageValue = 5
@@ -382,7 +382,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penGetEnchantmentValueIsZero(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.item.enchantmentValue != 0) helper.fail("pen enchantment value must be 0")
             helper.succeed()
         }
@@ -390,7 +390,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penIsValidRepairItemFalse(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.item.isValidRepairItem(pen, ItemStack(Items.REDSTONE))) {
                 helper.fail("pen must not be repairable by redstone via item.isValidRepairItem")
             }
@@ -400,7 +400,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penDestroySpeedHigherForFragileBlocks(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             val speedRedstoneWire =
                 pen.item.getDestroySpeed(pen, Blocks.REDSTONE_WIRE.defaultBlockState())
             val speedStone = pen.item.getDestroySpeed(pen, Blocks.STONE.defaultBlockState())
@@ -413,7 +413,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penGetBarColorIsSet(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.item.getBarColor(pen) == 0) helper.fail("pen bar color must be non-zero")
             helper.succeed()
         }
@@ -421,7 +421,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penGetBarWidthDecreasesWithDamage(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage <= 0) {
                 helper.succeed()
                 return
@@ -437,7 +437,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun penDoesSneakBypassUse(helper: GameTestHelper) {
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
             if (
                 !(pen.item as StandardItems.BaseItem).doesSneakBypassUse(
@@ -455,7 +455,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun pushRedstoneWithUnlimitedQuillGoesToInventory(helper: GameTestHelper) {
-            val quill = ItemStack(Registries.getItem("quill"))
+            val quill = ItemStack(Registries.requireItem("quill"))
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
             if (quill.maxDamage != 0) {
                 helper.succeed()
@@ -468,7 +468,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun popRedstoneFromUnlimitedQuillExtractsFromInventory(helper: GameTestHelper) {
-            val quill = ItemStack(Registries.getItem("quill"))
+            val quill = ItemStack(Registries.requireItem("quill"))
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
             if (quill.maxDamage != 0) {
                 helper.succeed()
@@ -484,7 +484,7 @@ class PenItemGameTests {
         @JvmStatic
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun hasEnoughRedstoneWithUnlimitedQuillChecksInventory(helper: GameTestHelper) {
-            val quill = ItemStack(Registries.getItem("quill"))
+            val quill = ItemStack(Registries.requireItem("quill"))
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
             if (quill.maxDamage != 0) {
                 helper.succeed()
@@ -500,7 +500,7 @@ class PenItemGameTests {
         @GameTest(template = EMPTY, timeoutTicks = 5)
         fun popRedstoneBreaksPenWhenDamageExceedsMax(helper: GameTestHelper) {
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             if (pen.maxDamage <= 0) {
                 helper.succeed()
                 return
@@ -547,7 +547,7 @@ class PenItemGameTests {
         fun penAttackOnNonTrackNonWireBlockReturnsNormally(helper: GameTestHelper) {
             helper.setBlock(POS, Blocks.STONE)
             val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val abs = helper.absolutePos(POS)
             val stoneState = helper.level.getBlockState(abs)
@@ -560,7 +560,7 @@ class PenItemGameTests {
         fun trackNeighborChangedAndUpdateShapeExercised(helper: GameTestHelper) {
             helper.setBlock(POS, Blocks.STONE)
             val player: Player = helper.makeMockPlayer(GameType.CREATIVE)
-            val pen = ItemStack(Registries.getItem("pen"))
+            val pen = ItemStack(Registries.requireItem("pen"))
             player.setItemInHand(InteractionHand.MAIN_HAND, pen)
             val abs = helper.absolutePos(POS)
             val clickLoc = Vec3.atCenterOf(abs).add(0.0, 0.0, 0.5)
