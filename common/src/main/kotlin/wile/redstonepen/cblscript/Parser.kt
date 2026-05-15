@@ -1,5 +1,23 @@
 package wile.redstonepen.cblscript
 
+/**
+ * The result of parsing a single source line.
+ *
+ * A line is either a comment (all fields empty/default), an assignment (`sym = expr`), or an error.
+ * The caller inspects [error] first; a non-empty string means parsing failed and only [errorPos] is
+ * meaningful.
+ *
+ * @property assignmentSymbol The symbol being assigned, lowercased. Empty for comment lines and
+ *   error lines.
+ * @property expression The compiled expression tree for the right-hand side. A no-op constant when
+ *   [error] is non-empty.
+ * @property symbols Every symbol name referenced anywhere in this line, including the assignment
+ *   target. Used by [CBLScript] to build [Program.referencedSymbols].
+ * @property error Non-empty error key (e.g. `"parse_error"`, `"unknown_function"`) when the line
+ *   could not be parsed; empty string on success.
+ * @property errorPos Byte offset within the original line string where the error was detected, or
+ *   -1 on success.
+ */
 internal class ParsedLine(
     val assignmentSymbol: String,
     val expression: Expression,
@@ -8,11 +26,36 @@ internal class ParsedLine(
     val errorPos: Int,
 )
 
+/**
+ * Parses individual lines of CBLScript source into [ParsedLine] trees.
+ *
+ * One [Parser] instance is reused across all lines of a single compilation unit so that the
+ * function map and symbol-suffix set are resolved once and shared.
+ *
+ * @param validSymbolSuffixes Allowed dot-suffixes for symbol names (e.g. `".re"`, `".fe"`). A
+ *   symbol whose suffix is not in this set is treated as a parse error. Pass `null` to disable
+ *   suffix validation entirely.
+ * @param functions Map of function name → [FunctionDef] for all callable built-ins and
+ *   user-supplied functions.
+ * @param policy Signal domain configuration; controls which integer values [NotExpression] and the
+ *   comparison nodes emit for true and false results.
+ */
 internal class Parser(
     private val validSymbolSuffixes: Set<String>?,
     private val functions: Map<String, FunctionDef>,
     private val policy: SignalPolicy = SignalPolicy.DEFAULT,
 ) {
+    /**
+     * Parses [lineStr] and returns the resulting [ParsedLine].
+     *
+     * Comment lines (starting with optional whitespace then `#`) return an empty [ParsedLine] with
+     * no error. Assignment lines are parsed as `identifier = expression`; bare expressions without
+     * an explicit left-hand side use [defaultAssignmentVariable] as the target symbol.
+     *
+     * @param lineStr A single line of source text without a trailing newline.
+     * @param defaultAssignmentVariable Symbol name to assign to when the line has no explicit
+     *   `identifier =` prefix.
+     */
     fun parseLine(lineStr: String, defaultAssignmentVariable: String = ""): ParsedLine {
         return LineParser(
                 lineStr,
@@ -25,6 +68,35 @@ internal class Parser(
     }
 }
 
+/**
+ * Recursive-descent parser for a single CBLScript line.
+ *
+ * Grammar (simplified):
+ * ```
+ * line       ::= assignment
+ * assignment ::= [identifier '='] expr
+ * expr       ::= or
+ * or         ::= xor (('or' | '||' | '|') xor)*
+ * xor        ::= and (('xor' | '^') and)*
+ * and        ::= rel (('and' | '&&' | '&') rel)*
+ * rel        ::= add (('==' | '!=' | '<>' | '>=' | '<=' | '>' | '<') add)*
+ * add        ::= mul (('+' | '-') mul)*
+ * mul        ::= factor (('*' | '/' | '%') factor)*
+ * factor     ::= ['+' | '-' | '!'] factor
+ *              | '(' expr ')'
+ *              | number
+ *              | identifier ['(' arglist ')']
+ *              | 'not' expr
+ * ```
+ *
+ * The parser advances through [line] one character at a time using [adv]. Whitespace and `#`
+ * comments are consumed transparently inside each `adv(Char)` and `adv(String)` overload before the
+ * match is attempted, so the grammar rules above do not need to account for spacing.
+ *
+ * All symbol names collected during parsing are accumulated in [symbols] and surfaced through
+ * [ParsedLine.symbols] so the compiler can build the referenced-symbol set without re-walking the
+ * expression tree.
+ */
 private class LineParser(
     private val line: String,
     private val defaultAssignmentVariable: String,
@@ -59,6 +131,12 @@ private class LineParser(
 
     private fun emptyExpression(): Expression = ConstExpression(0)
 
+    /**
+     * Advances [pos] by one and updates [c].
+     *
+     * Sets [c] to `' '` (space) when [pos] reaches or exceeds [line.length], treating end-of-input
+     * as trailing whitespace so callers that loop on whitespace terminate naturally.
+     */
     private fun adv() {
         if (++pos >= line.length) {
             c = ' '
@@ -72,6 +150,14 @@ private class LineParser(
         }
     }
 
+    /**
+     * Skips whitespace, then consumes [match] and advances past it.
+     *
+     * The whitespace skip is a side effect regardless of whether [match] is found. Callers must not
+     * rely on [pos] being unchanged when this returns `false`.
+     *
+     * @return `true` if [match] was the current character and was consumed; `false` otherwise.
+     */
     private fun adv(match: Char): Boolean {
         while (pos < line.length && (c == ' ' || c == '\t' || c == '#')) adv()
         if (c != match) return false
@@ -79,6 +165,14 @@ private class LineParser(
         return true
     }
 
+    /**
+     * Skips whitespace, then consumes [match] (case-insensitive) and advances past it.
+     *
+     * Like [adv] for characters, the whitespace skip is unconditional.
+     *
+     * @return `true` if the current position starts with [match] and it was consumed; `false`
+     *   otherwise.
+     */
     private fun adv(match: String): Boolean {
         while (pos < line.length && (c == ' ' || c == '\t' || c == '#')) adv()
         if (
