@@ -44,7 +44,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         state,
     ),
     Networking.IPacketTileNotifyReceiver {
-    private var state_flags_: Long = 0
+    private var state_flags_: TrackStateFlags = TrackStateFlags.EMPTY
     private val nets_: MutableList<TrackNet> = ArrayList()
     private val block_change_tracking_: Array<Block> = Array(6) { Blocks.AIR }
     private var trace_: Boolean = false
@@ -73,7 +73,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun readnbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag {
-        state_flags_ = nbt.getLong("sflags")
+        state_flags_ = TrackStateFlags(nbt.getLong("sflags"))
         nets_.clear()
         if (nbt.contains("nets", Tag.TAG_LIST.toInt())) {
             val lst = nbt.getList("nets", Tag.TAG_COMPOUND.toInt())
@@ -105,7 +105,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         nbt: CompoundTag,
         syncPacket: Boolean,
     ): CompoundTag {
-        nbt.putLong("sflags", state_flags_)
+        nbt.putLong("sflags", state_flags_.raw)
         if (syncPacket) return nbt
         if (nets_.isNotEmpty()) {
             val lst = ListTag()
@@ -167,58 +167,35 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         return true
     }
 
-    fun getStateFlags(): Long = state_flags_
+    fun getStateFlags(): Long = state_flags_.raw
 
     fun addWireFlags(flags: Long): Int {
-        var n_added = 0
-        for (i in 0 until getWireFlagCount()) {
-            val mask = 1L shl i
-            if ((flags and mask) != 0L && (state_flags_ and mask) == 0L) {
-                state_flags_ = state_flags_ or mask
-                ++n_added
-            }
-        }
-        return n_added
+        val (newFlags, added) = state_flags_.withAddedWireFlags(flags)
+        state_flags_ = newFlags
+        return added
     }
 
-    fun getWireFlags(): Int =
-        ((state_flags_ and RedstoneTrackDefs.STATE_FLAG_WIR_MASK) shr
-                RedstoneTrackDefs.STATE_FLAG_WIR_POS)
-            .toInt()
+    fun getWireFlags(): Int = state_flags_.wireFlags
 
-    fun getWireFlag(index: Int): Boolean =
-        (state_flags_ and (1L shl (RedstoneTrackDefs.STATE_FLAG_WIR_POS + index))) != 0L
+    fun getWireFlag(index: Int): Boolean = state_flags_.wireFlag(index)
 
     fun getWireFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_WIR_COUNT
 
-    fun getConnectionFlags(): Int =
-        ((state_flags_ and RedstoneTrackDefs.STATE_FLAG_CON_MASK) shr
-                RedstoneTrackDefs.STATE_FLAG_CON_POS)
-            .toInt()
+    fun getConnectionFlags(): Int = state_flags_.connectionFlags
 
-    fun getConnectionFlag(index: Int): Boolean =
-        (state_flags_ and (1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + index))) != 0L
+    fun getConnectionFlag(index: Int): Boolean = state_flags_.connectionFlag(index)
 
     fun getConnectionFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_CON_COUNT
 
-    fun getSidePower(side: Direction): Int {
-        val shift =
-            RedstoneTrackDefs.STATE_FLAG_PWR_POS +
-                4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
-        return ((state_flags_ shr shift) and 0xfL).toInt()
-    }
+    fun getSidePower(side: Direction): Int = state_flags_.sidePower(side)
 
     fun setSidePower(side: Direction, p: Int) {
-        val shift =
-            RedstoneTrackDefs.STATE_FLAG_PWR_POS +
-                4 * (connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0))
-        state_flags_ =
-            (state_flags_ and (0xfL shl shift).inv()) or ((p.toLong() and 0xfL) shl shift)
+        state_flags_ = state_flags_.withSidePower(side, p)
     }
 
     fun hasVanillaRedstoneConnection(side: Direction): Boolean =
         RedstoneTrackDefs.connections.hasVanillaWireConnection(getStateFlags(), side) ||
-            (state_flags_ and RedstoneTrackDefs.connections.getBulkConnectorBit(side)) != 0L
+            state_flags_.hasBits(RedstoneTrackDefs.connections.getBulkConnectorBit(side))
 
     fun getRedstonePower(redstone_side: Direction, _weak: Boolean): Int {
         if (isRemoved) return 0
@@ -363,21 +340,21 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         usedStack: ItemStack,
     ): Int {
         var materialUse = 0
-        if ((state_flags_ and flipMask) != 0L) {
+        if (state_flags_.hasBits(flipMask)) {
             if (!noRemove) {
-                state_flags_ = state_flags_ and flipMask.inv()
+                state_flags_ = state_flags_.withBitsCleared(flipMask)
                 materialUse -= 1
                 val bc = RedstoneTrackDefs.connections.getBulkConnectorBit(face)
                 if (
-                    (state_flags_ and RedstoneTrackDefs.connections.getAllElementsOnFace(face)) ==
-                        bc
+                    (state_flags_.raw and
+                        RedstoneTrackDefs.connections.getAllElementsOnFace(face)) == bc
                 ) {
-                    state_flags_ = state_flags_ and bc.inv()
+                    state_flags_ = state_flags_.withBitsCleared(bc)
                     materialUse -= 1
                 }
                 if (getWireFlags() == 0) {
                     materialUse -= getRedstoneDustCount()
-                    state_flags_ = 0
+                    state_flags_ = TrackStateFlags.EMPTY
                 }
             }
         } else if (!noAdd) {
@@ -385,7 +362,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 val mask = 1L shl i
                 if ((flipMask and mask) == 0L || (getStateFlags() and mask) != 0L) continue
                 if (!RedstonePenItem.hasEnoughRedstone(usedStack, materialUse + 1, player)) break
-                state_flags_ = state_flags_ or mask
+                state_flags_ = state_flags_.withBitsSet(mask)
                 materialUse += 1
             }
         }
@@ -509,7 +486,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             )
         ) {
             val to_remove = RedstoneTrackDefs.connections.getAllElementsOnFace(facing)
-            val new_flags = state_flags_ and to_remove.inv()
+            val new_flags = state_flags_.withBitsCleared(to_remove)
             if (new_flags != state_flags_) {
                 if (trace_) {
                     Auxiliaries.logWarn(

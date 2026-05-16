@@ -30,7 +30,7 @@ import wile.redstonepen.util.Auxiliaries
 internal class TrackNetworkCalculator(
     private val level: Level,
     private val pos: BlockPos,
-    private val stateFlags: Long,
+    private val stateFlags: TrackStateFlags,
     private val block: RedstoneTrackBlock,
     private val trace: Boolean,
 ) {
@@ -45,7 +45,7 @@ internal class TrackNetworkCalculator(
      */
     data class Result(
         val nets: List<TrackNet>,
-        val newStateFlags: Long,
+        val newStateFlags: TrackStateFlags,
         val trackConnectionUpdates: Set<TrackBlockEntity>,
         val neighboursToNotify: Set<BlockPos>,
     )
@@ -146,10 +146,10 @@ internal class TrackNetworkCalculator(
         externalConnectedRoutes: LongArray,
     ) {
         var externalConnectionFlags =
-            stateFlags and
+            stateFlags.raw and
                 (RedstoneTrackDefs.STATE_FLAG_WIR_MASK or RedstoneTrackDefs.STATE_FLAG_CON_MASK)
         for ((wireBitPair, _) in connections.INTERNAL_EDGE_CONNECTION_MAPPING) {
-            if ((stateFlags and wireBitPair) != wireBitPair) continue
+            if ((stateFlags.raw and wireBitPair) != wireBitPair) continue
             externalConnectionFlags = externalConnectionFlags and wireBitPair.inv()
             for (i in 0 until 6) {
                 if (((0xfL shl (4 * i)) and wireBitPair) == 0L) continue
@@ -403,18 +403,10 @@ internal class TrackNetworkCalculator(
 
     // Power bits for sides that are no longer part of any net must be explicitly cleared;
     // they are not overwritten by net construction and would otherwise carry stale values.
-    private fun zeroUnusedSidePowers(usedSides: Set<Direction>): Long {
-        var newFlags = stateFlags
+    private fun zeroUnusedSidePowers(usedSides: Set<Direction>): TrackStateFlags =
         Direction.values()
             .filter { !usedSides.contains(it) }
-            .forEach { side ->
-                val shift =
-                    RedstoneTrackDefs.STATE_FLAG_PWR_POS +
-                        4 * connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0)
-                newFlags = newFlags and (0xfL shl shift).inv()
-            }
-        return newFlags
-    }
+            .fold(stateFlags) { flags, side -> flags.withSidePower(side, 0) }
 
     /**
      * Finds adjacent track block entities that were connected before but are no longer reachable,
