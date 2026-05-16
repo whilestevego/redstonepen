@@ -479,7 +479,7 @@ object TrackTests {
     }
 
     @JvmStatic
-    fun modifySegmentsAddThenRemoveReturnsConsume(helper: GameTestHelper) {
+    fun applyPenEditAddThenRemoveReturnsConsume(helper: GameTestHelper) {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val player = helper.makeMockPlayer(GameType.CREATIVE)
@@ -489,7 +489,7 @@ object TrackTests {
         val pen = ItemStack(Registries.requireItem("pen"))
         player.setItemInHand(InteractionHand.MAIN_HAND, pen)
 
-        block.modifySegments(
+        block.applyPenEdit(
             helper.getBlockState(TRACK_POS),
             helper.level,
             absPos,
@@ -504,7 +504,7 @@ object TrackTests {
         val rtrRemove = BlockHitResult(hitAdd, Direction.NORTH, absPos, false)
         val pen2 = ItemStack(Registries.requireItem("pen"))
         player.setItemInHand(InteractionHand.MAIN_HAND, pen2)
-        block.modifySegments(
+        block.applyPenEdit(
             helper.getBlockState(TRACK_POS),
             helper.level,
             absPos,
@@ -519,7 +519,7 @@ object TrackTests {
     }
 
     @JvmStatic
-    fun modifySegmentsAddRemoveUntilEmptyRemovesBlock(helper: GameTestHelper) {
+    fun applyPenEditAddRemoveUntilEmptyRemovesBlock(helper: GameTestHelper) {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val player = helper.makeMockPlayer(GameType.CREATIVE)
@@ -529,7 +529,7 @@ object TrackTests {
         val pen = ItemStack(Registries.requireItem("pen"))
         player.setItemInHand(InteractionHand.MAIN_HAND, pen)
 
-        block.modifySegments(
+        block.applyPenEdit(
             helper.getBlockState(TRACK_POS),
             helper.level,
             absPos,
@@ -550,7 +550,7 @@ object TrackTests {
             return
         }
 
-        block.modifySegments(
+        block.applyPenEdit(
             helper.getBlockState(TRACK_POS),
             helper.level,
             absPos,
@@ -860,7 +860,7 @@ object TrackTests {
         val player = helper.makeMockPlayer(GameType.CREATIVE)
         val pen = ItemStack(Items.REDSTONE, 64)
         player.setItemInHand(InteractionHand.MAIN_HAND, pen)
-        block.modifySegments(
+        block.applyPenEdit(
             helper.getBlockState(TRACK_POS),
             helper.level,
             absA,
@@ -882,7 +882,7 @@ object TrackTests {
         if (powerAfter == 0) {
             helper.fail(
                 "BUG: TrackA NORTH face power is 0 after adding the external connection to redstone block. " +
-                    "RedstoneTrackBlock.modifySegments is missing the updateAllPowerValuesFromAdjacent " +
+                    "RedstoneTrackBlock.applyPenEdit is missing the updateAllPowerValuesFromAdjacent " +
                     "safety-net call in the add branch."
             )
             return

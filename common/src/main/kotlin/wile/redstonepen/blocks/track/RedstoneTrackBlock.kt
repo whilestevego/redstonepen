@@ -241,7 +241,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         player: Player,
         rtr: BlockHitResult,
     ): InteractionResult =
-        modifySegments(
+        applyPenEdit(
             state,
             world,
             pos,
@@ -270,7 +270,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
             return ItemInteractionResult.CONSUME
         } else {
             return when (
-                modifySegments(
+                applyPenEdit(
                     state,
                     world,
                     pos,
@@ -371,7 +371,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         }
     }
 
-    fun modifySegments(
+    fun applyPenEdit(
         state: BlockState,
         world: Level,
         pos: BlockPos,
@@ -396,7 +396,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         val te = tile(world, pos).orElse(null) ?: return InteractionResult.FAIL
         val no_bulk = false
         val redstone_use =
-            te.modifySegments(
+            te.applyPenEdit(
                 pos,
                 player,
                 player.getItemInHand(hand),

@@ -44,10 +44,10 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         state,
     ),
     Networking.IPacketTileNotifyReceiver {
-    private var state_flags_: TrackStateFlags = TrackStateFlags.EMPTY
-    private val nets_: MutableList<TrackNet> = ArrayList()
-    private val block_change_tracking_: Array<Block> = Array(6) { Blocks.AIR }
-    private var trace_: Boolean = false
+    private var stateFlags: TrackStateFlags = TrackStateFlags.EMPTY
+    private val nets: MutableList<TrackNet> = ArrayList()
+    private val blockChangeTracking: Array<Block> = Array(6) { Blocks.AIR }
+    private var trace: Boolean = false
 
     companion object {
         @JvmStatic internal fun posstr(pos: BlockPos): String = "[${pos.x},${pos.y},${pos.z}]"
@@ -73,14 +73,14 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun readnbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag {
-        state_flags_ = TrackStateFlags(nbt.getLong("sflags"))
-        nets_.clear()
+        stateFlags = TrackStateFlags(nbt.getLong("sflags"))
+        nets.clear()
         if (nbt.contains("nets", Tag.TAG_LIST.toInt())) {
             val lst = nbt.getList("nets", Tag.TAG_COMPOUND.toInt())
             try {
                 for (i in 0 until lst.size) {
                     val route_nbt = lst.getCompound(i)
-                    nets_.add(
+                    nets.add(
                         TrackNet(
                             route_nbt.getLongArray("npos").map { BlockPos.of(it) },
                             route_nbt.getIntArray("nsid").map { Direction.from3DDataValue(it) },
@@ -91,7 +91,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     )
                 }
             } catch (ex: Throwable) {
-                nets_.clear()
+                nets.clear()
                 Auxiliaries.logError(
                     "Dropped invalid NBT for Redstone Track at pos $blockPos ($ex)"
                 )
@@ -105,11 +105,11 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         nbt: CompoundTag,
         syncPacket: Boolean,
     ): CompoundTag {
-        nbt.putLong("sflags", state_flags_.raw)
+        nbt.putLong("sflags", stateFlags.raw)
         if (syncPacket) return nbt
-        if (nets_.isNotEmpty()) {
+        if (nets.isNotEmpty()) {
             val lst = ListTag()
-            for (net in nets_) {
+            for (net in nets) {
                 val route_nbt = CompoundTag()
                 route_nbt.putInt("power", net.power)
                 route_nbt.put(
@@ -167,41 +167,41 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         return true
     }
 
-    fun getStateFlags(): Long = state_flags_.raw
+    fun getStateFlags(): Long = stateFlags.raw
 
     fun addWireFlags(flags: Long): Int {
-        val (newFlags, added) = state_flags_.withAddedWireFlags(flags)
-        state_flags_ = newFlags
+        val (newFlags, added) = stateFlags.withAddedWireFlags(flags)
+        stateFlags = newFlags
         return added
     }
 
-    fun getWireFlags(): Int = state_flags_.wireFlags
+    fun getWireFlags(): Int = stateFlags.wireFlags
 
-    fun getWireFlag(index: Int): Boolean = state_flags_.wireFlag(index)
+    fun getWireFlag(index: Int): Boolean = stateFlags.wireFlag(index)
 
     fun getWireFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_WIR_COUNT
 
-    fun getConnectionFlags(): Int = state_flags_.connectionFlags
+    fun getConnectionFlags(): Int = stateFlags.connectionFlags
 
-    fun getConnectionFlag(index: Int): Boolean = state_flags_.connectionFlag(index)
+    fun getConnectionFlag(index: Int): Boolean = stateFlags.connectionFlag(index)
 
     fun getConnectionFlagCount(): Int = RedstoneTrackDefs.STATE_FLAG_CON_COUNT
 
-    fun getSidePower(side: Direction): Int = state_flags_.sidePower(side)
+    fun getSidePower(side: Direction): Int = stateFlags.sidePower(side)
 
     fun setSidePower(side: Direction, p: Int) {
-        state_flags_ = state_flags_.withSidePower(side, p)
+        stateFlags = stateFlags.withSidePower(side, p)
     }
 
     fun hasVanillaRedstoneConnection(side: Direction): Boolean =
         RedstoneTrackDefs.connections.hasVanillaWireConnection(getStateFlags(), side) ||
-            state_flags_.hasBits(RedstoneTrackDefs.connections.getBulkConnectorBit(side))
+            stateFlags.hasBits(RedstoneTrackDefs.connections.getBulkConnectorBit(side))
 
     fun getRedstonePower(redstone_side: Direction, _weak: Boolean): Int {
         if (isRemoved) return 0
         val own_side = redstone_side.opposite
         var p = 0
-        for (net in nets_) {
+        for (net in nets) {
             if (!net.power_sides.contains(own_side)) continue
             p = maxOf(p, net.power)
             if (p >= 15) break
@@ -241,17 +241,17 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
     fun toggle_trace(@Nullable player: Player?) {
         if (!Auxiliaries.isDevelopmentMode()) {
-            trace_ = false
+            trace = false
             if (player != null) {
                 Auxiliaries.playerChatMessage(player, "Trace disabled, not in development mode.")
             }
         } else {
-            trace_ = !trace_
-            if (player != null) Auxiliaries.playerChatMessage(player, "Trace: $trace_")
+            trace = !trace
+            if (player != null) Auxiliaries.playerChatMessage(player, "Trace: $trace")
         }
     }
 
-    internal fun modifySegments(
+    internal fun applyPenEdit(
         pos: BlockPos,
         player: Player,
         used_stack: ItemStack,
@@ -340,21 +340,21 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         usedStack: ItemStack,
     ): Int {
         var materialUse = 0
-        if (state_flags_.hasBits(flipMask)) {
+        if (stateFlags.hasBits(flipMask)) {
             if (!noRemove) {
-                state_flags_ = state_flags_.withBitsCleared(flipMask)
+                stateFlags = stateFlags.withBitsCleared(flipMask)
                 materialUse -= 1
                 val bc = RedstoneTrackDefs.connections.getBulkConnectorBit(face)
                 if (
-                    (state_flags_.raw and
-                        RedstoneTrackDefs.connections.getAllElementsOnFace(face)) == bc
+                    (stateFlags.raw and RedstoneTrackDefs.connections.getAllElementsOnFace(face)) ==
+                        bc
                 ) {
-                    state_flags_ = state_flags_.withBitsCleared(bc)
+                    stateFlags = stateFlags.withBitsCleared(bc)
                     materialUse -= 1
                 }
                 if (getWireFlags() == 0) {
                     materialUse -= getRedstoneDustCount()
-                    state_flags_ = TrackStateFlags.EMPTY
+                    stateFlags = TrackStateFlags.EMPTY
                 }
             }
         } else if (!noAdd) {
@@ -362,7 +362,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 val mask = 1L shl i
                 if ((flipMask and mask) == 0L || (getStateFlags() and mask) != 0L) continue
                 if (!RedstonePenItem.hasEnoughRedstone(usedStack, materialUse + 1, player)) break
-                state_flags_ = state_flags_.withBitsSet(mask)
+                stateFlags = stateFlags.withBitsSet(mask)
                 materialUse += 1
             }
         }
@@ -373,7 +373,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         setSidePower(face, 0)
         val changesBefore = updateAllPowerValuesFromAdjacent()
         val netNeighboursBefore: Set<BlockPos> =
-            nets_
+            nets
                 .firstOrNull { it.internal_sides.contains(face) }
                 ?.neighbour_positions
                 ?.let { HashSet(it) } ?: HashSet()
@@ -389,7 +389,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 RedstoneTrackDefs.connections.hasBulkConnection(getStateFlags(), face)
         ) {
             val netNeighboursAfter: Set<BlockPos> =
-                nets_
+                nets
                     .firstOrNull { it.internal_sides.contains(face) }
                     ?.neighbour_positions
                     ?.let { HashSet(it) } ?: HashSet()
@@ -404,7 +404,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             setSidePower(face, initialSidePower)
         } else {
             setSidePower(face, 0)
-            nets_.forEach { net -> if (net.internal_sides.contains(face)) net.power = 0 }
+            nets.forEach { net -> if (net.internal_sides.contains(face)) net.power = 0 }
             disconnected.forEach { p ->
                 val te = getLevel()!!.getBlockEntity(p)
                 getLevel()!!
@@ -486,9 +486,9 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             )
         ) {
             val to_remove = RedstoneTrackDefs.connections.getAllElementsOnFace(facing)
-            val new_flags = state_flags_.withBitsCleared(to_remove)
-            if (new_flags != state_flags_) {
-                if (trace_) {
+            val new_flags = stateFlags.withBitsCleared(to_remove)
+            if (new_flags != stateFlags) {
+                if (trace) {
                     Auxiliaries.logWarn(
                         String.format(
                             Locale.ROOT,
@@ -500,16 +500,16 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     )
                 }
                 var count = getRedstoneDustCount()
-                state_flags_ = new_flags
+                stateFlags = new_flags
                 count -= getRedstoneDustCount()
                 spawnRedstoneItems(count)
                 updateConnections(1)
                 update_neighbours = true
             }
         }
-        var bltv: Block = block_change_tracking_[facing.get3DDataValue()]
+        var bltv: Block = blockChangeTracking[facing.get3DDataValue()]
         if (bltv != facingState.block) {
-            if (trace_) {
+            if (trace) {
                 Auxiliaries.logWarn(
                     String.format(
                         Locale.ROOT,
@@ -521,7 +521,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                     )
                 )
             }
-            block_change_tracking_[facing.get3DDataValue()] = facingState.block
+            blockChangeTracking[facing.get3DDataValue()] = facingState.block
             if (!isMoving && bltv != Blocks.REDSTONE_BLOCK) updateConnections(1)
             update_neighbours = true
         }
@@ -582,12 +582,12 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
     fun handleNeighborChanged(fromPos: BlockPos): Map<BlockPos, BlockPos> {
         val notifications = LinkedHashMap<BlockPos, BlockPos>()
-        nets_
+        nets
             .filter { it.neighbour_positions.contains(fromPos) }
             .forEach { net -> handleNetNeighborChanged(net, fromPos, null, notifications) }
         val fst = getLevel()!!.getBlockState(fromPos)
         if (fst.`is`(getBlock()) || fst.isSignalSource) notifications.remove(fromPos)
-        if (trace_ && notifications.isNotEmpty()) {
+        if (trace && notifications.isNotEmpty()) {
             Auxiliaries.logWarn(
                 String.format(
                     Locale.ROOT,
@@ -620,7 +620,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (!isNetConnectedTo(my_pos, net, fromPos, null, fromNet)) return
         val world = getLevel()!!
         val neighbors = LinkedList<Neighbor>()
-        if (trace_) {
+        if (trace) {
             Auxiliaries.logWarn(
                 String.format(
                     Locale.ROOT,
@@ -644,7 +644,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 val nb_net =
                     RedstoneTrackBlock.tile(world, ext_pos)
                         .flatMap { te ->
-                            te.nets_
+                            te.nets
                                 .stream()
                                 .filter { nbn ->
                                     isNetConnectedTo(my_pos, net, ext_pos, ext_side, nbn)
@@ -673,7 +673,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         }
         var power_changed = false
         if (net.power != pmax) {
-            if (trace_) {
+            if (trace) {
                 Auxiliaries.logWarn(
                     String.format(
                         Locale.ROOT,
@@ -698,7 +698,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             if (neighbor.direct_update) {
                 val be = world.getBlockEntity(neighbor.pos)
                 if (be is TrackBlockEntity) {
-                    for (nb_net in be.nets_) {
+                    for (nb_net in be.nets) {
                         be.handleNetNeighborChanged(nb_net, my_pos, net, change_notifications)
                     }
                 } else {
@@ -724,15 +724,15 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
     internal fun updateConnections(recursion_left: Int) {
         val result =
-            TrackNetworkCalculator(getLevel()!!, blockPos, state_flags_, getBlock(), trace_)
-                .calculate(nets_)
-        state_flags_ = result.newStateFlags
-        nets_.clear()
-        nets_.addAll(result.nets)
+            TrackNetworkCalculator(getLevel()!!, blockPos, stateFlags, getBlock(), trace)
+                .calculate(nets)
+        stateFlags = result.newStateFlags
+        nets.clear()
+        nets.addAll(result.nets)
         setChanged()
         if (recursion_left > 0) {
             for (te in result.trackConnectionUpdates) {
-                if (trace_) {
+                if (trace) {
                     Auxiliaries.logWarn(
                         String.format(
                             Locale.ROOT,
@@ -749,7 +749,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         val state = blockState
         result.neighboursToNotify.forEach { pos ->
             val st = world.getBlockState(pos)
-            if (trace_) {
+            if (trace) {
                 Auxiliaries.logWarn(
                     String.format(
                         Locale.ROOT,
