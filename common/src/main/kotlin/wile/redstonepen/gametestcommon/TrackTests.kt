@@ -25,6 +25,7 @@ import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
 import wile.redstonepen.blocks.track.TrackBlockEntity
 import wile.redstonepen.blocks.track.TrackNet
 import wile.redstonepen.blocks.track.TrackNetworkCalculator
+import wile.redstonepen.blocks.track.TrackStateFlags
 import wile.redstonepen.registry.Registries
 
 object TrackTests {
@@ -896,7 +897,13 @@ object TrackTests {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val result =
-            TrackNetworkCalculator(helper.level, helper.absolutePos(TRACK_POS), 0L, block, false)
+            TrackNetworkCalculator(
+                    helper.level,
+                    helper.absolutePos(TRACK_POS),
+                    TrackStateFlags.EMPTY,
+                    block,
+                    false,
+                )
                 .calculate(emptyList())
         if (result.nets.isNotEmpty()) {
             helper.fail("isolated track (no wires) must produce no nets, got ${result.nets.size}")
@@ -916,7 +923,7 @@ object TrackTests {
         val te = getTrack(helper)!!
         te.setSidePower(Direction.NORTH, 12)
         te.setSidePower(Direction.SOUTH, 7)
-        val stateFlags = te.getStateFlags()
+        val stateFlags = TrackStateFlags(te.getStateFlags())
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val result =
             TrackNetworkCalculator(
@@ -927,9 +934,9 @@ object TrackTests {
                     false,
                 )
                 .calculate(emptyList())
-        if ((result.newStateFlags and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) != 0L) {
+        if ((result.newStateFlags.raw and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) != 0L) {
             helper.fail(
-                "all power bits must be zeroed when no wires are present, newStateFlags=${result.newStateFlags}"
+                "all power bits must be zeroed when no wires are present, newStateFlags=${result.newStateFlags.raw}"
             )
         }
         helper.succeed()
@@ -955,7 +962,7 @@ object TrackTests {
             TrackNetworkCalculator(
                     helper.level,
                     helper.absolutePos(TRACK_POS),
-                    wireBitA,
+                    TrackStateFlags(wireBitA),
                     block,
                     false,
                 )
@@ -978,7 +985,7 @@ object TrackTests {
             TrackNetworkCalculator(
                     helper.level,
                     helper.absolutePos(TRACK_POS),
-                    wireBit,
+                    TrackStateFlags(wireBit),
                     block,
                     false,
                 )
@@ -1019,7 +1026,13 @@ object TrackTests {
                 )
             )
         val result =
-            TrackNetworkCalculator(helper.level, helper.absolutePos(TRACK_POS), 0L, block, false)
+            TrackNetworkCalculator(
+                    helper.level,
+                    helper.absolutePos(TRACK_POS),
+                    TrackStateFlags.EMPTY,
+                    block,
+                    false,
+                )
                 .calculate(previousNets)
         if (!result.trackConnectionUpdates.contains(teB)) {
             helper.fail(
