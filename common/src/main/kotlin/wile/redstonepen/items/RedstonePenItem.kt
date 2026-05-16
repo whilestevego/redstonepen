@@ -126,7 +126,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     context.clickedPos,
                     context.isInside,
                 )
-            return track.modifySegments(
+            return track.applyPenEdit(
                 state,
                 world,
                 pos,
@@ -155,7 +155,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     targetPos,
                     context.isInside,
                 )
-            return trackBlock.modifySegments(
+            return trackBlock.applyPenEdit(
                 targetState,
                 world,
                 targetPos,
@@ -190,7 +190,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
             return if (placedState.block is RedstoneTrackBlock) {
                 val trackBlock = placedState.block as RedstoneTrackBlock
                 if (
-                    trackBlock.modifySegments(
+                    trackBlock.applyPenEdit(
                         targetState,
                         world,
                         targetPos,
@@ -378,7 +378,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     InteractionHand.OFF_HAND
                 }
             if (state.block !is RedstoneTrackBlock) return false
-            (state.block as RedstoneTrackBlock).modifySegments(
+            (state.block as RedstoneTrackBlock).applyPenEdit(
                 state,
                 world,
                 pos,

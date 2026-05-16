@@ -12,74 +12,74 @@ internal class ControlBoxLogic {
     var input_data = 0x00000000
     var output_mask = 0x00000000
     var output_data = 0x00000000
-    var intr_redges = 0x00000000
-    var intr_fedges = 0x00000000
+    var risingEdgeInterrupts = 0x00000000
+    var fallingEdgeInterrupts = 0x00000000
     var rca_input_mask = 0L
     var rca_input_data = 0L
     var rca_output_mask = 0L
     var rca_output_data = 0L
 
-    private val state_: MutableMap<String, Int> = HashMap()
-    private var program_: Program = Program.EMPTY
-    private var code_: String = ""
+    private val state: MutableMap<String, Int> = HashMap()
+    private var program: Program = Program.EMPTY
+    private var codeText: String = ""
 
-    fun valid(): Boolean = program_.isValid
+    fun valid(): Boolean = program.isValid
 
-    fun usesSymbol(s: String): Boolean = program_.referencedSymbols.contains(s)
+    fun usesSymbol(s: String): Boolean = program.referencedSymbols.contains(s)
 
-    fun errors(): Map<Int, String> = program_.errors
+    fun errors(): Map<Int, String> = program.errors
 
     fun symbol(key: String, value: Int) {
-        state_[key.lowercase()] = value
+        state[key.lowercase()] = value
     }
 
-    fun symbol(key: String): Int = state_.getOrDefault(key.lowercase(), 0)
+    fun symbol(key: String): Int = state.getOrDefault(key.lowercase(), 0)
 
-    fun symbols(): MutableMap<String, Int> = state_
+    fun symbols(): MutableMap<String, Int> = state
 
     fun clearSymbols() {
-        state_.clear()
+        state.clear()
     }
 
-    fun code(): String = code_
+    fun code(): String = codeText
 
     fun code(new_code: String): Boolean {
-        if (code_ == new_code && program_ !== Program.EMPTY) {
-            return program_.isValid
+        if (codeText == new_code && program !== Program.EMPTY) {
+            return program.isValid
         }
-        code_ = new_code
-        program_ =
+        codeText = new_code
+        program =
             CBLScript.compile(
                 code = new_code,
                 policy = SignalPolicy.REDSTONE,
                 outputClamp = { sym, v ->
-                    if (Defs.PORT_NAMES.contains(sym)) v.coerceIn(0, 15) else v
+                    if (PortNames.ALL.contains(sym)) v.coerceIn(0, 15) else v
                 },
             )
         input_mask = 0
         output_mask = 0
         rca_input_mask = 0
         rca_output_mask = 0
-        state_.clear()
-        for (i in Defs.PORT_NAMES.indices) {
-            val port = Defs.PORT_NAMES[i]
+        state.clear()
+        for (i in PortNames.ALL.indices) {
+            val port = PortNames.ALL[i]
             val bit = 0xf shl (4 * i)
-            if (program_.referencedSymbols.any { it == port + ".co.re" || it == port + ".co.fe" })
-                state_[port + ".co"] = 0
+            if (program.referencedSymbols.any { it == port + ".co.re" || it == port + ".co.fe" })
+                state[port + ".co"] = 0
             when {
-                program_.assignedSymbols.contains(port) -> output_mask = output_mask or bit
+                program.assignedSymbols.contains(port) -> output_mask = output_mask or bit
                 CBLScript.STANDARD_SYMBOL_SUFFIXES.any {
-                    program_.referencedSymbols.contains(port + it)
+                    program.referencedSymbols.contains(port + it)
                 } -> input_mask = input_mask or bit
             }
         }
         computeRcaMasks()
         clearStaleIoData()
-        return program_.isValid
+        return program.isValid
     }
 
     private fun computeRcaMasks() {
-        for (sym in program_.referencedSymbols) {
+        for (sym in program.referencedSymbols) {
             if (!sym.matches(RCA_SYMBOL_REGEX)) continue
             val ch = sym.substring(2).toInt()
             if (ch > 15) continue
@@ -99,9 +99,9 @@ internal class ControlBoxLogic {
     }
 
     fun tick() {
-        for (i in 0 until Defs.PORT_NAMES.size) {
+        for (i in 0 until PortNames.ALL.size) {
             if ((input_mask and (0xf shl (4 * i))) != 0) {
-                symbol(Defs.PORT_NAMES[i], (input_data shr (4 * i)) and 0xf)
+                symbol(PortNames.ALL[i], (input_data shr (4 * i)) and 0xf)
             }
         }
         if (rca_input_mask != 0L) {
@@ -111,38 +111,38 @@ internal class ControlBoxLogic {
                 }
             }
         }
-        program_.referencedSymbols.forEach { esym ->
+        program.referencedSymbols.forEach { esym ->
             if (!esym.contains(".")) return@forEach
             val isrising = esym.endsWith(".re")
             if (isrising || esym.endsWith(".fe")) {
                 val symref = esym.substring(0, esym.length - 3)
-                if (!state_.containsKey(symref) && !Defs.PORT_NAMES.contains(symref)) return@forEach
+                if (!state.containsKey(symref) && !PortNames.ALL.contains(symref)) return@forEach
                 val symlast = ".$esym.d"
-                val q1 = if (state_.getOrDefault(symref, 0) > 0) 15 else 0
+                val q1 = if (state.getOrDefault(symref, 0) > 0) 15 else 0
                 var edge = false
-                if (state_.containsKey(symlast)) {
-                    val q0 = if (state_.getOrDefault(symlast, 0) > 0) 15 else 0
+                if (state.containsKey(symlast)) {
+                    val q0 = if (state.getOrDefault(symlast, 0) > 0) 15 else 0
                     edge = if (isrising) (q0 <= 0 && q1 > 0) else (q0 > 0 && q1 <= 0)
                 }
                 symbol(esym, if (edge) 15 else 0)
                 symbol(symlast, q1)
             }
         }
-        for (i in 0 until Defs.PORT_NAMES.size) {
+        for (i in 0 until PortNames.ALL.size) {
             val port_mask = 0xf shl (4 * i)
-            if ((intr_redges and port_mask) != 0) symbol(Defs.PORT_NAMES[i] + ".re", 15)
-            if ((intr_fedges and port_mask) != 0) symbol(Defs.PORT_NAMES[i] + ".fe", 15)
+            if ((risingEdgeInterrupts and port_mask) != 0) symbol(PortNames.ALL[i] + ".re", 15)
+            if ((fallingEdgeInterrupts and port_mask) != 0) symbol(PortNames.ALL[i] + ".fe", 15)
         }
-        intr_redges = 0
-        intr_fedges = 0
+        risingEdgeInterrupts = 0
+        fallingEdgeInterrupts = 0
         // Timer built-ins lower .deadline to the ticks until their next edge; the block entity
         // uses the value to schedule early wakeups.  Initialize to 40 (max interval) so timers
         // only need to reduce it — never increase it.
         symbol(".deadline", 40)
-        program_.evaluate(state_)
+        program.evaluate(state)
         output_data = 0
-        for (i in 0 until Defs.PORT_NAMES.size) {
-            output_data = output_data or ((symbol(Defs.PORT_NAMES[i]) and 0xf) shl (4 * i))
+        for (i in 0 until PortNames.ALL.size) {
+            output_data = output_data or ((symbol(PortNames.ALL[i]) and 0xf) shl (4 * i))
         }
         output_data = output_data and output_mask
         if (rca_output_mask != 0L) {

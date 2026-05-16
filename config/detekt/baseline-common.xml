@@ -306,7 +306,7 @@
     <ID>ReturnCount:Parser.kt$LineParser$private fun parseFactor(): Expression</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
-    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun modifySegments( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun applyPenEdit( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
     <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack)</ID>
     <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter", "TooGenericExceptionCaught") fun &lt;T : AbstractContainerMenu&gt; render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T&gt;, x: Int, y: Int, ): Boolean</ID>
     <ID>TooManyFunctions:Auxiliaries.kt$Auxiliaries</ID>

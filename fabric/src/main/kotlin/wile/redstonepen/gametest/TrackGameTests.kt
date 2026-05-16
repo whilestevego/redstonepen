@@ -174,13 +174,13 @@ class TrackGameTests {
 
         @JvmStatic
         @GameTest(template = TEMPLATE, timeoutTicks = 10)
-        fun modifySegmentsAddThenRemoveReturnsConsume(helper: GameTestHelper) =
-            TrackTests.modifySegmentsAddThenRemoveReturnsConsume(helper)
+        fun applyPenEditAddThenRemoveReturnsConsume(helper: GameTestHelper) =
+            TrackTests.applyPenEditAddThenRemoveReturnsConsume(helper)
 
         @JvmStatic
         @GameTest(template = TEMPLATE, timeoutTicks = 10)
-        fun modifySegmentsAddRemoveUntilEmptyRemovesBlock(helper: GameTestHelper) =
-            TrackTests.modifySegmentsAddRemoveUntilEmptyRemovesBlock(helper)
+        fun applyPenEditAddRemoveUntilEmptyRemovesBlock(helper: GameTestHelper) =
+            TrackTests.applyPenEditAddRemoveUntilEmptyRemovesBlock(helper)
 
         @JvmStatic
         @GameTest(template = TEMPLATE, timeoutTicks = 5)

@@ -14,7 +14,7 @@ import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import wile.redstonepen.ModContent
 import wile.redstonepen.blocks.controlbox.ControlBoxUiContainer
-import wile.redstonepen.blocks.controlbox.Defs
+import wile.redstonepen.blocks.controlbox.PortNames
 import wile.redstonepen.client.GuiTextEditing
 import wile.redstonepen.client.Guis
 import wile.redstonepen.client.TooltipDisplay
@@ -53,8 +53,8 @@ class ControlBoxGui(
     private var update_counter_: Int = 0
     private var focus_editor_: Boolean = false
     private var debug_enabled_: Boolean = false
-    private var code_requested_: Boolean = false
-    private var activating_player_: Component = Component.empty()
+    private var codeRequested: Boolean = false
+    private var activatingPlayer: Component = Component.empty()
 
     init {
         titleLabelX = 17
@@ -126,7 +126,7 @@ class ControlBoxGui(
         rca_enabled_indicator.init(this, Guis.Coord2d.of(194, 40))
         rca_enabled_indicator.visible = false
         rca_enabled_indicator.tooltip { _ ->
-            Auxiliaries.localizable("$tooltip_prefix.tooltips.rcaplayer", activating_player_)
+            Auxiliaries.localizable("$tooltip_prefix.tooltips.rcaplayer", activatingPlayer)
         }
         addRenderableWidget(rca_enabled_indicator)
 
@@ -152,7 +152,7 @@ class ControlBoxGui(
             tb.setTextColor(COLOR_TEXT_ARGB)
             tb.setTextColorUneditable(COLOR_TEXT_ARGB)
             tb.setValue(
-                String.format(Locale.ROOT, "%1s=00", Defs.PORT_NAMES[i].uppercase(Locale.ROOT))
+                String.format(Locale.ROOT, "%1s=00", PortNames.ALL[i].uppercase(Locale.ROOT))
             )
             addRenderableWidget(tb)
             val imgI = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(78, 215))
@@ -174,7 +174,7 @@ class ControlBoxGui(
                     .forEach { (k, v) ->
                         val isInternalSymbol =
                             k.startsWith(".") ||
-                                Defs.PORT_NAMES.contains(k) ||
+                                PortNames.ALL.contains(k) ||
                                 k.endsWith(".re") ||
                                 k.endsWith(".fe")
                         if (!debug_enabled_ && isInternalSymbol) return@forEach
@@ -307,13 +307,13 @@ class ControlBoxGui(
             if (nbt.contains("ports")) {
                 val mask = nbt.getInt("inputs") or nbt.getInt("outputs")
                 val io = nbt.getInt("ports")
-                for (i in Defs.PORT_NAMES.indices) {
+                for (i in PortNames.ALL.indices) {
                     if ((mask and (0xf shl (4 * i))) == 0) continue
                     port_stati[i].setValue(
                         String.format(
                             Locale.ROOT,
                             "%1s=%02d",
-                            Defs.PORT_NAMES[i].uppercase(Locale.ROOT),
+                            PortNames.ALL[i].uppercase(Locale.ROOT),
                             (io shr (4 * i)) and 0xf,
                         )
                     )
@@ -332,14 +332,14 @@ class ControlBoxGui(
             }
             if (nbt.contains("inputs")) {
                 var mask = nbt.getInt("inputs")
-                for (i in Defs.PORT_NAMES.indices) {
+                for (i in PortNames.ALL.indices) {
                     port_stati_i_indicators[i].visible = (mask and 0xf) != 0
                     mask = mask shr 4
                 }
             }
             if (nbt.contains("outputs")) {
                 var mask = nbt.getInt("outputs")
-                for (i in Defs.PORT_NAMES.indices) {
+                for (i in PortNames.ALL.indices) {
                     port_stati_o_indicators[i].visible = (mask and 0xf) != 0
                     mask = mask shr 4
                 }
@@ -383,19 +383,19 @@ class ControlBoxGui(
             if (nbt.contains("player", Tag.TAG_STRING.toInt())) {
                 val playerName = nbt.getString("player")
                 if (playerName.isEmpty()) {
-                    activating_player_ = Component.empty()
+                    activatingPlayer = Component.empty()
                     rca_enabled_indicator.visible = false
                     rca_enabled_indicator.active = false
                 } else {
-                    activating_player_ = Component.literal(playerName)
+                    activatingPlayer = Component.literal(playerName)
                     rca_enabled_indicator.visible = true
                     rca_enabled_indicator.active = true
                 }
             }
         } else if (--update_counter_ <= 0) {
             update_counter_ = VALUE_UPDATE_INTERVAL
-            if (!code_requested_) {
-                code_requested_ = true
+            if (!codeRequested) {
+                codeRequested = true
                 onGuiAction("serverdata")
             } else {
                 onGuiAction("servervalues")

@@ -16,7 +16,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import wile.redstonepen.blocks.controlbox.ControlBoxBlock
 import wile.redstonepen.blocks.controlbox.ControlBoxBlockEntity
-import wile.redstonepen.blocks.controlbox.Defs
+import wile.redstonepen.blocks.controlbox.PortNames
 import wile.redstonepen.registry.Registries
 import wile.redstonepen.util.Auxiliaries
 
@@ -325,7 +325,7 @@ object ControlBoxTests {
 
     @JvmStatic
     fun defsPortNamesHasSixEntries(helper: GameTestHelper) {
-        if (Defs.PORT_NAMES.size != 6) helper.fail("PORT_NAMES must have 6 entries")
+        if (PortNames.ALL.size != 6) helper.fail("PORT_NAMES must have 6 entries")
         helper.succeed()
     }
 
