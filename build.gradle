@@ -71,6 +71,18 @@ tasks.register('analyzeBaseline') {
   dependsOn ':common:detektBaseline', ':neoforge:detektBaseline', ':fabric:detektBaseline'
 }
 
+tasks.register('analyzeTyped') {
+  group = 'verification'
+  description = 'Run detekt with type resolution across all subprojects.'
+  dependsOn ':common:detektMainTyped', ':neoforge:detektMainTyped', ':fabric:detektMainTyped'
+}
+
+tasks.register('analyzeBaselineTyped') {
+  group = 'verification'
+  description = 'Regenerate detekt baselines including type-resolution findings.'
+  dependsOn ':common:detektBaselineTyped', ':neoforge:detektBaselineTyped', ':fabric:detektBaselineTyped'
+}
+
 tasks.register('coverage') {
   group = 'verification'
   description = 'Runs all platform test suites and verifies JaCoCo coverage.'
@@ -97,6 +109,9 @@ gradle.projectsEvaluated {
 }
 
 subprojects {
+  // Tools subprojects are standalone JVM tools — skip all Minecraft/architectury config.
+  if (project.path.startsWith(':tools')) return
+
   apply plugin: 'java'
   apply plugin: 'architectury-plugin'
   apply plugin: 'com.diffplug.spotless'
@@ -163,6 +178,38 @@ subprojects {
       xml.required.set(false)
       txt.required.set(false)
     }
+  }
+
+  tasks.register('detektMainTyped', io.gitlab.arturbosch.detekt.Detekt) {
+    group = 'verification'
+    description = 'Run detekt with type resolution on main sources.'
+    dependsOn 'compileKotlin'
+    buildUponDefaultConfig = true
+    parallel = true
+    config.setFrom(rootProject.file('config/detekt/detekt.yml'))
+    baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+    setSource(fileTree('src/main').include('**/*.kt'))
+    classpath.from(configurations.compileClasspath)
+    jvmTarget = '21'
+    reports {
+      html.required.set(true)
+      sarif.required.set(true)
+      xml.required.set(false)
+      txt.required.set(false)
+    }
+  }
+
+  tasks.register('detektBaselineTyped', io.gitlab.arturbosch.detekt.DetektCreateBaselineTask) {
+    group = 'verification'
+    description = 'Regenerate detekt baseline including type-resolution findings.'
+    dependsOn 'compileKotlin', 'compileTestKotlin'
+    buildUponDefaultConfig = true
+    parallel = true
+    config.setFrom(rootProject.file('config/detekt/detekt.yml'))
+    baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
+    setSource(fileTree('src').include('**/*.kt'))
+    classpath.from(configurations.compileClasspath, configurations.testCompileClasspath)
+    jvmTarget = '21'
   }
 
   tasks.withType(JavaCompile).configureEach {

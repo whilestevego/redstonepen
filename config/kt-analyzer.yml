@@ -1,0 +1,22 @@
+# kt-analyzer configuration
+# suppress: list of rule IDs to exclude from output
+# severity-overrides: map of rule ID to severity (INFO, WARNING, ERROR)
+#
+# Rule IDs are derived from K2 compiler message text: the first clause before
+# ":\n", ": ", or ". " is normalized to UPPER_SNAKE_CASE with quoted identifiers
+# stripped.  Example:
+#   "Unresolved reference 'Foo'"              → UNRESOLVED_REFERENCE
+#   "Return type mismatch: ..."               → RETURN_TYPE_MISMATCH
+#   "Overload resolution ambiguity between candidates:\n..." → OVERLOAD_RESOLUTION_AMBIGUITY_BETWEEN_CANDIDATES
+#
+# Run without --config (or with --config /dev/null) to see all diagnostics and
+# discover the IDs you want to suppress.
+#
+# NOTE: kt-analyzer is invoked with the full Minecraft compile classpath via
+# 'make analyze-semantic'. Without --classpath the tool produces many cascade
+# errors from unresolved platform types; do not run it classpath-free and then
+# wonder why the suppress list is long.
+
+suppress: []
+
+severity-overrides: {}

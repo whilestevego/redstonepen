@@ -320,6 +320,15 @@ remapJar {
 
 jar { archiveClassifier = 'dev' }
 
+tasks.register('writeCompileClasspath') {
+  dependsOn configurations.compileClasspath
+  def outputFile = layout.buildDirectory.file('compile-classpath.txt')
+  outputs.file(outputFile)
+  doLast {
+    outputFile.get().asFile.text = configurations.compileClasspath.asPath
+  }
+}
+
 // --- Resource processing ----------------------------------------------------
 tasks.withType(ProcessResources).configureEach {
   def ver = project.version

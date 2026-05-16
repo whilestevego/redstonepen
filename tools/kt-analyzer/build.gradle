@@ -1,0 +1,53 @@
+// tools/kt-analyzer/build.gradle
+plugins {
+  id 'org.jetbrains.kotlin.jvm'
+  id 'com.gradleup.shadow'
+}
+
+group = 'wile.tools'
+version = '1.0.0'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // Pin the compiler to 2.3.20 — warnings like UNNECESSARY_NOT_NULL_ASSERTION are absent in 2.2.x
+  // but present in 2.3.x. The main project's kotlin_version stays at 2.2.20; only this tool upgrades.
+  implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.20"
+  // kotlin-stdlib is bundled so the embedded K2JVMCompiler can find it at runtime.
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:2.3.20"
+  implementation 'com.github.ajalt.clikt:clikt:4.4.0'
+  implementation 'org.yaml:snakeyaml:2.2'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    // allWarningsAsErrors intentionally omitted: this module calls KotlinCoreEnvironment (K1 API)
+    // which carries a "planned to deprecate" notice in 2.2.x. Once the K2 standalone analysis
+    // API stabilises this module can be migrated and the flag re-enabled.
+  }
+}
+
+shadowJar {
+  archiveBaseName = 'kt-analyzer'
+  archiveVersion = ''
+  archiveClassifier = ''
+  mergeServiceFiles()
+  manifest {
+    attributes 'Main-Class': 'wile.tools.ktanalyzer.MainKt'
+  }
+  // Exclude kotlin-compiler-embeddable's own signature files to avoid conflicts.
+  exclude 'META-INF/*.SF'
+  exclude 'META-INF/*.DSA'
+  exclude 'META-INF/*.RSA'
+}
+
+assemble.dependsOn shadowJar

@@ -14,3 +14,4 @@ plugins {
 
 rootProject.name = 'redstonepen'
 include('common', 'neoforge', 'fabric')
+include('tools:kt-analyzer')

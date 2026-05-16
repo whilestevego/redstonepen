@@ -35,7 +35,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze analyze-typed analyze-semantic build-analyzer
 
 default: mod
 
@@ -169,3 +169,39 @@ analyze: $(DETEKT_JAR)
 	@echo "Analyzing fabric..."
 	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
 	  --baseline config/detekt/baseline-fabric.xml --input fabric/src --parallel
+
+analyze-typed:
+	@echo "Analyzing with type resolution (detekt + classpath)..."
+	@$(GRADLE) analyzeTyped
+
+build-analyzer:
+	@echo "Building kt-analyzer fat JAR..."
+	@$(GRADLE) :tools:kt-analyzer:shadowJar -q
+
+KT_ANALYZER_JAR := tools/kt-analyzer/build/libs/kt-analyzer.jar
+KT_ANALYZER_JAR_VERSIONED := $(wildcard tools/kt-analyzer/build/libs/kt-analyzer*.jar)
+
+analyze-semantic: build-analyzer
+	@echo "Resolving compile classpaths via Gradle..."
+	@$(GRADLE) :common:writeCompileClasspath :neoforge:writeCompileClasspath :fabric:writeCompileClasspath -q
+	@echo "Analyzing common..."
+	@java -jar $(KT_ANALYZER_JAR) \
+	  --input common/src/main/kotlin \
+	  --input common/src/main/java \
+	  --classpath $$(cat common/build/compile-classpath.txt) \
+	  --config config/kt-analyzer.yml \
+	  --format text
+	@echo "Analyzing neoforge..."
+	@java -jar $(KT_ANALYZER_JAR) \
+	  --input neoforge/src/main/kotlin \
+	  --input neoforge/src/main/java \
+	  --classpath $$(cat neoforge/build/compile-classpath.txt) \
+	  --config config/kt-analyzer.yml \
+	  --format text
+	@echo "Analyzing fabric..."
+	@java -jar $(KT_ANALYZER_JAR) \
+	  --input fabric/src/main/kotlin \
+	  --input fabric/src/main/java \
+	  --classpath $$(cat fabric/build/compile-classpath.txt) \
+	  --config config/kt-analyzer.yml \
+	  --format text
