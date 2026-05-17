@@ -65,7 +65,7 @@ class KtAnalyzerCommand :
 
         PsiEngine(extraClasspath = classpathFiles).use { engine ->
             val runner = AnalysisRunner(engine, config)
-            val findings = runner.analyze(sourceFiles)
+            val findings = runner.analyze(inputs = inputs, sourceFiles = sourceFiles)
 
             val writer =
                 outputFile?.let { PrintWriter(it, Charsets.UTF_8) }
@@ -82,9 +82,9 @@ class KtAnalyzerCommand :
             val threshold =
                 runCatching { Severity.valueOf(failOnSeverity.uppercase()) }
                     .getOrElse { Severity.ERROR }
-            if (findings.any { it.severity >= threshold }) {
-                exitProcess(1)
-            }
+            // IntelliJ's thread pools create non-daemon threads; exitProcess is required so
+            // the JVM doesn't hang after analysis when only warnings (not errors) were found.
+            exitProcess(if (findings.any { it.severity >= threshold }) 1 else 0)
         }
     }
 

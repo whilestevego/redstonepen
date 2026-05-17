@@ -2,12 +2,14 @@
 # suppress: list of rule IDs to exclude from output
 # severity-overrides: map of rule ID to severity (INFO, WARNING, ERROR)
 #
-# Rule IDs are derived from K2 compiler message text: the first clause before
-# ":\n", ": ", or ". " is normalized to UPPER_SNAKE_CASE with quoted identifiers
-# stripped.  Example:
-#   "Unresolved reference 'Foo'"              → UNRESOLVED_REFERENCE
-#   "Return type mismatch: ..."               → RETURN_TYPE_MISMATCH
-#   "Overload resolution ambiguity between candidates:\n..." → OVERLOAD_RESOLUTION_AMBIGUITY_BETWEEN_CANDIDATES
+# Rule IDs are Kotlin diagnostic factory names in UPPER_SNAKE_CASE, taken directly
+# from the Analysis API.  Examples:
+#   UNRESOLVED_REFERENCE                — unknown identifier
+#   RETURN_TYPE_MISMATCH                — function return type does not match declared type
+#   UNUSED_VARIABLE                     — local variable that is never read
+#   REDUNDANT_CALL_OF_CONVERSION_METHOD — e.g. someInt.toInt() is a no-op
+#   WRONG_TYPE_FOR_JAVA_OVERRIDE        — nullability mismatch when overriding a Java method
+#   UNNECESSARY_NOT_NULL_ASSERTION      — !! on a value already known to be non-null
 #
 # Run without --config (or with --config /dev/null) to see all diagnostics and
 # discover the IDs you want to suppress.
