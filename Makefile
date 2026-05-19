@@ -10,9 +10,11 @@ TOOLS_DIR    := $(HOME)/.local/analysis-tools
 KTFMT_JAR    := $(TOOLS_DIR)/ktfmt.jar
 KTLINT_BIN   := $(TOOLS_DIR)/ktlint
 DETEKT_JAR   := $(TOOLS_DIR)/detekt.jar
+KRIT_JAR     := $(TOOLS_DIR)/krit.jar
 KTFMT_VERSION  := 0.62
 KTLINT_VERSION := 1.5.0
 DETEKT_VERSION := 1.23.8
+KRIT_VERSION   := 0.1.0
 
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))
@@ -35,7 +37,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze analyze-typed analyze-semantic build-analyzer
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze analyze-typed krit
 
 default: mod
 
@@ -174,34 +176,30 @@ analyze-typed:
 	@echo "Analyzing with type resolution (detekt + classpath)..."
 	@$(GRADLE) analyzeTyped
 
-build-analyzer:
-	@echo "Building kt-analyzer fat JAR..."
-	@$(GRADLE) :tools:kt-analyzer:shadowJar -q
+# --- krit (semantic analysis with K2 + IDE inspections) ---------------
+# Run with the Zed LS JBR (Java 25) so IDE inspection JARs load correctly.
+# Falls back to system java (compiler diagnostics only) if JBR is not found.
 
-KT_ANALYZER_JAR := tools/kt-analyzer/build/libs/kt-analyzer.jar
-KT_ANALYZER_JAR_VERSIONED := $(wildcard tools/kt-analyzer/build/libs/kt-analyzer*.jar)
+KRIT := java --enable-native-access=ALL-UNNAMED \
+  --add-opens java.base/jdk.internal.misc=ALL-UNNAMED \
+  -jar $(KRIT_JAR) --common-checks --format text
 
-analyze-semantic: build-analyzer
+$(KRIT_JAR): | $(TOOLS_DIR)
+	@echo "Downloading krit $(KRIT_VERSION)..."
+	@curl -sSLo $@ https://github.com/whilestevego/krit/releases/download/v$(KRIT_VERSION)/krit.jar
+
+$(TOOLS_DIR):
+	@mkdir -p $(TOOLS_DIR)
+
+krit: $(KRIT_JAR)
 	@echo "Resolving compile classpaths via Gradle..."
 	@$(GRADLE) :common:writeCompileClasspath :neoforge:writeCompileClasspath :fabric:writeCompileClasspath -q
 	@echo "Analyzing common..."
-	@java -jar $(KT_ANALYZER_JAR) \
-	  --input common/src/main/kotlin \
-	  --input common/src/main/java \
-	  --classpath $$(cat common/build/compile-classpath.txt) \
-	  --config config/kt-analyzer.yml \
-	  --format text
+	@$(KRIT) --input common/src/main/kotlin --input common/src/main/java \
+	  --classpath $$(cat common/build/compile-classpath.txt)
 	@echo "Analyzing neoforge..."
-	@java -jar $(KT_ANALYZER_JAR) \
-	  --input neoforge/src/main/kotlin \
-	  --input neoforge/src/main/java \
-	  --classpath $$(cat neoforge/build/compile-classpath.txt) \
-	  --config config/kt-analyzer.yml \
-	  --format text
+	@$(KRIT) --input neoforge/src/main/kotlin --input neoforge/src/main/java \
+	  --classpath $$(cat neoforge/build/compile-classpath.txt)
 	@echo "Analyzing fabric..."
-	@java -jar $(KT_ANALYZER_JAR) \
-	  --input fabric/src/main/kotlin \
-	  --input fabric/src/main/java \
-	  --classpath $$(cat fabric/build/compile-classpath.txt) \
-	  --config config/kt-analyzer.yml \
-	  --format text
+	@$(KRIT) --input fabric/src/main/kotlin --input fabric/src/main/java \
+	  --classpath $$(cat fabric/build/compile-classpath.txt)
