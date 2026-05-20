@@ -177,7 +177,13 @@ analyze-typed:
 	@$(GRADLE) analyzeTyped
 
 # --- krit (semantic analysis with K2 + IDE inspections) ---------------
-KRIT := java --enable-native-access=ALL-UNNAMED \
+KRIT_JAVA := $(shell \
+  if [ -n "$$JAVA_HOME" ] && [ -x "$$JAVA_HOME/bin/java" ]; then \
+    ver=$$($$JAVA_HOME/bin/java -version 2>&1 | sed -n 's/.*version "\([0-9]*\).*/\1/p'); \
+    [ "$${ver:-0}" -ge 25 ] 2>/dev/null && { printf '%s' "$$JAVA_HOME/bin/java"; exit 0; }; \
+  fi; \
+  printf '%s' "java")
+KRIT := "$(KRIT_JAVA)" --enable-native-access=ALL-UNNAMED \
   --add-opens java.base/jdk.internal.misc=ALL-UNNAMED \
   -jar $(KRIT_JAR) --common-checks --format text
 
