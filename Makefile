@@ -14,7 +14,7 @@ KRIT_JAR     := $(TOOLS_DIR)/krit.jar
 KTFMT_VERSION  := 0.62
 KTLINT_VERSION := 1.5.0
 DETEKT_VERSION := 1.23.8
-KRIT_VERSION   := 0.1.0
+KRIT_VERSION   := 0.2.0
 
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))
@@ -177,9 +177,6 @@ analyze-typed:
 	@$(GRADLE) analyzeTyped
 
 # --- krit (semantic analysis with K2 + IDE inspections) ---------------
-# Run with the Zed LS JBR (Java 25) so IDE inspection JARs load correctly.
-# Falls back to system java (compiler diagnostics only) if JBR is not found.
-
 KRIT := java --enable-native-access=ALL-UNNAMED \
   --add-opens java.base/jdk.internal.misc=ALL-UNNAMED \
   -jar $(KRIT_JAR) --common-checks --format text
