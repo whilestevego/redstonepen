@@ -3,7 +3,6 @@ plugins {
   id 'dev.architectury.loom'
   id 'jacoco'
   id 'org.jetbrains.kotlin.jvm'
-  id 'org.jetbrains.kotlin.plugin.power-assert'
 }
 
 architectury { common('neoforge', 'fabric') }
