@@ -8,9 +8,8 @@ class TrackNet(
     val neighbour_sides: List<Direction>,
     val internal_sides: List<Direction>,
     val power_sides: List<Direction>,
-    power: Int = 0,
+    internal var power: Int = 0,
 ) {
-    internal var power: Int = power
 
     override fun toString(): String {
         var s = "NET{"

@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
 
 object DemoBuilder {
 
-    @JvmField val FLAGS = Block.UPDATE_NEIGHBORS or Block.UPDATE_CLIENTS
+    const val FLAGS = Block.UPDATE_NEIGHBORS or Block.UPDATE_CLIENTS
 
     @JvmStatic
     fun cellOrigin(gridOrigin: BlockPos, cellIndex: Int, columns: Int, spacing: Int): BlockPos {

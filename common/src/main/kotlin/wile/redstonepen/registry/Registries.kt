@@ -254,12 +254,10 @@ object Registries {
         blockSupplier: Supplier<TB>,
         itemBuilder: BiFunction<Block, Item.Properties, Item>,
     ) {
-        @Suppress("UNCHECKED_CAST")
         addBlock(
             registryName,
             blockSupplier,
-            Supplier { itemBuilder.apply(registeredBlocks[registryName]!!, Item.Properties()) }
-                as Supplier<Item>,
+            Supplier { itemBuilder.apply(registeredBlocks[registryName]!!, Item.Properties()) },
         )
     }
 

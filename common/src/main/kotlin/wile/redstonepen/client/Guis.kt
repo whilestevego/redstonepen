@@ -128,8 +128,8 @@ object Guis {
 
         open fun init(parent: Screen): UiWidget {
             parent_ = parent
-            x = x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
-            y = y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0
+            x += if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
+            y += if (parent is ContainerGui<*>) parent.getGuiTop() else 0
             return this
         }
 

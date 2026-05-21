@@ -412,7 +412,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                         Inventories.insert(player, ItemStack(Items.REDSTONE, amount), false)
                     if (!remaining.isEmpty) Inventories.give(player, remaining)
                 } else if (stack.damageValue >= amount) {
-                    stack.damageValue = stack.damageValue - amount
+                    stack.damageValue -= amount
                 } else {
                     val left = amount - stack.damageValue
                     stack.damageValue = 0

@@ -166,7 +166,7 @@ object GuiTextEditing {
         override fun init(parent: Screen): MultiLineTextBox = init(parent, Guis.Coord2d.of(x, y))
 
         override fun init(parent: Screen, position: Guis.Coord2d): MultiLineTextBox {
-            super<Guis.UiWidget>.init(parent, position)
+            super.init(parent, position)
             font_ = Minecraft.getInstance().font
             font_color_ = 0xff000000.toInt()
             cursor_color_ = 0xff000000.toInt()
@@ -558,7 +558,7 @@ object GuiTextEditing {
             fun changeLine(cursorPos: Int, length: Int): Int {
                 val i = findLineFromPos(lineStarts, cursorPos)
                 val j = i + length
-                return if (j in 0 until lineStarts.size) {
+                return if (j in lineStarts.indices) {
                     val l = cursorPos - lineStarts[i]
                     lineStarts[j] + minOf(l, lines[j].contents.length)
                 } else {

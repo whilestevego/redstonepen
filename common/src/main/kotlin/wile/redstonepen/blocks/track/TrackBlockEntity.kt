@@ -55,7 +55,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
         @JvmStatic
         internal fun dirstr(@Nullable dir: Direction?): String =
-            if (dir == null) "?" else dir.toString().substring(0, 1)
+            dir?.toString()?.substring(0, 1) ?: "?"
 
         private val updatepower_order: List<Vec3i> by lazy {
             val list = ArrayList<Vec3i>()
@@ -82,7 +82,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (nbt.contains("nets", Tag.TAG_LIST.toInt())) {
             val lst = nbt.getList("nets", Tag.TAG_COMPOUND.toInt())
             try {
-                for (i in 0 until lst.size) {
+                for (i in lst.indices) {
                     val route_nbt = lst.getCompound(i)
                     nets.add(
                         TrackNet(

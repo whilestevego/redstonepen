@@ -61,7 +61,7 @@ value class TrackStateFlags(val raw: Long) {
      */
     fun withAddedWireFlags(flags: Long): Pair<TrackStateFlags, Int> {
         val toAdd = flags and STATE_FLAG_WIR_MASK and raw.inv()
-        return Pair(TrackStateFlags(raw or toAdd), java.lang.Long.bitCount(toAdd).toInt())
+        return Pair(TrackStateFlags(raw or toAdd), java.lang.Long.bitCount(toAdd))
     }
 
     /** Returns a copy with every bit in [mask] cleared. */

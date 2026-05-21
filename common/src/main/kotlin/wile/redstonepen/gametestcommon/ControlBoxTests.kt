@@ -564,7 +564,7 @@ object ControlBoxTests {
                 helper.absolutePos(CONTROL_BOX_POS),
                 Direction.WEST,
             )
-        if (sig < 0 || sig > 15) helper.fail("time() output must be in [0,15], got $sig")
+        if (sig !in 0..15) helper.fail("time() output must be in [0,15], got $sig")
         helper.succeed()
     }
 

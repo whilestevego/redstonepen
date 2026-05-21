@@ -71,8 +71,8 @@ object ModContent {
                 )
             },
             directedItem,
-            Registries.BlockEntityFactory { pos, state -> ControlBoxBlockEntity(pos, state) },
-            Registries.MenuFactory { id, inv -> ControlBoxUiContainer(id, inv) },
+            ::ControlBoxBlockEntity,
+            ::ControlBoxUiContainer,
         )
         Registries.addBlock("relay", { CircuitComponents.RelayBlock() }, directedItem)
         Registries.addBlock(

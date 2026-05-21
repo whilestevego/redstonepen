@@ -438,7 +438,7 @@ internal class TrackNetworkCalculator(
             val poss = TrackBlockEntity.posstr(pos)
             for (net in newNets) {
                 val adjacentDesc =
-                    (0 until net.neighbour_positions.size).map { i ->
+                    net.neighbour_positions.indices.map { i ->
                         "${TrackBlockEntity.posstr(net.neighbour_positions[i])}:${net.neighbour_sides[i]}"
                     }
                 Auxiliaries.logWarn(

@@ -82,7 +82,7 @@ class ExtendedShapelessRecipe(
                         remaining[i] = stack
                     } else {
                         val rstack = stack.copy()
-                        rstack.damageValue = rstack.damageValue + toolDamage
+                        rstack.damageValue += toolDamage
                         if (rstack.damageValue < rstack.maxDamage) remaining[i] = rstack
                     }
                 } else if (stack.item.hasCraftingRemainingItem()) {

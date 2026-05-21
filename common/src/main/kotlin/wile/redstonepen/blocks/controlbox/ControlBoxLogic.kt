@@ -4,7 +4,7 @@ import wile.redstonepen.cblscript.CBLScript
 import wile.redstonepen.cblscript.Program
 import wile.redstonepen.cblscript.SignalPolicy
 
-private val RCA_SYMBOL_REGEX = Regex("^d[io][1]?[\\d][\\d]?\$")
+private val RCA_SYMBOL_REGEX = Regex("""^d[io][1]?[\d][\d]?$""")
 
 internal class ControlBoxLogic {
 

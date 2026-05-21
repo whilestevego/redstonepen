@@ -27,7 +27,7 @@ class ControlBoxUiContainer(
     Networking.INetworkSynchronisableContainer {
 
     companion object {
-        protected const val NUM_OF_SLOTS = 1
+        private const val NUM_OF_SLOTS = 1
     }
 
     constructor(

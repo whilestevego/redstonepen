@@ -463,21 +463,12 @@ object Auxiliaries {
         Array(bbs.size) { i -> mapper.apply(bbs[i]) }
 
     class BlockPosRange(x0: Int, y0: Int, z0: Int, x1: Int, y1: Int, z1: Int) : Iterable<BlockPos> {
-        internal val x0: Int
-        internal val x1: Int
-        internal val y0: Int
-        internal val y1: Int
-        internal val z0: Int
-        internal val z1: Int
-
-        init {
-            this.x0 = minOf(x0, x1)
-            this.x1 = maxOf(x0, x1)
-            this.y0 = minOf(y0, y1)
-            this.y1 = maxOf(y0, y1)
-            this.z0 = minOf(z0, z1)
-            this.z1 = maxOf(z0, z1)
-        }
+        internal val x0: Int = minOf(x0, x1)
+        internal val x1: Int = maxOf(x0, x1)
+        internal val y0: Int = minOf(y0, y1)
+        internal val y1: Int = maxOf(y0, y1)
+        internal val z0: Int = minOf(z0, z1)
+        internal val z1: Int = maxOf(z0, z1)
 
         companion object {
             @JvmStatic

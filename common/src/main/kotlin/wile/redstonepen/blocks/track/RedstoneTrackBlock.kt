@@ -124,7 +124,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 (if ((wires and 0x000f00) != 0) 0x04 else 0) or
                 (if ((wires and 0x00f000) != 0) 0x08 else 0) or
                 (if ((wires and 0x0f0000) != 0) 0x10 else 0) or
-                (if ((wires and 0xf00000.toInt()) != 0) 0x20 else 0)
+                (if ((wires and 0xf00000) != 0) 0x20 else 0)
         return RedstoneTrackDefs.shape.get(faces)
     }
 

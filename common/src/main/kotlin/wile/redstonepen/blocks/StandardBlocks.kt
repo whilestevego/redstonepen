@@ -218,7 +218,7 @@ object StandardBlocks {
 
     open class Cutout : BaseBlock, IStandardBlock {
 
-        protected lateinit var vshape: VoxelShape
+        protected var vshape: VoxelShape = Shapes.empty()
 
         constructor(
             conf: Long,
@@ -352,7 +352,7 @@ object StandardBlocks {
             @JvmField val FACING: DirectionProperty = BlockStateProperties.FACING
         }
 
-        protected lateinit var vshapes: Map<BlockState, VoxelShape>
+        protected var vshapes: Map<BlockState, VoxelShape> = emptyMap()
 
         constructor(
             config: Long,
@@ -466,8 +466,8 @@ object StandardBlocks {
             val HORIZONTAL_FACING: DirectionProperty = BlockStateProperties.HORIZONTAL_FACING
         }
 
-        protected lateinit var vshapes: Map<BlockState, VoxelShape>
-        protected lateinit var cshapes: Map<BlockState, VoxelShape>
+        protected var vshapes: Map<BlockState, VoxelShape> = emptyMap()
+        protected var cshapes: Map<BlockState, VoxelShape> = emptyMap()
 
         constructor(
             config: Long,
@@ -549,17 +549,16 @@ object StandardBlocks {
 
         override fun getStateForPlacement(context: BlockPlaceContext): BlockState? {
             val state = super.getStateForPlacement(context) ?: return null
-            var facing = context.clickedFace
-            if ((config and CFG_LOOK_PLACEMENT) != 0L) {
-                facing = context.horizontalDirection
-            } else {
-                facing =
-                    if (facing == Direction.UP || facing == Direction.DOWN) {
-                        context.horizontalDirection
-                    } else {
-                        facing
-                    }
-            }
+            var facing =
+                if ((config and CFG_LOOK_PLACEMENT) != 0L) {
+                    context.horizontalDirection
+                } else if (
+                    context.clickedFace == Direction.UP || context.clickedFace == Direction.DOWN
+                ) {
+                    context.horizontalDirection
+                } else {
+                    context.clickedFace
+                }
             if ((config and CFG_OPPOSITE_PLACEMENT) != 0L) facing = facing.opposite
             val player = context.player
             if (

@@ -103,7 +103,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         customName = name
     }
 
-    override fun getDisplayName(): Component = super<Nameable>.getDisplayName()
+    override fun getDisplayName(): Component = super.getDisplayName()
 
     override fun createMenu(id: Int, inventory: Inventory, player: Player): AbstractContainerMenu =
         ControlBoxUiContainer(
