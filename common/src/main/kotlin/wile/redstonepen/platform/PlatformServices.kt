@@ -16,18 +16,13 @@ object PlatformServices {
     @Volatile private var rendering_: IRenderingPlatform? = null
 
     @JvmStatic
-    fun getNetworkingClient(): INetworkingClientPlatform {
-        if (networkingClient_ == null) {
-            networkingClient_ = load(INetworkingClientPlatform::class.java)
-        }
-        return networkingClient_!!
-    }
+    fun getNetworkingClient(): INetworkingClientPlatform =
+        networkingClient_
+            ?: load(INetworkingClientPlatform::class.java).also { networkingClient_ = it }
 
     @JvmStatic
-    fun getRendering(): IRenderingPlatform {
-        if (rendering_ == null) rendering_ = load(IRenderingPlatform::class.java)
-        return rendering_!!
-    }
+    fun getRendering(): IRenderingPlatform =
+        rendering_ ?: load(IRenderingPlatform::class.java).also { rendering_ = it }
 
     private fun <T> load(clazz: Class<T>): T =
         ServiceLoader.load(clazz).findFirst().orElseThrow {

@@ -94,7 +94,8 @@ class FmmRedstoneClientAdapter {
 
         fun tick(): Boolean =
             try {
-                if (isWrite) buffer!!.clear().put(mapData) else buffer!!.clear().get(mapData)
+                val buf = requireNotNull(buffer)
+                if (isWrite) buf.clear().put(mapData) else buf.clear().get(mapData)
                 true
             } catch (_: Throwable) {
                 close()

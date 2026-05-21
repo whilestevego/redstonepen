@@ -28,7 +28,7 @@ import wile.redstonepen.util.Auxiliaries
 @Suppress("DEPRECATION")
 class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     StandardEntityBlocks.StandardBlockEntity(
-        Registries.getBlockEntityTypeOfBlock(state.block)!!,
+        requireNotNull(Registries.getBlockEntityTypeOfBlock(state.block)),
         pos,
         state,
     ),
@@ -79,9 +79,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         nbt: CompoundTag,
         syncPacket: Boolean,
     ): CompoundTag {
-        if (customName != null) {
-            nbt.putString("name", Auxiliaries.serializeTextComponent(customName!!, hlp))
-        }
+        customName?.let { nbt.putString("name", Auxiliaries.serializeTextComponent(it, hlp)) }
         val logicdata = CompoundTag()
         logicdata.putString("code", logic.code())
         logicdata.putInt("input", logic.input_data)
@@ -90,14 +88,12 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         logic.symbols().forEach { (k, v) -> logicsymbols.putInt(k, v) }
         logicdata.put("symbols", logicsymbols)
         nbt.put("logic", logicdata)
-        if (activatingPlayer != null) nbt.putUUID("player", activatingPlayer!!)
+        activatingPlayer?.let { nbt.putUUID("player", it) }
         return nbt
     }
 
-    override fun getName(): Component {
-        if (customName != null) return customName!!
-        return Component.translatable(blockState.block.descriptionId)
-    }
+    override fun getName(): Component =
+        customName ?: Component.translatable(blockState.block.descriptionId)
 
     override fun getCustomName(): Component? = customName
 
@@ -318,9 +314,9 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         if (!full) return nbt
         nbt.putBoolean("debug", trace_enabled())
         nbt.putString("code", getCode())
-        if (activatingPlayer != null) {
-            val run_player = getLevel()?.getPlayerByUUID(activatingPlayer!!)
-            nbt.putString("player", if (run_player == null) "" else run_player.scoreboardName)
+        activatingPlayer?.let { pid ->
+            val run_player = getLevel()?.getPlayerByUUID(pid)
+            nbt.putString("player", run_player?.scoreboardName ?: "")
         }
         return nbt
     }

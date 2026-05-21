@@ -121,7 +121,8 @@ object RedstoneTrackDefs {
                 (0x00008000L or 0x00800000L) to Tuple(Direction.SOUTH, Direction.WEST),
             )
 
-        @JvmStatic fun getBulkConnectorBit(face: Direction): Long = BULK_FACE_MAPPING_REV[face]!!
+        @JvmStatic
+        fun getBulkConnectorBit(face: Direction): Long = BULK_FACE_MAPPING_REV.getValue(face)
 
         @JvmStatic
         fun getWireBit(face: Direction, wire_direction: Direction): Long =
@@ -156,7 +157,7 @@ object RedstoneTrackDefs {
 
         @JvmStatic
         fun hasBulkConnection(mask: Long, side: Direction): Boolean =
-            (BULK_FACE_MAPPING_REV[side]!! and mask) != 0L
+            (BULK_FACE_MAPPING_REV.getValue(side) and mask) != 0L
 
         @JvmStatic
         fun hasRedstoneConnection(mask: Long, side: Direction): Boolean =
@@ -316,7 +317,7 @@ object RedstoneTrackDefs {
                 if ((faces and 0x20) != 0) shape = Shapes.join(shape, WEST_SHAPE, BooleanOp.OR)
                 shape_cache[faces] = shape
             }
-            return shape_cache[faces]!!
+            return requireNotNull(shape_cache[faces])
         }
     }
 

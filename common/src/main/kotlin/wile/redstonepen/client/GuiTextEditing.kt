@@ -419,10 +419,8 @@ object GuiTextEditing {
 
         private var display_cache_: DisplayCache? = DisplayCache.EMPTY
 
-        private fun getDisplayCache(): DisplayCache {
-            if (display_cache_ == null) display_cache_ = rebuildDisplayCache()
-            return display_cache_!!
-        }
+        private fun getDisplayCache(): DisplayCache =
+            display_cache_ ?: rebuildDisplayCache().also { display_cache_ = it }
 
         private fun clearDisplayCache() {
             display_cache_ = null

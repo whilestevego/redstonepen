@@ -290,7 +290,7 @@ object Auxiliaries {
 
     @JvmStatic
     fun serializeTextComponent(tc: Component?, ra: HolderLookup.Provider?): String =
-        if (tc == null) "" else Component.Serializer.toJson(tc, ra!!)
+        if (tc == null) "" else Component.Serializer.toJson(tc, requireNotNull(ra))
 
     // -------------------------------------------------------------------------------------------------------------------
     // Tag Handling

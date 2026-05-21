@@ -87,7 +87,8 @@ class ExtendedShapelessRecipe(
                         if (rstack.damageValue < rstack.maxDamage) remaining[i] = rstack
                     }
                 } else if (stack.item.hasCraftingRemainingItem()) {
-                    remaining[i] = ItemStack(stack.item.craftingRemainingItem!!, stack.count)
+                    remaining[i] =
+                        ItemStack(requireNotNull(stack.item.craftingRemainingItem), stack.count)
                 }
             }
             return remaining
@@ -268,7 +269,7 @@ class ExtendedShapelessRecipe(
                 val ingredients = NonNullList.withSize(size, Ingredient.EMPTY)
                 ingredients.replaceAll { Ingredient.CONTENTS_STREAM_CODEC.decode(buf) }
                 val stack = ItemStack.STREAM_CODEC.decode(buf)
-                val aspects = buf.readNbt()!!
+                val aspects = requireNotNull(buf.readNbt())
                 return ExtendedShapelessRecipe(group, cat, stack, ingredients, aspects)
             }
 
