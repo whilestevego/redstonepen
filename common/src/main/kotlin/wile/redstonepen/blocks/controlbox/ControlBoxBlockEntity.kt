@@ -142,7 +142,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         try {
             run {
                 logic.input_data = 0
-                for (d in Direction.values()) {
+                for (d in Direction.entries) {
                     val world_dir =
                         CircuitComponents.DirectedComponentBlock.getForwardStateMappedFacing(
                             device_state,
@@ -150,11 +150,11 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
                         )
                     if (device_enabled) {
                         val port_name = PortNames.ALL[d.ordinal]
-                        if (logic.usesSymbol(port_name + ".co")) {
+                        if (logic.usesSymbol("${port_name}.co")) {
                             val target_pos = device_pos.relative(world_dir)
                             val target_state = world.getBlockState(target_pos)
                             logic.symbol(
-                                port_name + ".co",
+                                "${port_name}.co",
                                 if (target_state.hasAnalogOutputSignal()) {
                                     target_state.getAnalogOutputSignal(world, target_pos)
                                 } else {
@@ -192,7 +192,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
             }
             run {
                 if (logic.output_data != last_output_data) {
-                    for (d in Direction.values()) {
+                    for (d in Direction.entries) {
                         if ((logic.output_mask and (0xf shl (4 * d.ordinal))) == 0) continue
                         val world_dir =
                             CircuitComponents.DirectedComponentBlock.getForwardStateMappedFacing(

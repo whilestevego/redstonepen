@@ -2,6 +2,7 @@ package wile.redstonepen.blocks.track
 
 import java.util.LinkedList
 import java.util.Locale
+import kotlin.math.abs
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
@@ -58,13 +59,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
         private val updatepower_order: List<Vec3i> by lazy {
             val list = ArrayList<Vec3i>()
-            for (side in Direction.values()) {
+            for (side in Direction.entries) {
                 list.add(Vec3i(0, 0, 0).relative(side, 1))
             }
             for (x in -1..1) {
                 for (y in -1..1) {
                     for (z in -1..1) {
-                        if (Math.abs(x) + Math.abs(y) + Math.abs(z) == 2) list.add(Vec3i(x, y, z))
+                        if (abs(x) + abs(y) + abs(z) == 2) list.add(Vec3i(x, y, z))
                     }
                 }
             }
@@ -551,7 +552,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             getBlock().disablePower(false)
             return p
         }
-        for (rs_side in Direction.values()) {
+        for (rs_side in Direction.entries) {
             val side_pos = pos.relative(rs_side)
             val side_state = world.getBlockState(side_pos)
             if (side_state.`is`(Blocks.REDSTONE_WIRE) || side_state.`is`(getBlock())) continue

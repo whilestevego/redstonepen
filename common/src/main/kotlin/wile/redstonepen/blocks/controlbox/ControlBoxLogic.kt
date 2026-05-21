@@ -64,8 +64,8 @@ internal class ControlBoxLogic {
         for (i in PortNames.ALL.indices) {
             val port = PortNames.ALL[i]
             val bit = 0xf shl (4 * i)
-            if (program.referencedSymbols.any { it == port + ".co.re" || it == port + ".co.fe" })
-                state[port + ".co"] = 0
+            if (program.referencedSymbols.any { it == "${port}.co.re" || it == "${port}.co.fe" })
+                state["${port}.co"] = 0
             when {
                 program.assignedSymbols.contains(port) -> output_mask = output_mask or bit
                 CBLScript.STANDARD_SYMBOL_SUFFIXES.any {
@@ -151,7 +151,7 @@ internal class ControlBoxLogic {
                 if ((rca_output_mask and (0xfL shl (4 * i))) != 0L) {
                     rca_output_data =
                         rca_output_data or
-                            (Math.min(15, Math.max(0, symbol("do$i"))).toLong() shl (4 * i))
+                            (minOf(15, maxOf(0, symbol("do$i"))).toLong() shl (4 * i))
                 }
             }
         }

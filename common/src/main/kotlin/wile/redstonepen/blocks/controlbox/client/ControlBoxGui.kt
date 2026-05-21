@@ -296,7 +296,7 @@ class ControlBoxGui(
         tooltip_.init(tooltips).delay(50)
 
         setInitialFocus(textbox)
-        setFocused(textbox)
+        focused = textbox
         textbox.active = false
         onGuiAction("serverdata")
     }
@@ -414,7 +414,7 @@ class ControlBoxGui(
                 children().forEach { child ->
                     if (child != textbox && child is AbstractWidget) child.setFocused(false)
                 }
-                setFocused(textbox)
+                focused = textbox
             }
         }
     }

@@ -153,7 +153,7 @@ object TrackTests {
     fun setSidePowerAndGetSidePowerRoundTrip(helper: GameTestHelper) {
         placeTrack(helper)
         val te = requireNotNull(getTrack(helper))
-        for (d in Direction.values()) te.setSidePower(d, 0)
+        for (d in Direction.entries) te.setSidePower(d, 0)
         te.setSidePower(Direction.NORTH, 11)
         if (te.getSidePower(Direction.NORTH) != 11) helper.fail("expected 11 on NORTH")
         if (te.getSidePower(Direction.SOUTH) != 0) helper.fail("expected 0 on SOUTH (untouched)")
@@ -165,7 +165,7 @@ object TrackTests {
         placeTrack(helper)
         val te = requireNotNull(getTrack(helper))
         seedTrackNet(helper, 0, Direction.EAST)
-        for (d in Direction.values()) te.hasVanillaRedstoneConnection(d)
+        for (d in Direction.entries) te.hasVanillaRedstoneConnection(d)
         helper.succeed()
     }
 
@@ -277,7 +277,7 @@ object TrackTests {
     fun getSignalForUnpoweredTrackIsZero(helper: GameTestHelper) {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
-        for (d in Direction.values()) {
+        for (d in Direction.entries) {
             val s =
                 block.getSignal(
                     helper.getBlockState(TRACK_POS),
@@ -619,7 +619,7 @@ object TrackTests {
     fun getRedstonePowerZeroOnIsolatedTrack(helper: GameTestHelper) {
         placeTrack(helper)
         val te = requireNotNull(getTrack(helper))
-        for (d in Direction.values()) {
+        for (d in Direction.entries) {
             val p = te.getRedstonePower(d, false)
             if (p != 0) helper.fail("expected 0 power on isolated track side $d, got $p")
         }

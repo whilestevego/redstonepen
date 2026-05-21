@@ -366,7 +366,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         val te = tileResult.get()
         if ((te.getStateFlags() and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) == 0L) return
         val color = Vec3(0.6, 0.0, 0.0)
-        for (side in Direction.values()) {
+        for (side in Direction.entries) {
             val p = te.getSidePower(side)
             if (p == 0) continue
             spawnPoweredParticle(world, rand, pos, color, side, side.opposite, -0.5f, 0.5f)

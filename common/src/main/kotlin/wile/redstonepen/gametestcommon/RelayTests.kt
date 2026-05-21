@@ -230,7 +230,7 @@ object RelayTests {
     @JvmStatic
     fun upFacingIsOppositeOfFacingForAllDirections(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             val s =
                 relay
                     .defaultBlockState()
@@ -248,7 +248,7 @@ object RelayTests {
     @JvmStatic
     fun downFacingMethodEqualsFacingPropertyForAllDirections(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             val s =
                 relay
                     .defaultBlockState()
@@ -265,7 +265,7 @@ object RelayTests {
     @JvmStatic
     fun rightFacingIsRotationPlusOneRelativeToFront(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             for (r in 0..3) {
                 val s =
                     relay
@@ -292,7 +292,7 @@ object RelayTests {
     @JvmStatic
     fun backFacingIsRotationPlusTwoRelativeToFront(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             for (r in 0..3) {
                 val s =
                     relay
@@ -319,7 +319,7 @@ object RelayTests {
     @JvmStatic
     fun leftFacingIsRotationPlusThreeRelativeToFront(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             for (r in 0..3) {
                 val s =
                     relay
@@ -346,7 +346,7 @@ object RelayTests {
     @JvmStatic
     fun allSixMappedDirectionsAreDistinctForEveryState(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             for (r in 0..3) {
                 val s =
                     relay
@@ -373,14 +373,14 @@ object RelayTests {
     @JvmStatic
     fun forwardThenReverseStateMappedFacingIsIdentity(helper: GameTestHelper) {
         val relay = Registries.requireBlock("relay")
-        for (face in Direction.values()) {
+        for (face in Direction.entries) {
             for (r in 0..3) {
                 val s =
                     relay
                         .defaultBlockState()
                         .setValue(CircuitComponents.DirectedComponentBlock.FACING, face)
                         .setValue(CircuitComponents.DirectedComponentBlock.ROTATION, r)
-                for (worldSide in Direction.values()) {
+                for (worldSide in Direction.entries) {
                     val mapped =
                         CircuitComponents.DirectedComponentBlock.getForwardStateMappedFacing(
                             s,
@@ -693,7 +693,7 @@ object RelayTests {
     fun bridgeRelayPlacedAndGetSignalDoesNotThrow(helper: GameTestHelper) {
         helper.setBlock(RELAY_POS, Registries.requireBlock("bridge_relay").defaultBlockState())
         val abs = helper.absolutePos(RELAY_POS)
-        for (d in Direction.values()) {
+        for (d in Direction.entries) {
             val sig = helper.getBlockState(RELAY_POS).getSignal(helper.getLevel(), abs, d)
             if (sig < 0) helper.fail("getSignal must be non-negative for $d")
         }

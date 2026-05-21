@@ -163,8 +163,7 @@ object GuiTextEditing {
             )
         }
 
-        override fun init(parent: Screen): MultiLineTextBox =
-            init(parent, Guis.Coord2d.of(getX(), getY()))
+        override fun init(parent: Screen): MultiLineTextBox = init(parent, Guis.Coord2d.of(x, y))
 
         override fun init(parent: Screen, position: Guis.Coord2d): MultiLineTextBox {
             super<Guis.UiWidget>.init(parent, position)
@@ -209,7 +208,7 @@ object GuiTextEditing {
             }
             last_index_ = index
             last_clicked_ = index.toLong()
-            if (isFocused) setFocused(true)
+            if (isFocused) isFocused = true
             return true
         }
 
@@ -269,8 +268,8 @@ object GuiTextEditing {
             if (!visible) return
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-            val ox = (getX() * (1.0 - font_scale_)).toInt()
-            val oy = (getY() * (1.0 - font_scale_)).toInt()
+            val ox = (x * (1.0 - font_scale_)).toInt()
+            val oy = (y * (1.0 - font_scale_)).toInt()
             val mxs: PoseStack = gg.pose()
             mxs.pushPose()
             mxs.translate(ox.toDouble(), oy.toDouble(), 0.0)
@@ -402,8 +401,8 @@ object GuiTextEditing {
             val fillColor = 0x339999ff
             var firstYOffsetPx = -1
             for (rc in lineRects) {
-                val x = rc.x - getX()
-                val y = rc.y - getY()
+                val x = rc.x - this.x
+                val y = rc.y - this.y
                 val pos0 = screenCoordinates(Guis.Coord2d.of(x, y), true)
                 val pos1 = screenCoordinates(Guis.Coord2d.of(x + rc.width, y + rc.height), true)
                 gg.fill(

@@ -2,7 +2,6 @@ package wile.redstonepen.client
 
 import com.mojang.blaze3d.platform.Window
 import com.mojang.blaze3d.systems.RenderSystem
-import java.util.Arrays
 import java.util.function.Consumer
 import java.util.function.Function
 import net.fabricmc.api.EnvType
@@ -129,15 +128,15 @@ object Guis {
 
         open fun init(parent: Screen): UiWidget {
             parent_ = parent
-            setX(getX() + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0)
-            setY(getY() + if (parent is ContainerGui<*>) parent.getGuiTop() else 0)
+            x = x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
+            y = y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0
             return this
         }
 
         open fun init(parent: Screen, position: Coord2d): UiWidget {
             parent_ = parent
-            setX(position.x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0)
-            setY(position.y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0)
+            x = position.x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
+            y = position.y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0
             return this
         }
 
@@ -159,14 +158,12 @@ object Guis {
             val win: Window = mc_.window
             return Coord2d.of(
                 Mth.clamp(
-                    (mc_.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() -
-                        getX(),
+                    (mc_.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() - x,
                     -1,
                     width + 1,
                 ),
                 Mth.clamp(
-                    (mc_.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() -
-                        getY(),
+                    (mc_.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() - y,
                     -1,
                     height + 1,
                 ),
@@ -175,9 +172,9 @@ object Guis {
 
         protected fun screenCoordinates(xy: Coord2d, reverse: Boolean): Coord2d =
             if (reverse) {
-                Coord2d.of(xy.x + getX(), xy.y + getY())
+                Coord2d.of(xy.x + x, xy.y + y)
             } else {
-                Coord2d.of(xy.x - getX(), xy.y - getY())
+                Coord2d.of(xy.x - x, xy.y - y)
             }
 
         fun show(): UiWidget {
@@ -194,7 +191,7 @@ object Guis {
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
-            setTooltip(null)
+            tooltip = null
         }
 
         @Suppress("all")
@@ -202,7 +199,7 @@ object Guis {
             if (!visible || !active || tooltip_ === NO_TOOLTIP) return
             val tip = tooltip_.apply(this)
             if (tip.string.trim().isEmpty()) return
-            gg.renderTooltip(mc_.font, Arrays.asList(tip.visualOrderText), mouseX, mouseY)
+            gg.renderTooltip(mc_.font, listOf(tip.visualOrderText), mouseX, mouseY)
         }
 
         companion object {
@@ -251,7 +248,7 @@ object Guis {
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
             val pos = if (checked_) texture_position_on_ else texture_position_off_
-            gg.blit(atlas_, getX(), getY(), pos.x, pos.y, width, height)
+            gg.blit(atlas_, x, y, pos.x, pos.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
@@ -284,7 +281,7 @@ object Guis {
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            gg.blit(atlas_, getX(), getY(), texture_position_.x, texture_position_.y, width, height)
+            gg.blit(atlas_, x, y, texture_position_.x, texture_position_.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
@@ -305,7 +302,7 @@ object Guis {
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            gg.blit(atlas_, getX(), getY(), texture_position_.x, texture_position_.y, width, height)
+            gg.blit(atlas_, x, y, texture_position_.x, texture_position_.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
@@ -315,7 +312,7 @@ object Guis {
         net.minecraft.client.gui.components.EditBox(font, x, y, width, height, title) {
 
         init {
-            setBordered(false)
+            isBordered = false
         }
 
         fun withMaxLength(len: Int): TextBox {

@@ -85,7 +85,7 @@ object CircuitComponents {
 
             private fun makeFacingMappings(): List<Direction> {
                 val maps = ArrayList<Direction>()
-                Direction.values().forEach { face ->
+                Direction.entries.forEach { face ->
                     when (face) {
                         Direction.DOWN,
                         Direction.UP -> {
@@ -130,7 +130,7 @@ object CircuitComponents {
                     return
                 }
                 for (state in states) {
-                    for (worldSide in Direction.values()) {
+                    for (worldSide in Direction.entries) {
                         val sm =
                             when (worldSide) {
                                 Direction.DOWN -> getDownFacing(state)
@@ -694,7 +694,7 @@ object CircuitComponents {
         protected open fun isPowered(state: BlockState, world: Level, pos: BlockPos): Boolean {
             val outputSide = getOutputFacing(state)
             val mountSide = state.getValue(FACING)
-            for (side in Direction.values()) {
+            for (side in Direction.entries) {
                 if (side == outputSide) continue
                 if (side == mountSide.opposite) continue
                 if (world.getSignal(pos.relative(side), side) > 0) return true
@@ -956,7 +956,7 @@ object CircuitComponents {
                                     !state.isSignalSource &&
                                     RsSignals.canEmitWeakPower(state, world, pos, redstoneSide)
                             ) {
-                                for (d in Direction.values()) {
+                                for (d in Direction.entries) {
                                     if (d == redstoneSide.opposite) continue
                                     sp =
                                         maxOf(

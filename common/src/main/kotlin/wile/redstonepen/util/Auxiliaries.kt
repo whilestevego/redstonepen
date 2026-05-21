@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Function
 import java.util.stream.Collectors
+import kotlin.math.floor
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
@@ -482,12 +483,12 @@ object Auxiliaries {
             @JvmStatic
             fun of(range: AABB): BlockPosRange =
                 BlockPosRange(
-                    Math.floor(range.minX).toInt(),
-                    Math.floor(range.minY).toInt(),
-                    Math.floor(range.minZ).toInt(),
-                    Math.floor(range.maxX - 0.0625).toInt(),
-                    Math.floor(range.maxY - 0.0625).toInt(),
-                    Math.floor(range.maxZ - 0.0625).toInt(),
+                    floor(range.minX).toInt(),
+                    floor(range.minY).toInt(),
+                    floor(range.minZ).toInt(),
+                    floor(range.maxX - 0.0625).toInt(),
+                    floor(range.maxY - 0.0625).toInt(),
+                    floor(range.maxZ - 0.0625).toInt(),
                 )
         }
 

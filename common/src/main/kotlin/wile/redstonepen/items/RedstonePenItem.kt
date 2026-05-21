@@ -1,6 +1,7 @@
 package wile.redstonepen.items
 
 import java.util.Locale
+import kotlin.math.roundToInt
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
@@ -73,7 +74,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
         if (stack.maxDamage <= 0) {
             13
         } else {
-            13 - Mth.clamp(Math.round(13f * stack.damageValue / stack.maxDamage), 0, 13)
+            13 - Mth.clamp((13f * stack.damageValue / stack.maxDamage).roundToInt(), 0, 13)
         }
 
     override fun getBarColor(stack: ItemStack): Int = 0x663333
@@ -260,7 +261,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     )
                     tc.append(
                         Component.literal(
-                            Direction.values().joinToString(",") { side ->
+                            Direction.entries.joinToString(",") { side ->
                                 side.toString().substring(0, 1) +
                                     te.getRedstonePower(side.opposite, false)
                             }
@@ -308,7 +309,7 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                     tc = Auxiliaries.localizable("overlay.direct_power", powerFormatted(p))
                 } else {
                     var maxSide: Direction? = null
-                    for (side in Direction.values()) {
+                    for (side in Direction.entries) {
                         if (side == rsSide) continue
                         val ps =
                             maxOf(
@@ -334,9 +335,9 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                 }
             }
             RsSignals.canEmitWeakPower(state, world, pos, rsSide) -> {
-                var maxSide = Direction.values()[0]
+                var maxSide = Direction.entries[0]
                 var p = 0
-                for (d in Direction.values()) {
+                for (d in Direction.entries) {
                     val ps = world.getSignal(pos.relative(d), d)
                     if (ps > p) {
                         p = ps

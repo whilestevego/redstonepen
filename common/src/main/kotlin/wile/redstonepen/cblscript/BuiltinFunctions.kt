@@ -1,5 +1,7 @@
 package wile.redstonepen.cblscript
 
+import kotlin.math.abs
+
 /**
  * TON (timer-on delay): output is true after [inp] has been continuously high for [pt] ticks.
  *
@@ -192,7 +194,7 @@ private fun timerInterval(
     if (pt <= 2) return policy.falseValue
     val now = m.getOrDefault(".clock", 0)
     val clk = m.getOrDefault("$sym.clk", now - pt)
-    return if (Math.abs(now - clk) >= pt) {
+    return if (abs(now - clk) >= pt) {
         m["$sym.clk"] = now
         m[".deadline"] = 1
         policy.trueValue

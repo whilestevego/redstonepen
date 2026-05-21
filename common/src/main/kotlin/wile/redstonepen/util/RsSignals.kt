@@ -1,5 +1,6 @@
 package wile.redstonepen.util
 
+import kotlin.math.floor
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.Container
@@ -32,7 +33,7 @@ object RsSignals {
             nonempty = true
         }
         fillLevel /= container.containerSize
-        return (Math.floor(fillLevel * 14) + if (nonempty) 1 else 0)
+        return (floor(fillLevel * 14) + if (nonempty) 1 else 0)
             .toInt() // vanilla compliant calculation.
     }
 

@@ -404,7 +404,7 @@ internal class TrackNetworkCalculator(
     // Power bits for sides that are no longer part of any net must be explicitly cleared;
     // they are not overwritten by net construction and would otherwise carry stale values.
     private fun zeroUnusedSidePowers(usedSides: Set<Direction>): TrackStateFlags =
-        Direction.values()
+        Direction.entries
             .filter { !usedSides.contains(it) }
             .fold(stateFlags) { flags, side -> flags.withSidePower(side, 0) }
 
