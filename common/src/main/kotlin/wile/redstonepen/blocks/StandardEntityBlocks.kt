@@ -55,7 +55,7 @@ object StandardEntityBlocks {
             null
     }
 
-    abstract class StandardBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
+    open class StandardBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
         BlockEntity(type, pos, state) {
 
         open fun tick() {}

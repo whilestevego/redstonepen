@@ -10,7 +10,7 @@ import wile.redstonepen.client.Overlay
 
 @Environment(EnvType.CLIENT)
 @Mixin(net.minecraft.client.gui.Gui::class)
-abstract class GuiRenderingMixin {
+open class GuiRenderingMixin {
     @Suppress("UnusedPrivateMember")
     @Inject(
         at = [At(value = "TAIL")],

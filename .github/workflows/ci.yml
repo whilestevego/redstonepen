@@ -30,23 +30,17 @@ jobs:
           path: ~/.local/analysis-tools/ktlint
           key: ktlint-1.5.0
 
-      - name: Cache detekt
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/analysis-tools/detekt.jar
-          key: detekt-1.23.8
-
       - name: Cache krit
         uses: actions/cache@v4
         with:
           path: ~/.local/analysis-tools/krit.jar
           key: krit-0.3.0
 
-      - name: Check formatting, lint, and static analysis
-        run: make check
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Check formatting, lint, and static analysis
+        run: make check
 
       - name: Semantic analysis (krit)
         run: make krit

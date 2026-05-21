@@ -76,38 +76,42 @@ object Registries {
         }
         registeredBlockEntityTypes.clear()
         blockEntityTypeSuppliers.forEach { (name, supplier) ->
-            registeredBlockEntityTypes[name] = supplier.get()
+            val value = supplier.get()
+            registeredBlockEntityTypes[name] = value
             Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
                 ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name),
-                registeredBlockEntityTypes[name]!!,
+                value,
             )
         }
         registeredEntityTypes.clear()
         entityTypeSuppliers.forEach { (name, supplier) ->
-            registeredEntityTypes[name] = supplier.get()
+            val value = supplier.get()
+            registeredEntityTypes[name] = value
             Registry.register(
                 BuiltInRegistries.ENTITY_TYPE,
                 ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name),
-                registeredEntityTypes[name]!!,
+                value,
             )
         }
         registeredMenuTypes.clear()
         menuTypeSuppliers.forEach { (name, supplier) ->
-            registeredMenuTypes[name] = supplier.get()
+            val value = supplier.get()
+            registeredMenuTypes[name] = value
             Registry.register(
                 BuiltInRegistries.MENU,
                 ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name),
-                registeredMenuTypes[name]!!,
+                value,
             )
         }
         registeredRecipeSerializers.clear()
         recipeSerializersSuppliers.forEach { (name, supplier) ->
-            registeredRecipeSerializers[name] = supplier.get()
+            val value = supplier.get()
+            registeredRecipeSerializers[name] = value
             Registry.register(
                 BuiltInRegistries.RECIPE_SERIALIZER,
                 ResourceLocation.fromNamespaceAndPath(ModConstants.MODID, name),
-                registeredRecipeSerializers[name]!!,
+                value,
             )
         }
     }
@@ -141,13 +145,13 @@ object Registries {
 
     @JvmStatic
     fun getBlockEntityTypeOfBlock(block: Block): BlockEntityType<*>? =
-        getBlockEntityTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block)!!.path)
+        getBlockEntityTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block).path)
 
     @JvmStatic fun getMenuTypeOfBlock(name: String): MenuType<*>? = getMenuType("ct_$name")
 
     @JvmStatic
     fun getMenuTypeOfBlock(block: Block): MenuType<*>? =
-        getMenuTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block)!!.path)
+        getMenuTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block).path)
 
     @JvmStatic fun getBlockTagKey(name: String): TagKey<Block>? = registeredBlockTagKeys[name]
 

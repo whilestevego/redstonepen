@@ -41,7 +41,8 @@ object ModRenderers {
                 val resources_to_register = ArrayList<ResourceLocation>()
                 RedstoneTrackDefs.models.STATE_WIRE_MAPPING.forEach { (key, value) ->
                     val mrl =
-                        ResourceLocation.tryBuild(ModConstants.MODID, value)!!.withPrefix("item/")
+                        requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
+                            .withPrefix("item/")
                     for (i in 0 until RedstoneTrackDefs.STATE_FLAG_WIR_COUNT) {
                         if ((key and (1L shl (RedstoneTrackDefs.STATE_FLAG_WIR_POS + i))) != 0L) {
                             model_rls[i] = mrl
@@ -52,7 +53,8 @@ object ModRenderers {
                 }
                 RedstoneTrackDefs.models.STATE_CONNECT_MAPPING.forEach { (key, value) ->
                     val mrl =
-                        ResourceLocation.tryBuild(ModConstants.MODID, value)!!.withPrefix("item/")
+                        requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
+                            .withPrefix("item/")
                     for (i in 0 until RedstoneTrackDefs.STATE_FLAG_CON_COUNT) {
                         if ((key and (1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + i))) != 0L) {
                             modelc_rls[i] = mrl
@@ -63,7 +65,8 @@ object ModRenderers {
                 }
                 RedstoneTrackDefs.models.STATE_CNTWIRE_MAPPING.forEach { (key, value) ->
                     val mrl =
-                        ResourceLocation.tryBuild(ModConstants.MODID, value)!!.withPrefix("item/")
+                        requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
+                            .withPrefix("item/")
                     for (i in 0 until RedstoneTrackDefs.STATE_FLAG_CON_COUNT) {
                         if ((key and (1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + i))) != 0L) {
                             modelm_rls[i] = mrl
@@ -124,7 +127,7 @@ object ModRenderers {
                                 PlatformServices.getRendering()
                                     .getBakedModel(
                                         Minecraft.getInstance().modelManager,
-                                        model_rls[i]!!,
+                                        requireNotNull(model_rls[i]),
                                     )
                             Minecraft.getInstance()
                                 .blockRenderer
@@ -163,13 +166,13 @@ object ModRenderers {
                                     PlatformServices.getRendering()
                                         .getBakedModel(
                                             Minecraft.getInstance().modelManager,
-                                            modelm_rls[i]!!,
+                                            requireNotNull(modelm_rls[i]),
                                         )
                                 } else {
                                     PlatformServices.getRendering()
                                         .getBakedModel(
                                             Minecraft.getInstance().modelManager,
-                                            modelc_rls[i]!!,
+                                            requireNotNull(modelc_rls[i]),
                                         )
                                 }
                             Minecraft.getInstance()

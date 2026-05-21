@@ -152,7 +152,7 @@ class RemoteItem(properties: Item.Properties) : StandardItems.BaseItem(propertie
     private data class RemoteData(val pos: BlockPos, val name: String)
 
     private fun getRemoteData(stack: ItemStack): RemoteData? {
-        val nbt = Auxiliaries.getItemStackNbt(stack, "remote") ?: return null
+        val nbt = Auxiliaries.getItemStackNbt(stack, "remote")
         if (!nbt.contains("pos", 99) || !nbt.contains("name", 8)) return null
         return RemoteData(BlockPos.of(nbt.getLong("pos")), nbt.getString("name"))
     }

@@ -39,7 +39,7 @@ import wile.redstonepen.util.RsSignals
 @Suppress("DEPRECATION")
 class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     StandardEntityBlocks.StandardBlockEntity(
-        Registries.getBlockEntityTypeOfBlock(state.block)!!,
+        requireNotNull(Registries.getBlockEntityTypeOfBlock(state.block)),
         pos,
         state,
     ),
@@ -71,6 +71,9 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             list
         }
     }
+
+    private val requireLevel: Level
+        get() = checkNotNull(level) { "level not set on $this" }
 
     override fun readnbt(hlp: HolderLookup.Provider, nbt: CompoundTag): CompoundTag {
         stateFlags = TrackStateFlags(nbt.getLong("sflags"))
@@ -136,7 +139,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun onServerPacketReceived(nbt: CompoundTag) {
-        readnbt(getLevel()!!.registryAccess(), nbt)
+        readnbt(requireLevel.registryAccess(), nbt)
     }
 
     override fun onClientPacketReceived(player: Player, nbt: CompoundTag) {}
@@ -149,19 +152,19 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
     fun getViewDistance(): Double = 64.0
 
     fun sync(schedule: Boolean): Boolean {
-        if (level!!.isClientSide()) return true
+        if (requireLevel.isClientSide()) return true
         setChanged()
         if (
             schedule &&
-                !getLevel()!!
+                !requireLevel
                     .getBlockTicks()
                     .hasScheduledTick(blockPos, ModContent.References.TRACK_BLOCK)
         ) {
-            getLevel()!!.scheduleTick(blockPos, ModContent.References.TRACK_BLOCK, 1)
+            requireLevel.scheduleTick(blockPos, ModContent.References.TRACK_BLOCK, 1)
         } else {
             Networking.PacketTileNotifyServerToClient.sendToPlayers(
                 this,
-                writenbt(getLevel()!!.registryAccess(), CompoundTag(), true),
+                writenbt(requireLevel.registryAccess(), CompoundTag(), true),
             )
         }
         return true
@@ -209,7 +212,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         p =
             if (
                 p <= 0 ||
-                    !getLevel()!!
+                    !requireLevel
                         .getBlockState(blockPos.relative(own_side))
                         .`is`(Blocks.REDSTONE_WIRE)
             ) {
@@ -406,19 +409,19 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             setSidePower(face, 0)
             nets.forEach { net -> if (net.internal_sides.contains(face)) net.power = 0 }
             disconnected.forEach { p ->
-                val te = getLevel()!!.getBlockEntity(p)
-                getLevel()!!
+                val te = requireLevel.getBlockEntity(p)
+                requireLevel
                     .getBlockState(p)
-                    .handleNeighborChanged(getLevel()!!, p, getBlock(), originalPos, false)
+                    .handleNeighborChanged(requireLevel, p, getBlock(), originalPos, false)
                 if (te is TrackBlockEntity) te.updateConnections(1)
             }
             connected.forEach { p ->
-                val te = getLevel()!!.getBlockEntity(p)
+                val te = requireLevel.getBlockEntity(p)
                 if (te is TrackBlockEntity) te.updateConnections(1)
-                getLevel()!!
+                requireLevel
                     .getBlockState(p)
-                    .handleNeighborChanged(getLevel()!!, p, getBlock(), originalPos, false)
-                getBlock().neighborChanged(blockState, getLevel()!!, blockPos, getBlock(), p, false)
+                    .handleNeighborChanged(requireLevel, p, getBlock(), originalPos, false)
+                getBlock().neighborChanged(blockState, requireLevel, blockPos, getBlock(), p, false)
             }
         }
     }
@@ -428,12 +431,12 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             return false
         }
         val pos = blockPos.relative(dir)
-        val te = RedstoneTrackBlock.tile(getLevel()!!, pos).orElse(null)
+        val te = RedstoneTrackBlock.tile(requireLevel, pos).orElse(null)
         if (te != null) {
             return (te.getStateFlags() and
                 RedstoneTrackDefs.connections.getWireBit(face, dir.opposite)) != 0L
         }
-        val state = getLevel()!!.getBlockState(pos)
+        val state = requireLevel.getBlockState(pos)
         return state.`is`(Blocks.REDSTONE_WIRE) || state.isSignalSource
     }
 
@@ -450,7 +453,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (count <= 0) return
         val e =
             ItemEntity(
-                getLevel()!!,
+                requireLevel,
                 blockPos.x + .5,
                 blockPos.y + .5,
                 blockPos.z + .5,
@@ -459,13 +462,13 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         e.setDefaultPickUpDelay()
         e.setDeltaMovement(
             Vec3(
-                    getLevel()!!.random.nextDouble() - .5,
-                    getLevel()!!.random.nextDouble() - .5,
-                    getLevel()!!.random.nextDouble(),
+                    requireLevel.random.nextDouble() - .5,
+                    requireLevel.random.nextDouble() - .5,
+                    requireLevel.random.nextDouble(),
                 )
                 .scale(0.1)
         )
-        getLevel()!!.addFreshEntity(e)
+        requireLevel.addFreshEntity(e)
     }
 
     private fun getBlock(): RedstoneTrackBlock = ModContent.References.TRACK_BLOCK
@@ -480,7 +483,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         if (
             !RedstoneTrackBlock.canBePlacedOnFace(
                 facingState,
-                getLevel()!!,
+                requireLevel,
                 fromPos,
                 facing.opposite,
             )
@@ -507,7 +510,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 update_neighbours = true
             }
         }
-        var bltv: Block = blockChangeTracking[facing.get3DDataValue()]
+        val bltv: Block = blockChangeTracking[facing.get3DDataValue()]
         if (bltv != facingState.block) {
             if (trace) {
                 Auxiliaries.logWarn(
@@ -526,7 +529,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             update_neighbours = true
         }
         if (update_neighbours) {
-            val world = getLevel()!!
+            val world = requireLevel
             val block = getBlock()
             handleNeighborChanged(fromPos).forEach { chpos, frpos ->
                 world.neighborChanged(chpos, block, frpos)
@@ -585,7 +588,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         nets
             .filter { it.neighbour_positions.contains(fromPos) }
             .forEach { net -> handleNetNeighborChanged(net, fromPos, null, notifications) }
-        val fst = getLevel()!!.getBlockState(fromPos)
+        val fst = requireLevel.getBlockState(fromPos)
         if (fst.`is`(getBlock()) || fst.isSignalSource) notifications.remove(fromPos)
         if (trace && notifications.isNotEmpty()) {
             Auxiliaries.logWarn(
@@ -618,7 +621,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
         val my_pos = blockPos
         if (!isNetConnectedTo(my_pos, net, fromPos, null, fromNet)) return
-        val world = getLevel()!!
+        val world = requireLevel
         val neighbors = LinkedList<Neighbor>()
         if (trace) {
             Auxiliaries.logWarn(
@@ -635,7 +638,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
         for (i in 0 until net.neighbour_positions.size) {
             val ext_pos = net.neighbour_positions[i]
             val ext_side = net.neighbour_sides[i]
-            val ext_state = level!!.getBlockState(ext_pos)
+            val ext_state = requireLevel.getBlockState(ext_pos)
             if (ext_state.`is`(Blocks.REDSTONE_WIRE)) {
                 val p_vanilla_wire = ext_state.getValue(RedStoneWireBlock.POWER)
                 neighbors.add(Neighbor(ext_pos, ext_side, p_vanilla_wire, false, false))
@@ -724,7 +727,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
 
     internal fun updateConnections(recursion_left: Int) {
         val result =
-            TrackNetworkCalculator(getLevel()!!, blockPos, stateFlags, getBlock(), trace)
+            TrackNetworkCalculator(requireLevel, blockPos, stateFlags, getBlock(), trace)
                 .calculate(nets)
         stateFlags = result.newStateFlags
         nets.clear()
@@ -745,7 +748,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 te.updateConnections(recursion_left - 1)
             }
         }
-        val world = getLevel()!!
+        val world = requireLevel
         val state = blockState
         result.neighboursToNotify.forEach { pos ->
             val st = world.getBlockState(pos)

@@ -361,7 +361,9 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
     @Environment(EnvType.CLIENT)
     override fun animateTick(state: BlockState, world: Level, pos: BlockPos, rand: RandomSource) {
         if (rand.nextFloat() > 0.4f) return
-        val te = tile(world, pos).orElse(null) ?: return
+        val tileResult = tile(world, pos)
+        if (!tileResult.isPresent) return
+        val te = tileResult.get()
         if ((te.getStateFlags() and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) == 0L) return
         val color = Vec3(0.6, 0.0, 0.0)
         for (side in Direction.values()) {
@@ -393,7 +395,9 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         if (world.isClientSide()) return InteractionResult.SUCCESS
         var no_add_mut = no_add
         if (!RedstonePenItem.hasEnoughRedstone(stack, 1, player)) no_add_mut = !no_remove
-        val te = tile(world, pos).orElse(null) ?: return InteractionResult.FAIL
+        val tileResult = tile(world, pos)
+        if (!tileResult.isPresent) return InteractionResult.FAIL
+        val te = tileResult.get()
         val no_bulk = false
         val redstone_use =
             te.applyPenEdit(

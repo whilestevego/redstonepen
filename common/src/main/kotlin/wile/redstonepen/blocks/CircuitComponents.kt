@@ -364,13 +364,17 @@ object CircuitComponents {
 
             @JvmStatic
             fun getForwardStateMappedFacing(state: BlockState, internalSide: Direction): Direction =
-                facingFwdStateMapping[state.getValue(FACING).ordinal][state.getValue(ROTATION)][
-                    internalSide.ordinal]!!
+                requireNotNull(
+                    facingFwdStateMapping[state.getValue(FACING).ordinal][state.getValue(ROTATION)][
+                        internalSide.ordinal]
+                )
 
             @JvmStatic
             fun getReverseStateMappedFacing(state: BlockState, worldSide: Direction): Direction =
-                facingRevStateMapping[state.getValue(FACING).ordinal][state.getValue(ROTATION)][
-                    worldSide.ordinal]!!
+                requireNotNull(
+                    facingRevStateMapping[state.getValue(FACING).ordinal][state.getValue(ROTATION)][
+                        worldSide.ordinal]
+                )
 
             @JvmStatic
             protected fun getOutputFacing(state: BlockState): Direction = getFrontFacing(state)

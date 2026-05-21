@@ -417,7 +417,7 @@ object StandardBlocks {
             source: BlockGetter,
             pos: BlockPos,
             selectionContext: CollisionContext,
-        ): VoxelShape = vshapes[state]!!
+        ): VoxelShape = vshapes.getValue(state)
 
         override fun getCollisionShape(
             state: BlockState,
@@ -538,14 +538,14 @@ object StandardBlocks {
             source: BlockGetter,
             pos: BlockPos,
             selectionContext: CollisionContext,
-        ): VoxelShape = vshapes[state]!!
+        ): VoxelShape = vshapes.getValue(state)
 
         override fun getCollisionShape(
             state: BlockState,
             world: BlockGetter,
             pos: BlockPos,
             selectionContext: CollisionContext,
-        ): VoxelShape = cshapes[state]!!
+        ): VoxelShape = cshapes.getValue(state)
 
         override fun getStateForPlacement(context: BlockPlaceContext): BlockState? {
             val state = super.getStateForPlacement(context) ?: return null

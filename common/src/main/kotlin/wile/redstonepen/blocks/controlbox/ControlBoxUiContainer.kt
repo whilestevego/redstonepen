@@ -74,11 +74,12 @@ class ControlBoxUiContainer(
 
     override fun sendAllDataToRemote() {
         super.sendAllDataToRemote()
-        if (world().isClientSide || te() == null) return
+        if (world().isClientSide) return
+        val te = te() ?: return
         Networking.PacketContainerSyncServerToClient.sendToListeners(
             world(),
             this,
-            composeServerData(te()!!, true),
+            composeServerData(te, true),
         )
     }
 

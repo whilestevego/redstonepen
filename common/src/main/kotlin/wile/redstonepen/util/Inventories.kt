@@ -364,7 +364,7 @@ object Inventories {
         fun insert(inputStack: ItemStack, simulate: Boolean): ItemStack {
             if (inputStack.isEmpty) return ItemStack.EMPTY
             if (!simulate) return insert(inputStack)
-            var stack = inputStack.copy()
+            val stack = inputStack.copy()
             for (s in this) {
                 if (s.isEmpty) return ItemStack.EMPTY
                 val nleft = s.count - s.maxStackSize
