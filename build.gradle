@@ -53,34 +53,16 @@ tasks.register('lintFix') {
   dependsOn ':common:ktlintFormat', ':neoforge:ktlintFormat', ':fabric:ktlintFormat'
 }
 
-tasks.register('analyze') {
+tasks.register('detekt') {
   group = 'verification'
-  description = 'Run detekt static analysis on all subprojects.'
-  dependsOn ':common:detekt', ':neoforge:detekt', ':fabric:detekt'
+  description = 'Run detekt static analysis across all subprojects.'
+  dependsOn ':common:detektScan', ':neoforge:detektScan', ':fabric:detektScan'
 }
 
-tasks.register('analyzeFull') {
-  group = 'verification'
-  description = 'Run detekt static analysis on all subprojects ignoring the baseline.'
-  dependsOn ':common:detektFull', ':neoforge:detektFull', ':fabric:detektFull'
-}
-
-tasks.register('analyzeBaseline') {
+tasks.register('detektBaseline') {
   group = 'verification'
   description = 'Regenerate detekt baselines for all subprojects.'
   dependsOn ':common:detektBaseline', ':neoforge:detektBaseline', ':fabric:detektBaseline'
-}
-
-tasks.register('analyzeTyped') {
-  group = 'verification'
-  description = 'Run detekt with type resolution across all subprojects.'
-  dependsOn ':common:detektMainTyped', ':neoforge:detektMainTyped', ':fabric:detektMainTyped'
-}
-
-tasks.register('analyzeBaselineTyped') {
-  group = 'verification'
-  description = 'Regenerate detekt baselines including type-resolution findings.'
-  dependsOn ':common:detektBaselineTyped', ':neoforge:detektBaselineTyped', ':fabric:detektBaselineTyped'
 }
 
 tasks.register('coverage') {
@@ -180,9 +162,9 @@ subprojects {
     }
   }
 
-  tasks.register('detektMainTyped', io.gitlab.arturbosch.detekt.Detekt) {
+  tasks.register('detektScan', io.gitlab.arturbosch.detekt.Detekt) {
     group = 'verification'
-    description = 'Run detekt with type resolution on main sources.'
+    description = 'Run detekt static analysis on main sources.'
     dependsOn 'compileKotlin'
     buildUponDefaultConfig = true
     parallel = true
@@ -197,19 +179,6 @@ subprojects {
       xml.required.set(false)
       txt.required.set(false)
     }
-  }
-
-  tasks.register('detektBaselineTyped', io.gitlab.arturbosch.detekt.DetektCreateBaselineTask) {
-    group = 'verification'
-    description = 'Regenerate detekt baseline including type-resolution findings.'
-    dependsOn 'compileKotlin', 'compileTestKotlin'
-    buildUponDefaultConfig = true
-    parallel = true
-    config.setFrom(rootProject.file('config/detekt/detekt.yml'))
-    baseline = rootProject.file("config/detekt/baseline-${project.name}.xml")
-    setSource(fileTree('src').include('**/*.kt'))
-    classpath.from(configurations.compileClasspath, configurations.testCompileClasspath)
-    jvmTarget = '21'
   }
 
   tasks.withType(JavaCompile).configureEach {

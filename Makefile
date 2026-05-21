@@ -9,11 +9,9 @@
 TOOLS_DIR    := $(HOME)/.local/analysis-tools
 KTFMT_JAR    := $(TOOLS_DIR)/ktfmt.jar
 KTLINT_BIN   := $(TOOLS_DIR)/ktlint
-DETEKT_JAR   := $(TOOLS_DIR)/detekt.jar
 KRIT_JAR     := $(TOOLS_DIR)/krit.jar
 KTFMT_VERSION  := 0.62
 KTLINT_VERSION := 1.5.0
-DETEKT_VERSION := 1.23.8
 KRIT_VERSION   := 0.3.0
 
 MOD_JAR_PREFIX=redstonepen-
@@ -37,7 +35,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze analyze-typed krit
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix detekt krit
 
 default: mod
 
@@ -136,12 +134,7 @@ $(KTLINT_BIN):
 	@curl -sSLo $@ https://github.com/pinterest/ktlint/releases/download/$(KTLINT_VERSION)/ktlint
 	@chmod a+x $@
 
-$(DETEKT_JAR):
-	@mkdir -p $(TOOLS_DIR)
-	@echo "Downloading detekt $(DETEKT_VERSION)..."
-	@curl -sSLo $@ https://github.com/detekt/detekt/releases/download/v$(DETEKT_VERSION)/detekt-cli-$(DETEKT_VERSION)-all.jar
-
-check: format lint analyze
+check: format lint detekt
 
 format: $(KTFMT_JAR)
 	@echo "Checking formatting (ktfmt)..."
@@ -161,20 +154,9 @@ lint-fix: $(KTLINT_BIN)
 	@echo "Auto-correcting lint (ktlint)..."
 	@$(KTLINT_BIN) --format --reporter=plain '**/*.kt' '!**/build/**' '!**/bin/**'
 
-analyze: $(DETEKT_JAR)
-	@echo "Analyzing common..."
-	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
-	  --baseline config/detekt/baseline-common.xml --input common/src --parallel
-	@echo "Analyzing neoforge..."
-	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
-	  --baseline config/detekt/baseline-neoforge.xml --input neoforge/src --parallel
-	@echo "Analyzing fabric..."
-	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
-	  --baseline config/detekt/baseline-fabric.xml --input fabric/src --parallel
-
-analyze-typed:
-	@echo "Analyzing with type resolution (detekt + classpath)..."
-	@$(GRADLE) analyzeTyped
+detekt:
+	@echo "Analyzing (detekt + type resolution)..."
+	@$(GRADLE) :detekt
 
 # --- krit (semantic analysis with K2 + IDE inspections) ---------------
 KRIT_JAVA := $(shell \
