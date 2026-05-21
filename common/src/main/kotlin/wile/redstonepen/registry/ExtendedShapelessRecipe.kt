@@ -179,7 +179,7 @@ class ExtendedShapelessRecipe(
             if (Auxiliaries.getResourceLocation(stack.item).toString() == toolName) continue
             remaining[i] =
                 if (stack.item.hasCraftingRemainingItem()) {
-                    ItemStack(stack.item.craftingRemainingItem!!, stack.count)
+                    ItemStack(requireNotNull(stack.item.craftingRemainingItem), stack.count)
                 } else {
                     stack.copy()
                 }

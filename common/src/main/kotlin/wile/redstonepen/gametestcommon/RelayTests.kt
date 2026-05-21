@@ -407,7 +407,10 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.UP, Vec3(0.0, 0.0, -0.3))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.FACING) != Direction.DOWN) {
+        if (
+            requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.FACING) !=
+                Direction.DOWN
+        ) {
             helper.fail(
                 "expected FACING=DOWN, got ${s.getValue(CircuitComponents.DirectedComponentBlock.FACING)}"
             )
@@ -420,7 +423,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.UP, Vec3(0.3, 0.0, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 1) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 1) {
             helper.fail(
                 "expected ROTATION=1, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -433,7 +436,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.UP, Vec3(0.0, 0.0, 0.3))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
             helper.fail(
                 "expected ROTATION=2, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -446,7 +449,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.UP, Vec3(-0.3, 0.0, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
             helper.fail(
                 "expected ROTATION=3, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -459,7 +462,10 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.SOUTH, Vec3(0.0, 0.3, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null for NORTH face")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.FACING) != Direction.NORTH) {
+        if (
+            requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.FACING) !=
+                Direction.NORTH
+        ) {
             helper.fail(
                 "expected FACING=NORTH, got ${s.getValue(CircuitComponents.DirectedComponentBlock.FACING)}"
             )
@@ -472,7 +478,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.SOUTH, Vec3(0.3, 0.0, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 1) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 1) {
             helper.fail(
                 "expected ROTATION=1, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -485,7 +491,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.SOUTH, Vec3(0.0, -0.3, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
             helper.fail(
                 "expected ROTATION=2, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -498,7 +504,10 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.WEST, Vec3(0.0, 0.0, 0.3))
         if (s == null) helper.fail("getStateForPlacement returned null for EAST face")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.FACING) != Direction.EAST) {
+        if (
+            requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.FACING) !=
+                Direction.EAST
+        ) {
             helper.fail(
                 "expected FACING=EAST, got ${s.getValue(CircuitComponents.DirectedComponentBlock.FACING)}"
             )
@@ -516,7 +525,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.WEST, Vec3(0.0, -0.3, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 2) {
             helper.fail(
                 "expected ROTATION=2, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -529,7 +538,10 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.NORTH, Vec3(-0.3, 0.0, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null for SOUTH face")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.FACING) != Direction.SOUTH) {
+        if (
+            requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.FACING) !=
+                Direction.SOUTH
+        ) {
             helper.fail(
                 "expected FACING=SOUTH, got ${s.getValue(CircuitComponents.DirectedComponentBlock.FACING)}"
             )
@@ -547,7 +559,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.NORTH, Vec3(0.3, 0.0, 0.0))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
             helper.fail(
                 "expected ROTATION=3, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )
@@ -560,7 +572,10 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.EAST, Vec3(0.0, 0.0, -0.3))
         if (s == null) helper.fail("getStateForPlacement returned null for WEST face")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.FACING) != Direction.WEST) {
+        if (
+            requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.FACING) !=
+                Direction.WEST
+        ) {
             helper.fail(
                 "expected FACING=WEST, got ${s.getValue(CircuitComponents.DirectedComponentBlock.FACING)}"
             )
@@ -578,7 +593,7 @@ object RelayTests {
         helper.setBlock(RELAY_POS, Blocks.STONE)
         val s = relayPlacementState(helper, RELAY_POS, Direction.EAST, Vec3(0.0, 0.0, 0.3))
         if (s == null) helper.fail("getStateForPlacement returned null")
-        if (s!!.getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
+        if (requireNotNull(s).getValue(CircuitComponents.DirectedComponentBlock.ROTATION) != 3) {
             helper.fail(
                 "expected ROTATION=3, got ${s.getValue(CircuitComponents.DirectedComponentBlock.ROTATION)}"
             )

@@ -36,8 +36,8 @@ object TrackTests {
         placeTrack(helper)
         seedTrackNet(helper, 15, Direction.WEST)
         helper.succeedWhen {
-            val te = getTrack(helper)
-            val nbt = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), false)
+            val te = requireNotNull(getTrack(helper))
+            val nbt = te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
             val route = nbt.getList("nets", Tag.TAG_COMPOUND.toInt()).getCompound(0)
             check(route.getInt("power") == 15) {
                 "expected seeded track route to keep its stored power value"
@@ -57,8 +57,8 @@ object TrackTests {
         seedTrackNet(helper, 15, Direction.WEST)
         seedTrackNet(helper, 0, Direction.WEST)
         helper.succeedWhen {
-            val te = getTrack(helper)
-            val nbt = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), false)
+            val te = requireNotNull(getTrack(helper))
+            val nbt = te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
             val route = nbt.getList("nets", Tag.TAG_COMPOUND.toInt()).getCompound(0)
             check(route.getInt("power") == 0) {
                 "expected seeded track route power to update to zero"
@@ -70,8 +70,8 @@ object TrackTests {
     fun writenbtSyncOmitsNetsList(helper: GameTestHelper) {
         placeTrack(helper)
         seedTrackNet(helper, 5, Direction.WEST)
-        val te = getTrack(helper)
-        val sync = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), true)
+        val te = requireNotNull(getTrack(helper))
+        val sync = te.writenbt(helper.level.registryAccess(), CompoundTag(), true)
         if (sync.contains("nets")) helper.fail("sync packet writenbt must omit nets list")
         helper.succeed()
     }
@@ -80,8 +80,8 @@ object TrackTests {
     fun writenbtFullIncludesNetsList(helper: GameTestHelper) {
         placeTrack(helper)
         seedTrackNet(helper, 5, Direction.WEST)
-        val te = getTrack(helper)
-        val full = te!!.writenbt(helper.level.registryAccess(), CompoundTag(), false)
+        val te = requireNotNull(getTrack(helper))
+        val full = te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
         if (!full.contains("nets", Tag.TAG_LIST.toInt())) {
             helper.fail("full writenbt must include nets list")
         }
@@ -92,7 +92,7 @@ object TrackTests {
     fun readnbtRestoresStateFlagsAndNets(helper: GameTestHelper) {
         placeTrack(helper)
         seedTrackNet(helper, 9, Direction.NORTH)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         val full = te.writenbt(helper.level.registryAccess(), CompoundTag(), false)
         val empty = CompoundTag()
         empty.putLong("sflags", 0L)
@@ -107,7 +107,7 @@ object TrackTests {
     @JvmStatic
     fun readnbtAcceptsCorruptNetsListWithoutThrowing(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         val corrupt = CompoundTag()
         corrupt.putLong("sflags", 0L)
         val nets = ListTag()
@@ -126,7 +126,7 @@ object TrackTests {
     @JvmStatic
     fun addWireFlagsRecordsOnlyNewBits(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         val firstAdded = te.addWireFlags(0x0FL)
         val secondAdded = te.addWireFlags(0x0FL)
         if (firstAdded != 4) helper.fail("expected 4 wire flags added, got $firstAdded")
@@ -139,7 +139,7 @@ object TrackTests {
     @JvmStatic
     fun getWireFlagsReadsIndividualBits(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0b10101L)
         if (!te.getWireFlag(0)) helper.fail("bit 0 should be set")
         if (te.getWireFlag(1)) helper.fail("bit 1 should not be set")
@@ -152,7 +152,7 @@ object TrackTests {
     @JvmStatic
     fun setSidePowerAndGetSidePowerRoundTrip(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         for (d in Direction.values()) te.setSidePower(d, 0)
         te.setSidePower(Direction.NORTH, 11)
         if (te.getSidePower(Direction.NORTH) != 11) helper.fail("expected 11 on NORTH")
@@ -163,7 +163,7 @@ object TrackTests {
     @JvmStatic
     fun hasVanillaRedstoneConnectionReadsBitsAndConnectorMask(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         seedTrackNet(helper, 0, Direction.EAST)
         for (d in Direction.values()) te.hasVanillaRedstoneConnection(d)
         helper.succeed()
@@ -172,7 +172,7 @@ object TrackTests {
     @JvmStatic
     fun updateAllPowerValuesOnIsolatedTrackReturnsMap(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.updateAllPowerValuesFromAdjacent()
         helper.succeed()
     }
@@ -181,7 +181,7 @@ object TrackTests {
     fun updateAllPowerValuesOnTrackWithSeededNetReturnsMap(helper: GameTestHelper) {
         placeTrack(helper)
         seedTrackNet(helper, 0, Direction.EAST)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.updateAllPowerValuesFromAdjacent()
         helper.succeed()
     }
@@ -189,7 +189,7 @@ object TrackTests {
     @JvmStatic
     fun handleShapeUpdateForAirNeighborReturns(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0x01L)
         te.handleShapeUpdate(
             Direction.DOWN,
@@ -203,7 +203,7 @@ object TrackTests {
     @JvmStatic
     fun handleShapeUpdateMovingFlagSkipsRecursion(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.handleShapeUpdate(
             Direction.DOWN,
             Blocks.AIR.defaultBlockState(),
@@ -216,7 +216,7 @@ object TrackTests {
     @JvmStatic
     fun handleShapeUpdateRedstoneBlockNeighborSkipsConnectionRefresh(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.handleShapeUpdate(
             Direction.EAST,
             Blocks.REDSTONE_BLOCK.defaultBlockState(),
@@ -229,7 +229,7 @@ object TrackTests {
     @JvmStatic
     fun getShapeReflectsWireFlags(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0x01L)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val shape =
@@ -420,7 +420,7 @@ object TrackTests {
     @JvmStatic
     fun dropListReturnsRedstoneDustMatchingWireCount(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0x03L)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val drops = block.dropList(helper.getBlockState(TRACK_POS), helper.level, te, false)
@@ -434,7 +434,12 @@ object TrackTests {
         placeTrack(helper)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
         val drops =
-            block.dropList(helper.getBlockState(TRACK_POS), helper.level, getTrack(helper)!!, false)
+            block.dropList(
+                helper.getBlockState(TRACK_POS),
+                helper.level,
+                requireNotNull(getTrack(helper)),
+                false,
+            )
         if (drops.isNotEmpty()) helper.fail("dropList must be empty when track has no wires")
         helper.succeed()
     }
@@ -472,7 +477,7 @@ object TrackTests {
     @JvmStatic
     fun onRemoveNotifiesAdjacentWhenReplaced(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0x01L)
         helper.setBlock(TRACK_POS, Blocks.STONE)
         helper.succeed()
@@ -567,7 +572,7 @@ object TrackTests {
     @JvmStatic
     fun toggleTraceWithNullPlayerDoesNotThrow(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.toggle_trace(null)
         helper.succeed()
     }
@@ -575,7 +580,7 @@ object TrackTests {
     @JvmStatic
     fun toggleTraceWithMockPlayerDoesNotThrow(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
         te.toggle_trace(player)
         helper.succeed()
@@ -584,7 +589,7 @@ object TrackTests {
     @JvmStatic
     fun connectionFlagAccessorsDoNotThrow(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         val flags = te.getConnectionFlags()
         val flag0 = te.getConnectionFlag(0)
         val count = te.getConnectionFlagCount()
@@ -613,7 +618,7 @@ object TrackTests {
     @JvmStatic
     fun getRedstonePowerZeroOnIsolatedTrack(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         for (d in Direction.values()) {
             val p = te.getRedstonePower(d, false)
             if (p != 0) helper.fail("expected 0 power on isolated track side $d, got $p")
@@ -624,7 +629,7 @@ object TrackTests {
     @JvmStatic
     fun getRedstoneDustCountZeroForFreshTrack(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         if (te.getRedstoneDustCount() != 0) helper.fail("expected 0 dust count on fresh track")
         helper.succeed()
     }
@@ -632,7 +637,7 @@ object TrackTests {
     @JvmStatic
     fun getRedstoneDustCountMatchesWireFlags(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.addWireFlags(0x07L)
         val count = te.getRedstoneDustCount()
         if (count != 3) helper.fail("expected 3 dust from 3 wire bits, got $count")
@@ -920,7 +925,7 @@ object TrackTests {
     @JvmStatic
     fun calculatorZerosUnusedSidePowersInNewStateFlags(helper: GameTestHelper) {
         placeTrack(helper)
-        val te = getTrack(helper)!!
+        val te = requireNotNull(getTrack(helper))
         te.setSidePower(Direction.NORTH, 12)
         te.setSidePower(Direction.SOUTH, 7)
         val stateFlags = TrackStateFlags(te.getStateFlags())
