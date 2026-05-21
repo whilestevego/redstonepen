@@ -642,7 +642,15 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
             val ext_state = requireLevel.getBlockState(ext_pos)
             if (ext_state.`is`(Blocks.REDSTONE_WIRE)) {
                 val p_vanilla_wire = ext_state.getValue(RedStoneWireBlock.POWER)
-                neighbors.add(Neighbor(ext_pos, ext_side, p_vanilla_wire, false, false))
+                neighbors.add(
+                    Neighbor(
+                        ext_pos,
+                        ext_side,
+                        p_vanilla_wire,
+                        direct_update = false,
+                        needs_indirect = false,
+                    )
+                )
                 pmax = maxOf(pmax, p_vanilla_wire - 1)
             } else if (ext_state.`is`(getBlock())) {
                 val nb_net =
@@ -658,12 +666,28 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                         .orElse(null)
                 if (nb_net != null) {
                     val p_track = maxOf(0, nb_net.power)
-                    neighbors.add(Neighbor(ext_pos, ext_side, p_track, true, false))
+                    neighbors.add(
+                        Neighbor(
+                            ext_pos,
+                            ext_side,
+                            p_track,
+                            direct_update = true,
+                            needs_indirect = false,
+                        )
+                    )
                     pmax = maxOf(pmax, p_track - 1)
                 }
             } else if (ext_state.`is`(ModContent.References.BRIDGE_RELAY_BLOCK)) {
                 val p_nowire = getNonWireSignal(world, ext_pos, ext_side.opposite)
-                neighbors.add(Neighbor(ext_pos, ext_side, p_nowire, true, false))
+                neighbors.add(
+                    Neighbor(
+                        ext_pos,
+                        ext_side,
+                        p_nowire,
+                        direct_update = true,
+                        needs_indirect = false,
+                    )
+                )
                 pmax = maxOf(pmax, p_nowire)
             } else {
                 val p_nowire = getNonWireSignal(world, ext_pos, ext_side.opposite)

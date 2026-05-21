@@ -69,7 +69,14 @@ object Inventories {
     fun insert(toRanges: Array<InventoryRange>, stack: ItemStack): ItemStack {
         var remaining = stack.copy()
         for (range in toRanges) {
-            remaining = range.insert(remaining, false, 0, false, true)
+            remaining =
+                range.insert(
+                    remaining,
+                    onlyFillup = false,
+                    limit = 0,
+                    reverse = false,
+                    forceGroupStacks = true,
+                )
             if (remaining.isEmpty) return remaining
         }
         return remaining
@@ -375,7 +382,14 @@ object Inventories {
             return stack
         }
 
-        fun insert(stackToMove: ItemStack): ItemStack = insert(stackToMove, false, 0, false, true)
+        fun insert(stackToMove: ItemStack): ItemStack =
+            insert(
+                stackToMove,
+                onlyFillup = false,
+                limit = 0,
+                reverse = false,
+                forceGroupStacks = true,
+            )
 
         fun insert(index: Int, stackToMove: ItemStack): ItemStack {
             if (stackToMove.isEmpty) return stackToMove
@@ -405,7 +419,8 @@ object Inventories {
          */
         fun extract(amount: Int): ItemStack = extract(amount, false)
 
-        fun extract(amount: Int, _random: Boolean): ItemStack = extract(amount, false, false)
+        fun extract(amount: Int, _random: Boolean): ItemStack =
+            extract(amount, random = false, simulate = false)
 
         fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack {
             var outStack = ItemStack.EMPTY
@@ -523,7 +538,14 @@ object Inventories {
         }
 
         fun move(index: Int, targetRange: InventoryRange): Boolean =
-            move(index, targetRange, false, false, false, true)
+            move(
+                index,
+                targetRange,
+                allIdenticalStacks = false,
+                onlyFillup = false,
+                reverse = false,
+                forceGroupStacks = true,
+            )
 
         /**
          * Moves/clears the complete range to another range if possible. Returns true if something
@@ -544,9 +566,10 @@ object Inventories {
         }
 
         fun move(targetRange: InventoryRange, onlyFillup: Boolean): Boolean =
-            move(targetRange, onlyFillup, false, true)
+            move(targetRange, onlyFillup, reverse = false, forceGroupStacks = true)
 
-        fun move(targetRange: InventoryRange): Boolean = move(targetRange, false, false, true)
+        fun move(targetRange: InventoryRange): Boolean =
+            move(targetRange, onlyFillup = false, reverse = false, forceGroupStacks = true)
 
         private fun checked(stack: ItemStack): ItemStack =
             if (stack.isEmpty) ItemStack.EMPTY else stack

@@ -502,8 +502,8 @@ object TrackTests {
             pen,
             InteractionHand.MAIN_HAND,
             rtrAdd,
-            false,
-            true,
+            no_add = false,
+            no_remove = true,
         )
 
         val rtrRemove = BlockHitResult(hitAdd, Direction.NORTH, absPos, false)
@@ -517,8 +517,8 @@ object TrackTests {
             pen2,
             InteractionHand.MAIN_HAND,
             rtrRemove,
-            true,
-            false,
+            no_add = true,
+            no_remove = false,
         )
         helper.succeed()
     }
@@ -542,8 +542,8 @@ object TrackTests {
             pen,
             InteractionHand.MAIN_HAND,
             rtr,
-            false,
-            true,
+            no_add = false,
+            no_remove = true,
         )
         val te = getTrack(helper)
         if (te == null) {
@@ -563,8 +563,8 @@ object TrackTests {
             ItemStack.EMPTY,
             InteractionHand.MAIN_HAND,
             BlockHitResult(hitVec, Direction.NORTH, absPos, false),
-            true,
-            false,
+            no_add = true,
+            no_remove = false,
         )
         helper.succeed()
     }

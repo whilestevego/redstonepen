@@ -249,8 +249,8 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
             ItemStack.EMPTY,
             InteractionHand.MAIN_HAND,
             rtr,
-            true,
-            false,
+            no_add = true,
+            no_remove = false,
         )
 
     override fun useItemOn(
