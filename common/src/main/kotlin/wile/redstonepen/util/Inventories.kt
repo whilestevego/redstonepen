@@ -173,23 +173,11 @@ object Inventories {
 
         override fun setChanged() = inventory.setChanged()
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun stillValid(player: Player?): Boolean = inventory.stillValid(player)
+        override fun stillValid(player: Player): Boolean = inventory.stillValid(player)
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun startOpen(player: Player?) = inventory.startOpen(player)
+        override fun startOpen(player: Player) = inventory.startOpen(player)
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun stopOpen(player: Player?) = inventory.stopOpen(player)
+        override fun stopOpen(player: Player) = inventory.stopOpen(player)
 
         override fun canPlaceItem(index: Int, stack: ItemStack): Boolean =
             validator_.test(offset + index, stack) && inventory.canPlaceItem(offset + index, stack)

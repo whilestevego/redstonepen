@@ -216,7 +216,7 @@ object Registries {
                                     }
                             }
                             .toTypedArray()
-                    @Suppress("SpreadOperator", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                    @Suppress("SpreadOperator", "TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
                     BlockEntityType.Builder.of(ctor::create, *blocks).build(null)
                 },
             )
