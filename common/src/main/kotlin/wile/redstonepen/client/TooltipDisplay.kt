@@ -85,23 +85,29 @@ class TooltipDisplay {
             return false
         } else if (
             ranges.stream().noneMatch { tip ->
-                val outsideX = x < tip.x0 || x > tip.x1
-                val outsideY = y < tip.y0 || y > tip.y1
-                val outside = outsideX || outsideY
-                if (outside) return@noneMatch false
-                val tipComponent = tip.text.get() ?: return@noneMatch false
-                if (tipComponent.string.isEmpty()) return@noneMatch false
-                try {
-                    val lines = Auxiliaries.wrapText(tipComponent, 80)
-                    gg.renderTooltip(font, lines, Optional.empty(), x, y)
-                } catch (ex: Exception) {
-                    hadRenderException = true
-                    Auxiliaries.logError(
-                        "Tooltip rendering disabled due to exception: '${ex.message}'"
-                    )
-                    return@noneMatch false
+                val insideX = x >= tip.x0 && x <= tip.x1
+                val insideY = y >= tip.y0 && y <= tip.y1
+                if (!insideX || !insideY) {
+                    false
+                } else {
+                    val tipComponent = tip.text.get()
+                    when {
+                        tipComponent == null -> false
+                        tipComponent.string.isEmpty() -> false
+                        else ->
+                            try {
+                                val lines = Auxiliaries.wrapText(tipComponent, 80)
+                                gg.renderTooltip(font, lines, Optional.empty(), x, y)
+                                true
+                            } catch (ex: Exception) {
+                                hadRenderException = true
+                                Auxiliaries.logError(
+                                    "Tooltip rendering disabled due to exception: '${ex.message}'"
+                                )
+                                false
+                            }
+                    }
                 }
-                true
             }
         ) {
             resetTimer()

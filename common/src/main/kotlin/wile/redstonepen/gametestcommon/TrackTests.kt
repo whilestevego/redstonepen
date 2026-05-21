@@ -951,12 +951,12 @@ object TrackTests {
         helper.level.setBlock(helper.absolutePos(TRACK_POS.east()), block.defaultBlockState(), 16)
         val wireBitA = connections.getWireBit(Direction.DOWN, Direction.EAST)
         val wireBitB = connections.getWireBit(Direction.DOWN, Direction.WEST)
-        val teB =
-            RedstoneTrackBlock.tile(helper.level, helper.absolutePos(TRACK_POS.east())).orElse(null)
-                ?: run {
-                    helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
-                    return
-                }
+        val teBResult = RedstoneTrackBlock.tile(helper.level, helper.absolutePos(TRACK_POS.east()))
+        if (!teBResult.isPresent) {
+            helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
+            return
+        }
+        val teB = teBResult.get()
         teB.addWireFlags(wireBitB)
         val result =
             TrackNetworkCalculator(
@@ -1009,12 +1009,12 @@ object TrackTests {
         // the cascade that would remove a wire-less track when a neighbour block changes.
         helper.level.setBlock(helper.absolutePos(TRACK_POS.east()), block.defaultBlockState(), 16)
         val absEast = helper.absolutePos(TRACK_POS.east())
-        val teB =
-            RedstoneTrackBlock.tile(helper.level, absEast).orElse(null)
-                ?: run {
-                    helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
-                    return
-                }
+        val teBResult = RedstoneTrackBlock.tile(helper.level, absEast)
+        if (!teBResult.isPresent) {
+            helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
+            return
+        }
+        val teB = teBResult.get()
         val previousNets =
             listOf(
                 TrackNet(
