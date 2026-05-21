@@ -3,7 +3,6 @@ plugins {
   id 'dev.architectury.loom'
   id 'jacoco'
   id 'org.jetbrains.kotlin.jvm'
-  id 'org.jetbrains.kotlin.plugin.power-assert'
 }
 
 architectury { common('neoforge', 'fabric') }
@@ -48,4 +47,13 @@ test {
 
 tasks.withType(ProcessResources).configureEach {
   outputs.upToDateWhen { false }
+}
+
+tasks.register('writeCompileClasspath') {
+  dependsOn configurations.compileClasspath
+  def outputFile = layout.buildDirectory.file('compile-classpath.txt')
+  outputs.file(outputFile)
+  doLast {
+    outputFile.get().asFile.text = configurations.compileClasspath.asPath
+  }
 }

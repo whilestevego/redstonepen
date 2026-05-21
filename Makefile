@@ -10,9 +10,11 @@ TOOLS_DIR    := $(HOME)/.local/analysis-tools
 KTFMT_JAR    := $(TOOLS_DIR)/ktfmt.jar
 KTLINT_BIN   := $(TOOLS_DIR)/ktlint
 DETEKT_JAR   := $(TOOLS_DIR)/detekt.jar
+KRIT_JAR     := $(TOOLS_DIR)/krit.jar
 KTFMT_VERSION  := 0.62
 KTLINT_VERSION := 1.5.0
 DETEKT_VERSION := 1.23.8
+KRIT_VERSION   := 0.3.0
 
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))
@@ -35,7 +37,7 @@ wildcardr=$(foreach d,$(wildcard $1*),$(call wildcardr,$d/,$2) $(filter $(subst 
 #
 # Targets
 #
-.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze
+.PHONY: default mod data init clean clean-all mrproper all run install sanitize dist-check dist start-server assets test coverage verify check format format-fix lint lint-fix analyze analyze-typed krit
 
 default: mod
 
@@ -169,3 +171,38 @@ analyze: $(DETEKT_JAR)
 	@echo "Analyzing fabric..."
 	@java -jar $(DETEKT_JAR) --config config/detekt/detekt.yml --build-upon-default-config \
 	  --baseline config/detekt/baseline-fabric.xml --input fabric/src --parallel
+
+analyze-typed:
+	@echo "Analyzing with type resolution (detekt + classpath)..."
+	@$(GRADLE) analyzeTyped
+
+# --- krit (semantic analysis with K2 + IDE inspections) ---------------
+KRIT_JAVA := $(shell \
+  if [ -n "$$JAVA_HOME" ] && [ -x "$$JAVA_HOME/bin/java" ]; then \
+    ver=$$($$JAVA_HOME/bin/java -version 2>&1 | sed -n 's/.*version "\([0-9]*\).*/\1/p'); \
+    [ "$${ver:-0}" -ge 25 ] 2>/dev/null && { printf '%s' "$$JAVA_HOME/bin/java"; exit 0; }; \
+  fi; \
+  printf '%s' "java")
+KRIT := "$(KRIT_JAVA)" --enable-native-access=ALL-UNNAMED \
+  --add-opens java.base/jdk.internal.misc=ALL-UNNAMED \
+  -jar $(KRIT_JAR) --common-checks --format text
+
+$(KRIT_JAR): | $(TOOLS_DIR)
+	@echo "Downloading krit $(KRIT_VERSION)..."
+	@curl -sSLo $@ https://github.com/whilestevego/krit/releases/download/v$(KRIT_VERSION)/krit.jar
+
+$(TOOLS_DIR):
+	@mkdir -p $(TOOLS_DIR)
+
+krit: $(KRIT_JAR)
+	@echo "Resolving compile classpaths via Gradle..."
+	@$(GRADLE) :common:writeCompileClasspath :neoforge:writeCompileClasspath :fabric:writeCompileClasspath -q
+	@echo "Analyzing common..."
+	@$(KRIT) --input common/src/main/kotlin --input common/src/main/java \
+	  --classpath $$(cat common/build/compile-classpath.txt)
+	@echo "Analyzing neoforge..."
+	@$(KRIT) --input neoforge/src/main/kotlin --input neoforge/src/main/java \
+	  --classpath $$(cat neoforge/build/compile-classpath.txt)
+	@echo "Analyzing fabric..."
+	@$(KRIT) --input fabric/src/main/kotlin --input fabric/src/main/java \
+	  --classpath $$(cat fabric/build/compile-classpath.txt)

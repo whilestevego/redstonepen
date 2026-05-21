@@ -365,6 +365,15 @@ tasks.register('coverage') {
   finalizedBy tasks.named('jacocoTestReport'), tasks.named('jacocoTestCoverageVerification')
 }
 
+tasks.register('writeCompileClasspath') {
+  dependsOn configurations.compileClasspath
+  def outputFile = layout.buildDirectory.file('compile-classpath.txt')
+  outputs.file(outputFile)
+  doLast {
+    outputFile.get().asFile.text = configurations.compileClasspath.asPath
+  }
+}
+
 // --- Resource processing ----------------------------------------------------
 tasks.withType(ProcessResources).configureEach {
   var property_replacements = [
