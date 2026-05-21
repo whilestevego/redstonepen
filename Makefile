@@ -14,7 +14,7 @@ KRIT_JAR     := $(TOOLS_DIR)/krit.jar
 KTFMT_VERSION  := 0.62
 KTLINT_VERSION := 1.5.0
 DETEKT_VERSION := 1.23.8
-KRIT_VERSION   := 0.2.0
+KRIT_VERSION   := 0.3.0
 
 MOD_JAR_PREFIX=redstonepen-
 MOD_JAR=$(filter-out %-sources.jar,$(wildcard build/libs/${MOD_JAR_PREFIX}*.jar))

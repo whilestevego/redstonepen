@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local/analysis-tools/krit.jar
-          key: krit-0.2.0
+          key: krit-0.3.0
 
       - name: Check formatting, lint, and static analysis
         run: make check
