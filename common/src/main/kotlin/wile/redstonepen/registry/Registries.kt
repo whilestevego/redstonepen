@@ -141,13 +141,13 @@ object Registries {
 
     @JvmStatic
     fun getBlockEntityTypeOfBlock(block: Block): BlockEntityType<*>? =
-        getBlockEntityTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block)!!.path)
+        getBlockEntityTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block).path)
 
     @JvmStatic fun getMenuTypeOfBlock(name: String): MenuType<*>? = getMenuType("ct_$name")
 
     @JvmStatic
     fun getMenuTypeOfBlock(block: Block): MenuType<*>? =
-        getMenuTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block)!!.path)
+        getMenuTypeOfBlock(BuiltInRegistries.BLOCK.getKey(block).path)
 
     @JvmStatic fun getBlockTagKey(name: String): TagKey<Block>? = registeredBlockTagKeys[name]
 

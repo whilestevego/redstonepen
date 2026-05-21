@@ -27,7 +27,7 @@ import wile.redstonepen.util.Auxiliaries
 object Guis {
 
     @Environment(EnvType.CLIENT)
-    abstract class ContainerGui<T : AbstractContainerMenu>(
+    open class ContainerGui<T : AbstractContainerMenu>(
         menu: T,
         playerInv: Inventory,
         title: Component,

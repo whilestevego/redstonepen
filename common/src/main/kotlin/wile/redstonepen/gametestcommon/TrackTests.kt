@@ -606,7 +606,7 @@ object TrackTests {
                 7,
             )
         val s = net.toString()
-        if (s.isNullOrEmpty()) helper.fail("TrackNet.toString must return non-empty string")
+        if (s.isEmpty()) helper.fail("TrackNet.toString must return non-empty string")
         helper.succeed()
     }
 

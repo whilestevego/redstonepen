@@ -507,7 +507,7 @@ class TrackBlockEntity(pos: BlockPos, state: BlockState) :
                 update_neighbours = true
             }
         }
-        var bltv: Block = blockChangeTracking[facing.get3DDataValue()]
+        val bltv: Block = blockChangeTracking[facing.get3DDataValue()]
         if (bltv != facingState.block) {
             if (trace) {
                 Auxiliaries.logWarn(

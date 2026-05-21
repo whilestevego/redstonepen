@@ -7,22 +7,22 @@ package wile.redstonepen.cblscript
  * point; implementations may read from [mem] (variable references, built-in function state) and —
  * for assignment and function nodes — write back to it as a side effect.
  */
-abstract class Expression {
+interface Expression {
     /**
      * Evaluates this node and returns its integer result.
      *
      * @param mem Symbol table for the current tick. Reads resolve missing keys to 0. Stateful nodes
      *   ([AssignExpression], [FuncExpression]) write their results back here.
      */
-    abstract fun calc(mem: Map<String, Int>): Int
+    fun calc(mem: Map<String, Int>): Int
 }
 
-internal class ConstExpression(private val value: Int) : Expression() {
+internal class ConstExpression(private val value: Int) : Expression {
     override fun calc(mem: Map<String, Int>): Int = value
 }
 
 /** Reads a named symbol from [mem], returning 0 if the symbol is not yet set. */
-internal class VarRefExpression(private val name: String) : Expression() {
+internal class VarRefExpression(private val name: String) : Expression {
     override fun calc(mem: Map<String, Int>): Int = mem.getOrDefault(name, 0)
 }
 
@@ -38,7 +38,7 @@ internal class FuncExpression(
     private val arity: Int,
     private val func: (Array<Expression>, MutableMap<String, Int>) -> Int,
     private val args: List<Expression>,
-) : Expression() {
+) : Expression {
     init {
         if (arity >= 0 && arity != args.size) error("invalid_number_of_arguments")
     }
@@ -53,7 +53,7 @@ internal class FuncExpression(
  * assignments work in the source language.
  */
 internal class AssignExpression(private val name: String, private val value: Expression) :
-    Expression() {
+    Expression {
     fun assignmentName(): String = name
 
     @Suppress("UNCHECKED_CAST")
@@ -64,7 +64,7 @@ internal class AssignExpression(private val name: String, private val value: Exp
     }
 }
 
-internal class NegExpression(private val operand: Expression) : Expression() {
+internal class NegExpression(private val operand: Expression) : Expression {
     override fun calc(mem: Map<String, Int>): Int = -operand.calc(mem)
 }
 
@@ -81,18 +81,18 @@ internal class NotExpression(
     private val operand: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (operand.calc(mem) <= 0) trueValue else falseValue
 }
 
 internal class MulExpression(private val left: Expression, private val right: Expression) :
-    Expression() {
+    Expression {
     override fun calc(mem: Map<String, Int>): Int = left.calc(mem) * right.calc(mem)
 }
 
 internal class DivExpression(private val left: Expression, private val right: Expression) :
-    Expression() {
+    Expression {
     override fun calc(mem: Map<String, Int>): Int {
         val b = right.calc(mem)
         if (b == 0) throw ArithmeticException("division by zero")
@@ -101,7 +101,7 @@ internal class DivExpression(private val left: Expression, private val right: Ex
 }
 
 internal class ModExpression(private val left: Expression, private val right: Expression) :
-    Expression() {
+    Expression {
     override fun calc(mem: Map<String, Int>): Int {
         val b = right.calc(mem)
         if (b == 0) throw ArithmeticException("modulo by zero")
@@ -110,12 +110,12 @@ internal class ModExpression(private val left: Expression, private val right: Ex
 }
 
 internal class AddExpression(private val left: Expression, private val right: Expression) :
-    Expression() {
+    Expression {
     override fun calc(mem: Map<String, Int>): Int = left.calc(mem) + right.calc(mem)
 }
 
 internal class SubExpression(private val left: Expression, private val right: Expression) :
-    Expression() {
+    Expression {
     override fun calc(mem: Map<String, Int>): Int = left.calc(mem) - right.calc(mem)
 }
 
@@ -130,7 +130,7 @@ internal class AndExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) > 0 && right.calc(mem) > 0) trueValue else falseValue
 }
@@ -146,7 +146,7 @@ internal class OrExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) > 0 || right.calc(mem) > 0) trueValue else falseValue
 }
@@ -162,7 +162,7 @@ internal class XorExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if ((left.calc(mem) > 0) xor (right.calc(mem) > 0)) trueValue else falseValue
 }
@@ -172,7 +172,7 @@ internal class NeqExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) != right.calc(mem)) trueValue else falseValue
 }
@@ -182,7 +182,7 @@ internal class EqExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) == right.calc(mem)) trueValue else falseValue
 }
@@ -192,7 +192,7 @@ internal class GeExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) >= right.calc(mem)) trueValue else falseValue
 }
@@ -202,7 +202,7 @@ internal class LeExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) <= right.calc(mem)) trueValue else falseValue
 }
@@ -212,7 +212,7 @@ internal class GtExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) > right.calc(mem)) trueValue else falseValue
 }
@@ -222,7 +222,7 @@ internal class LtExpression(
     private val right: Expression,
     private val trueValue: Int,
     private val falseValue: Int,
-) : Expression() {
+) : Expression {
     override fun calc(mem: Map<String, Int>): Int =
         if (left.calc(mem) < right.calc(mem)) trueValue else falseValue
 }
