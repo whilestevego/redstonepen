@@ -48,7 +48,7 @@ private fun localPlayer(world: Level, menu: AbstractContainerMenu? = null): Loca
 }
 
 private fun resetOverlayHandler() {
-    val field = Networking.OverlayTextMessage::class.java.getDeclaredField("handler_")
+    val field = Networking.OverlayTextMessage::class.java.getDeclaredField("handler")
     field.isAccessible = true
     field.set(null, null)
 }
@@ -507,11 +507,11 @@ class NetworkingTest :
 
                     val calls = TestNetworkingPlatform.sendToPlayerCalls
                     calls.size shouldBe 1
-                    val data = calls[0].second.data()
+                    val data = calls[0].second.data
                     assertSoftly {
-                        data.id() shouldBe "tns2c"
-                        BlockPos.of(data.nbt().getLong("pos")) shouldBe pos
-                        data.nbt().getCompound("nbt").getInt("power") shouldBe 12
+                        data.id shouldBe "tns2c"
+                        BlockPos.of(data.nbt.getLong("pos")) shouldBe pos
+                        data.nbt.getCompound("nbt").getInt("power") shouldBe 12
                     }
                 }
 
@@ -549,8 +549,8 @@ class NetworkingTest :
                     TestNetworkingPlatform.sendToAllPlayersCalls.size shouldBe 1
                     TestNetworkingPlatform.sendToAllPlayersCalls[0]
                         .second
-                        .data()
-                        .nbt()
+                        .data
+                        .nbt
                         .getCompound("nbt")
                         .getByte("v") shouldBe 1.toByte()
                 }
@@ -584,11 +584,11 @@ class NetworkingTest :
 
                     val calls = TestNetworkingPlatform.sendToPlayerCalls
                     calls.size shouldBe 1
-                    val data = calls[0].second.data()
+                    val data = calls[0].second.data
                     assertSoftly {
-                        data.id() shouldBe "css2c"
-                        data.nbt().getInt("cid") shouldBe 5
-                        data.nbt().getCompound("nbt").getString("code") shouldBe "b=d"
+                        data.id shouldBe "css2c"
+                        data.nbt.getInt("cid") shouldBe 5
+                        data.nbt.getCompound("nbt").getString("code") shouldBe "b=d"
                     }
                 }
 
@@ -625,7 +625,7 @@ class NetworkingTest :
 
                     val calls = TestNetworkingPlatform.sendToPlayerCalls
                     calls.size shouldBe 1
-                    calls[0].second.data().nbt().getInt("cid") shouldBe 11
+                    calls[0].second.data.nbt.getInt("cid") shouldBe 11
                 }
 
                 it("is a no-op when container is null") {
@@ -702,10 +702,10 @@ class NetworkingTest :
 
                     val calls = TestNetworkingPlatform.sendToPlayerCalls
                     calls.size shouldBe 1
-                    val data = calls[0].second.data()
+                    val data = calls[0].second.data
                     assertSoftly {
-                        data.id() shouldBe "nns2c"
-                        data.nbt().getInt("val") shouldBe 42
+                        data.id shouldBe "nns2c"
+                        data.nbt.getInt("val") shouldBe 42
                     }
                 }
 
@@ -787,8 +787,8 @@ class NetworkingTest :
                 val decoded = Networking.UnifiedPayload.STREAM_CODEC.decode(buf)
 
                 assertSoftly {
-                    decoded.data().id() shouldBe "round-trip"
-                    decoded.data().nbt().getLong("v") shouldBe 0xDEAD_BEEFL
+                    decoded.data.id shouldBe "round-trip"
+                    decoded.data.nbt.getLong("v") shouldBe 0xDEAD_BEEFL
                 }
             }
         }

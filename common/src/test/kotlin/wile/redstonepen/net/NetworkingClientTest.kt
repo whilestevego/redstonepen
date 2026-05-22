@@ -30,11 +30,11 @@ class NetworkingClientTest :
 
                     val calls = TestNetworkingClientPlatform.sendToServerCalls
                     calls.size shouldBe 1
-                    val data = calls[0].data()
+                    val data = calls[0].data
                     assertSoftly {
-                        data.id() shouldBe "tnc2s"
-                        BlockPos.of(data.nbt().getLong("pos")) shouldBe pos
-                        data.nbt().getCompound("nbt").getInt("power") shouldBe 7
+                        data.id shouldBe "tnc2s"
+                        BlockPos.of(data.nbt.getLong("pos")) shouldBe pos
+                        data.nbt.getCompound("nbt").getInt("power") shouldBe 7
                     }
                 }
 
@@ -68,7 +68,7 @@ class NetworkingClientTest :
 
                     val calls = TestNetworkingClientPlatform.sendToServerCalls
                     calls.size shouldBe 1
-                    BlockPos.of(calls[0].data().nbt().getLong("pos")) shouldBe pos
+                    BlockPos.of(calls[0].data.nbt.getLong("pos")) shouldBe pos
                 }
 
                 it("is a no-op when block entity is null") {
@@ -93,11 +93,11 @@ class NetworkingClientTest :
 
                     val calls = TestNetworkingClientPlatform.sendToServerCalls
                     calls.size shouldBe 1
-                    val data = calls[0].data()
+                    val data = calls[0].data
                     assertSoftly {
-                        data.id() shouldBe "csc2s"
-                        data.nbt().getInt("cid") shouldBe 4
-                        data.nbt().getCompound("nbt").getString("code") shouldBe "b=d"
+                        data.id shouldBe "csc2s"
+                        data.nbt.getInt("cid") shouldBe 4
+                        data.nbt.getCompound("nbt").getString("code") shouldBe "b=d"
                     }
                 }
 
@@ -119,7 +119,7 @@ class NetworkingClientTest :
 
                     val calls = TestNetworkingClientPlatform.sendToServerCalls
                     calls.size shouldBe 1
-                    calls[0].data().nbt().getInt("cid") shouldBe 9
+                    calls[0].data.nbt.getInt("cid") shouldBe 9
                 }
             }
         }
@@ -135,10 +135,10 @@ class NetworkingClientTest :
 
                 val calls = TestNetworkingClientPlatform.sendToServerCalls
                 calls.size shouldBe 1
-                val data = calls[0].data()
+                val data = calls[0].data
                 assertSoftly {
-                    data.id() shouldBe "nnc2s"
-                    data.nbt().getDouble("v") shouldBe 3.14
+                    data.id shouldBe "nnc2s"
+                    data.nbt.getDouble("v") shouldBe 3.14
                 }
             }
         }
