@@ -9,6 +9,7 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.LongArrayTag
 import net.minecraft.nbt.Tag
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.GameType
@@ -1044,6 +1045,79 @@ object TrackTests {
                 "previously connected track B must be queued for update when wire is removed"
             )
         }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun penEditFailsWhenPlayerHasNoRedstone(helper: GameTestHelper) {
+        placeTrack(helper)
+        val block = Registries.requireBlock("track") as RedstoneTrackBlock
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        val absPos = helper.absolutePos(TRACK_POS)
+        val hitVec = Vec3(absPos.x + 0.5 - 0.3, absPos.y + 0.5 + 0.3, absPos.z.toDouble())
+        val rtr = BlockHitResult(hitVec, Direction.NORTH, absPos, false)
+        // Empty stack: hasEnoughRedstone returns false → break in applyWireMutation
+        val result =
+            block.applyPenEdit(
+                helper.getBlockState(TRACK_POS),
+                helper.level,
+                absPos,
+                player,
+                ItemStack.EMPTY,
+                InteractionHand.MAIN_HAND,
+                rtr,
+                noAdd = false,
+                noRemove = true,
+            )
+        if (result != InteractionResult.CONSUME)
+            helper.fail("expected CONSUME with no-op edit, got $result")
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun trackNeighborChangedWithSamePowerDoesNotPropagate(helper: GameTestHelper) {
+        placeTrack(helper)
+        val te = getTrack(helper) ?: return helper.fail("no track block entity")
+        helper.setBlock(TRACK_POS.east(), Blocks.REDSTONE_BLOCK)
+        val redstoneAbs = helper.absolutePos(TRACK_POS.east())
+        // Pre-set side power to match the expected pmax (15) so powerChanged stays false
+        te.setSidePower(Direction.EAST, 15)
+        // Net already at power 15 — re-processing the same source hits the no-change early return
+        val net =
+            TrackNet(
+                listOf(redstoneAbs),
+                listOf(Direction.WEST),
+                listOf(Direction.EAST),
+                listOf(Direction.EAST),
+                15,
+            )
+        te.handleNetNeighborChanged(net, redstoneAbs, null, null)
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun trackReceivesPowerThroughConductorBlock(helper: GameTestHelper) {
+        placeTrack(helper)
+        val te = getTrack(helper) ?: return helper.fail("no track block entity")
+        helper.setBlock(TRACK_POS.north(), Blocks.STONE)
+        helper.setBlock(TRACK_POS.east(), Blocks.REDSTONE_BLOCK)
+        val stoneAbs = helper.absolutePos(TRACK_POS.north())
+        val redstoneAbs = helper.absolutePos(TRACK_POS.east())
+        // Net with conductor (stone) and power source (redstone block) as neighbors
+        // Stone: !isSignalSource && pNowire==0 && isRedstoneConductor → needsIndirect=true
+        // Redstone block: pNowire=15 → pmax=15 → powerChanged=true → needsIndirect branch fires
+        val net =
+            TrackNet(
+                listOf(stoneAbs, redstoneAbs),
+                listOf(Direction.SOUTH, Direction.WEST),
+                listOf(Direction.NORTH, Direction.EAST),
+                listOf(Direction.NORTH, Direction.EAST),
+                0,
+            )
+        te.handleNetNeighborChanged(net, stoneAbs, null, null)
+        val power = te.getSidePower(Direction.NORTH)
+        if (power <= 0)
+            helper.fail("expected track power > 0 from redstone block via conductor path")
         helper.succeed()
     }
 

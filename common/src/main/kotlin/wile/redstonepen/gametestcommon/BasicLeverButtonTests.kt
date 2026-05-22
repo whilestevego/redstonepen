@@ -191,4 +191,64 @@ object BasicLeverButtonTests {
         block.getStateForPlacement(ctx)
         helper.succeed()
     }
+
+    @JvmStatic
+    fun gaugeNeighborChangedWithSamePowerDoesNotUpdate(helper: GameTestHelper) {
+        helper.setBlock(SUPPORT, Blocks.STONE)
+        helper.setBlock(POS, Registries.requireBlock("basic_gauge").defaultBlockState())
+        // Two sources both provide 15 — removing one still leaves gauge at 15, hitting early return
+        helper.setBlock(POS.east(), Blocks.REDSTONE_BLOCK)
+        helper.setBlock(POS.north(), Blocks.REDSTONE_BLOCK)
+        helper.runAfterDelay(2) {
+            val powerBefore = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
+            if (powerBefore != 15) helper.fail("expected gauge powered at 15, got $powerBefore")
+            // Remove one — neighborChanged fires with p=15 == state power=15 → early return
+            helper.setBlock(POS.north(), Blocks.AIR)
+            helper.runAfterDelay(2) {
+                val powerAfter = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
+                if (powerAfter != 15)
+                    helper.fail(
+                        "expected gauge still at 15 with remaining redstone block, got $powerAfter"
+                    )
+                helper.succeed()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun gaugeGetStateForPlacementReturnsPowerMatchingNeighbour(helper: GameTestHelper) {
+        helper.setBlock(POS.east(), Blocks.REDSTONE_BLOCK)
+        val block: Block = Registries.requireBlock("basic_gauge")
+        val stack = ItemStack(block)
+        val abs = helper.absolutePos(POS)
+        val hit = BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false)
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        player.setItemInHand(InteractionHand.MAIN_HAND, stack)
+        val useCtx = UseOnContext(helper.level, player, InteractionHand.MAIN_HAND, stack, hit)
+        val ctx = BlockPlaceContext(useCtx)
+        val state =
+            block.getStateForPlacement(ctx)
+                ?: return helper.fail("getStateForPlacement returned null")
+        val power = state.getValue(BasicGauge.BasicGaugeBlock.POWER)
+        if (power != 15) helper.fail("expected POWER=15 adjacent to redstone block, got $power")
+        helper.succeed()
+    }
+
+    @JvmStatic
+    fun gaugeUpdateShapeOnServerLevelSetsPower(helper: GameTestHelper) {
+        helper.setBlock(SUPPORT, Blocks.STONE)
+        helper.setBlock(POS, Registries.requireBlock("basic_gauge").defaultBlockState())
+        helper.runAfterDelay(1) {
+            val zeroPower = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
+            if (zeroPower != 0) helper.fail("expected initial power=0, got $zeroPower")
+            // Place a redstone block adjacent — triggers updateShape via block update
+            helper.setBlock(POS.north(), Blocks.REDSTONE_BLOCK)
+            helper.runAfterDelay(2) {
+                val power = helper.getBlockState(POS).getValue(BlockStateProperties.POWER)
+                if (power <= 0)
+                    helper.fail("expected gauge power>0 after adjacent redstone block, got $power")
+                helper.succeed()
+            }
+        }
+    }
 }

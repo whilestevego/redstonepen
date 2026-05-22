@@ -56,4 +56,19 @@ object BasicLeverButtonGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 5)
     fun gaugeGetStateForPlacementReturnsNonNull(helper: GameTestHelper) =
         BasicLeverButtonTests.gaugeGetStateForPlacementReturnsNonNull(helper)
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
+    fun gaugeNeighborChangedWithSamePowerDoesNotUpdate(helper: GameTestHelper) =
+        BasicLeverButtonTests.gaugeNeighborChangedWithSamePowerDoesNotUpdate(helper)
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
+    fun gaugeGetStateForPlacementReturnsPowerMatchingNeighbour(helper: GameTestHelper) =
+        BasicLeverButtonTests.gaugeGetStateForPlacementReturnsPowerMatchingNeighbour(helper)
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
+    fun gaugeUpdateShapeOnServerLevelSetsPower(helper: GameTestHelper) =
+        BasicLeverButtonTests.gaugeUpdateShapeOnServerLevelSetsPower(helper)
 }

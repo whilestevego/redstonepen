@@ -207,6 +207,29 @@ object RemoteItemGameTests {
 
     @JvmStatic
     @GameTest(template = EMPTY, timeoutTicks = 10)
+    fun remoteDoesNotDoublePressAlreadyPoweredButton(helper: GameTestHelper) {
+        helper.setBlock(POS.below(), Blocks.STONE)
+        helper.setBlock(
+            POS,
+            Blocks.STONE_BUTTON.defaultBlockState().setValue(BlockStateProperties.POWERED, true),
+        )
+        val fp = FakePlayerFactory.getMinecraft(helper.level)
+        val remote = ItemStack(Registries.requireItem("remote"))
+        fp.setItemInHand(InteractionHand.MAIN_HAND, remote)
+        val buttonAbs = helper.absolutePos(POS)
+        val nbt = CompoundTag()
+        nbt.putLong("pos", buttonAbs.asLong())
+        nbt.putString("name", Blocks.STONE_BUTTON.descriptionId)
+        Auxiliaries.setItemStackNbt(remote, "remote", nbt)
+        remote.item.use(helper.level, fp, InteractionHand.MAIN_HAND)
+        if (!helper.level.getBlockState(buttonAbs).getValue(BlockStateProperties.POWERED)) {
+            helper.fail("button must remain powered after remote skips already-powered button")
+        }
+        helper.succeed()
+    }
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 10)
     fun remoteTriggerLinkedObserverHitsElseFail(helper: GameTestHelper) {
         helper.setBlock(POS.below(), Blocks.STONE)
         helper.setBlock(POS, Blocks.OBSERVER)

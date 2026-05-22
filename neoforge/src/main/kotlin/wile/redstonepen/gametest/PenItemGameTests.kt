@@ -12,6 +12,10 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.ComparatorBlock
+import net.minecraft.world.level.block.LeverBlock
+import net.minecraft.world.level.block.state.properties.AttachFace
+import net.minecraft.world.level.block.state.properties.ComparatorMode
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.common.util.FakePlayerFactory
@@ -678,6 +682,61 @@ object PenItemGameTests {
             fp.setShiftKeyDown(false)
             helper.succeed()
         }
+    }
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 15)
+    fun penInventoryTickCoversComparatorSubtractBranch(helper: GameTestHelper) {
+        val blockRel = BlockPos(2, 1, 2)
+        helper.setBlock(blockRel.below(), Blocks.STONE)
+        helper.setBlock(
+            blockRel,
+            Blocks.COMPARATOR.defaultBlockState()
+                .setValue(ComparatorBlock.MODE, ComparatorMode.SUBTRACT),
+        )
+        val fp = FakePlayerFactory.getMinecraft(helper.level)
+        val pen = ItemStack(Registries.requireItem("pen"))
+        setupFpLookingDown(fp, helper.absolutePos(blockRel), pen)
+        pen.item.inventoryTick(pen, helper.level, fp, 0, true)
+        helper.runAfterDelay(1) {
+            pen.item.inventoryTick(pen, helper.level, fp, 0, true)
+            fp.setShiftKeyDown(false)
+            helper.succeed()
+        }
+    }
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 15)
+    fun penInventoryTickSignalSourceNoSignalOnLookedAtSide(helper: GameTestHelper) {
+        val blockRel = BlockPos(2, 1, 2)
+        helper.setBlock(blockRel.below(), Blocks.STONE)
+        // Unpowered lever: isSignalSource=true but all getSignal() calls return 0
+        helper.setBlock(
+            blockRel,
+            Blocks.LEVER.defaultBlockState()
+                .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+                .setValue(LeverBlock.FACING, Direction.NORTH),
+        )
+        val fp = FakePlayerFactory.getMinecraft(helper.level)
+        val pen = ItemStack(Registries.requireItem("pen"))
+        setupFpLookingDown(fp, helper.absolutePos(blockRel), pen)
+        pen.item.inventoryTick(pen, helper.level, fp, 0, true)
+        helper.runAfterDelay(1) {
+            pen.item.inventoryTick(pen, helper.level, fp, 0, true)
+            fp.setShiftKeyDown(false)
+            helper.succeed()
+        }
+    }
+
+    @JvmStatic
+    @GameTest(template = EMPTY, timeoutTicks = 5)
+    fun pushRedstoneIntoFullRedstoneStackDropsExtra(helper: GameTestHelper) {
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        // count=62, amount=3 → 62 > 64-3=61 → else branch → Inventories.give; stack count unchanged
+        val rs = ItemStack(Items.REDSTONE, 62)
+        RedstonePenItem.pushRedstone(rs, 3, player)
+        if (rs.count != 62) helper.fail("expected stack count 62 (unchanged), got ${rs.count}")
+        helper.succeed()
     }
 
     @JvmStatic
