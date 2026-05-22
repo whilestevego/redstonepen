@@ -812,4 +812,44 @@ class CblScriptTest :
                 p.evaluate(state, mapOf("inp" to 1, ".clock" to 5))["r"] shouldBe 15
             }
         }
+
+        describe("parser edge cases") {
+            it("deeply nested parentheses parse and evaluate correctly") {
+                val p = compile("r = ((((a))))")
+                assertSoftly {
+                    p.isValid shouldBe true
+                    p.evaluate(mutableMapOf(), mapOf("a" to 7))["r"] shouldBe 7
+                }
+            }
+
+            it("large integer literal at Int.MAX_VALUE does not produce a parse error") {
+                val p = compile("r = 2147483647")
+                p.isValid shouldBe true
+            }
+
+            it("multi-line program with many assignments all execute") {
+                val code = (1..10).joinToString("\n") { i -> "v$i = $i" }
+                val p = compile(code)
+                assertSoftly {
+                    p.isValid shouldBe true
+                    val result = p.evaluate(mutableMapOf())
+                    for (i in 1..10) result["v$i"] shouldBe i
+                }
+            }
+
+            it("expression with multiple chained additions evaluates left-to-right") {
+                val p = compile("r = 1 + 2 + 3 + 4")
+                p.evaluate(mutableMapOf())["r"] shouldBe 10
+            }
+
+            it("empty lines between assignments are ignored") {
+                val p = compile("a = 1\n\n\nb = 2")
+                assertSoftly {
+                    p.isValid shouldBe true
+                    val result = p.evaluate(mutableMapOf())
+                    result["a"] shouldBe 1
+                    result["b"] shouldBe 2
+                }
+            }
+        }
     })
