@@ -180,7 +180,7 @@ krit: $(KRIT_JAR)
 	@echo "Resolving compile classpaths via Gradle..."
 	@$(GRADLE) :common:writeCompileClasspath :neoforge:writeCompileClasspath :fabric:writeCompileClasspath -q
 	@echo "Analyzing common..."
-	@$(KRIT) --input common/src/main/kotlin --input common/src/main/java \
+	@$(KRIT) --input common/src/main/kotlin \
 	  --classpath $$(cat common/build/compile-classpath.txt)
 	@echo "Analyzing neoforge..."
 	@$(KRIT) --input neoforge/src/main/kotlin \
