@@ -9,10 +9,10 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import net.minecraft.core.Direction
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.Connections
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_CON_MASK
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_PWR_MASK
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_WIR_MASK
-import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
 import wile.redstonepen.blocks.track.TestHooks
 
 class RedstoneTrackStateTest :
@@ -178,11 +178,11 @@ class RedstoneTrackStateTest :
         describe("connection flags by direction") {
             it("CONNECTION_BIT_ORDER index matches getConnectionFlag(index)") {
                 assertSoftly {
-                    connections.CONNECTION_BIT_ORDER.forEachIndexed { i, dir ->
+                    Connections.CONNECTION_BIT_ORDER.forEachIndexed { i, dir ->
                         val th = h()
                         th.state = 1L shl (24 + i)
                         th.getConnectionFlag(i) shouldBe true
-                        connections.CONNECTION_BIT_ORDER_REV[dir] shouldBe i
+                        Connections.CONNECTION_BIT_ORDER_REV[dir] shouldBe i
                     }
                 }
             }
@@ -190,12 +190,12 @@ class RedstoneTrackStateTest :
 
         describe("static mappings") {
             it("WIRE_FACE_DIRECTION_MAPPING has 24 entries") {
-                connections.WIRE_FACE_DIRECTION_MAPPING.size - 1 shouldBe 24
+                Connections.WIRE_FACE_DIRECTION_MAPPING.size - 1 shouldBe 24
             }
 
             it("WIRE_FACE_DIRECTION_MAPPING keys are distinct powers of two") {
                 val seen = mutableSetOf<Long>()
-                for (key in connections.WIRE_FACE_DIRECTION_MAPPING.keys) {
+                for (key in Connections.WIRE_FACE_DIRECTION_MAPPING.keys) {
                     if (key == 0L) continue
                     java.lang.Long.bitCount(key) shouldBe 1
                     seen.add(key) shouldBe true
@@ -203,19 +203,19 @@ class RedstoneTrackStateTest :
             }
 
             it("BULK_FACE_MAPPING has one entry per face plus zero") {
-                connections.BULK_FACE_MAPPING.size shouldBe 7
+                Connections.BULK_FACE_MAPPING.size shouldBe 7
             }
 
             it("BULK_FACE_MAPPING_REV non-null for all directions") {
                 for (dir in Direction.values()) {
-                    connections.BULK_FACE_MAPPING_REV[dir] shouldNotBe null
+                    Connections.BULK_FACE_MAPPING_REV[dir] shouldNotBe null
                 }
             }
 
             it("CONNECTION_BIT_ORDER_REV has all six directions") {
-                connections.CONNECTION_BIT_ORDER_REV.size shouldBe 6
+                Connections.CONNECTION_BIT_ORDER_REV.size shouldBe 6
                 for (dir in Direction.values()) {
-                    connections.CONNECTION_BIT_ORDER_REV.containsKey(dir) shouldBe true
+                    Connections.CONNECTION_BIT_ORDER_REV.containsKey(dir) shouldBe true
                 }
             }
         }

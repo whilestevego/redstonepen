@@ -69,7 +69,14 @@ object Inventories {
     fun insert(toRanges: Array<InventoryRange>, stack: ItemStack): ItemStack {
         var remaining = stack.copy()
         for (range in toRanges) {
-            remaining = range.insert(remaining, false, 0, false, true)
+            remaining =
+                range.insert(
+                    remaining,
+                    onlyFillup = false,
+                    limit = 0,
+                    reverse = false,
+                    forceGroupStacks = true,
+                )
             if (remaining.isEmpty) return remaining
         }
         return remaining
@@ -87,8 +94,8 @@ object Inventories {
         protected val offset: Int
         protected val size: Int
         protected val numRows: Int
-        private var maxStackSize_: Int = 64
-        private var validator_: BiPredicate<Int, ItemStack> = BiPredicate { _, _ -> true }
+        private var maxStackSize: Int = 64
+        private var validator: BiPredicate<Int, ItemStack> = BiPredicate { _, _ -> true }
 
         constructor(inventory: Container, offset: Int, size: Int, numRows: Int) {
             this.inventory = inventory
@@ -125,15 +132,15 @@ object Inventories {
 
         fun set(index: Int, stack: ItemStack) = inventory.setItem(offset + index, stack)
 
-        fun setValidator(validator: BiPredicate<Int, ItemStack>): InventoryRange {
-            validator_ = validator
+        fun setValidator(v: BiPredicate<Int, ItemStack>): InventoryRange {
+            validator = v
             return this
         }
 
-        fun getValidator(): BiPredicate<Int, ItemStack> = validator_
+        fun getValidator(): BiPredicate<Int, ItemStack> = validator
 
         fun setMaxStackSize(count: Int): InventoryRange {
-            maxStackSize_ = maxOf(count, 1)
+            maxStackSize = maxOf(count, 1)
             return this
         }
 
@@ -162,30 +169,18 @@ object Inventories {
         override fun setItem(index: Int, stack: ItemStack) =
             inventory.setItem(offset + index, stack)
 
-        override fun getMaxStackSize(): Int = minOf(maxStackSize_, inventory.maxStackSize)
+        override fun getMaxStackSize(): Int = minOf(maxStackSize, inventory.maxStackSize)
 
         override fun setChanged() = inventory.setChanged()
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun stillValid(player: Player?): Boolean = inventory.stillValid(player)
+        override fun stillValid(player: Player): Boolean = inventory.stillValid(player)
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun startOpen(player: Player?) = inventory.startOpen(player)
+        override fun startOpen(player: Player) = inventory.startOpen(player)
 
-        @Suppress(
-            "WRONG_NULLABILITY_FOR_JAVA_OVERRIDE",
-            "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
-        )
-        override fun stopOpen(player: Player?) = inventory.stopOpen(player)
+        override fun stopOpen(player: Player) = inventory.stopOpen(player)
 
         override fun canPlaceItem(index: Int, stack: ItemStack): Boolean =
-            validator_.test(offset + index, stack) && inventory.canPlaceItem(offset + index, stack)
+            validator.test(offset + index, stack) && inventory.canPlaceItem(offset + index, stack)
 
         // ------------------------------------------------------------------------------------------------------------------
 
@@ -375,7 +370,14 @@ object Inventories {
             return stack
         }
 
-        fun insert(stackToMove: ItemStack): ItemStack = insert(stackToMove, false, 0, false, true)
+        fun insert(stackToMove: ItemStack): ItemStack =
+            insert(
+                stackToMove,
+                onlyFillup = false,
+                limit = 0,
+                reverse = false,
+                forceGroupStacks = true,
+            )
 
         fun insert(index: Int, stackToMove: ItemStack): ItemStack {
             if (stackToMove.isEmpty) return stackToMove
@@ -405,7 +407,8 @@ object Inventories {
          */
         fun extract(amount: Int): ItemStack = extract(amount, false)
 
-        fun extract(amount: Int, _random: Boolean): ItemStack = extract(amount, false, false)
+        fun extract(amount: Int, random: Boolean): ItemStack =
+            extract(amount, random = false, simulate = false)
 
         fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack {
             var outStack = ItemStack.EMPTY
@@ -523,7 +526,14 @@ object Inventories {
         }
 
         fun move(index: Int, targetRange: InventoryRange): Boolean =
-            move(index, targetRange, false, false, false, true)
+            move(
+                index,
+                targetRange,
+                allIdenticalStacks = false,
+                onlyFillup = false,
+                reverse = false,
+                forceGroupStacks = true,
+            )
 
         /**
          * Moves/clears the complete range to another range if possible. Returns true if something
@@ -544,9 +554,10 @@ object Inventories {
         }
 
         fun move(targetRange: InventoryRange, onlyFillup: Boolean): Boolean =
-            move(targetRange, onlyFillup, false, true)
+            move(targetRange, onlyFillup, reverse = false, forceGroupStacks = true)
 
-        fun move(targetRange: InventoryRange): Boolean = move(targetRange, false, false, true)
+        fun move(targetRange: InventoryRange): Boolean =
+            move(targetRange, onlyFillup = false, reverse = false, forceGroupStacks = true)
 
         private fun checked(stack: ItemStack): ItemStack =
             if (stack.isEmpty) ItemStack.EMPTY else stack

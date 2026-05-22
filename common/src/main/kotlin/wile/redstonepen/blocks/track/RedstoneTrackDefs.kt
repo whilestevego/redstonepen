@@ -28,7 +28,7 @@ object RedstoneTrackDefs {
             Direction.SOUTH,
         )
 
-    object connections {
+    object Connections {
         @JvmField
         val CONNECTION_BIT_ORDER: Array<Direction> =
             arrayOf(
@@ -125,9 +125,9 @@ object RedstoneTrackDefs {
         fun getBulkConnectorBit(face: Direction): Long = BULK_FACE_MAPPING_REV.getValue(face)
 
         @JvmStatic
-        fun getWireBit(face: Direction, wire_direction: Direction): Long =
+        fun getWireBit(face: Direction, wireDirection: Direction): Long =
             WIRE_FACE_DIRECTION_MAPPING.entries
-                .firstOrNull { it.value.getA() == face && it.value.getB() == wire_direction }
+                .firstOrNull { it.value.getA() == face && it.value.getB() == wireDirection }
                 ?.key ?: 0L
 
         @JvmStatic
@@ -184,7 +184,7 @@ object RedstoneTrackDefs {
         }
     }
 
-    object shape {
+    object Shape {
         private const val SHAPE_LAYER_THICKNESS = 0.01
         private const val SHAPE_TRACK_HALFWIDTH = 2.0
 
@@ -321,7 +321,7 @@ object RedstoneTrackDefs {
         }
     }
 
-    object models {
+    object Models {
         @JvmField
         val STATE_WIRE_MAPPING: Map<Long, String> =
             mapOf(

@@ -94,9 +94,9 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         explosion: Boolean,
     ): List<ItemStack> {
         if (te !is TrackBlockEntity) return Collections.emptyList()
-        val num_connections = te.getRedstoneDustCount()
-        if (num_connections <= 0) return Collections.emptyList()
-        return Collections.singletonList(ItemStack(Items.REDSTONE, num_connections))
+        val numConnections = te.getRedstoneDustCount()
+        if (numConnections <= 0) return Collections.emptyList()
+        return Collections.singletonList(ItemStack(Items.REDSTONE, numConnections))
     }
 
     @Nullable
@@ -124,8 +124,8 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 (if ((wires and 0x000f00) != 0) 0x04 else 0) or
                 (if ((wires and 0x00f000) != 0) 0x08 else 0) or
                 (if ((wires and 0x0f0000) != 0) 0x10 else 0) or
-                (if ((wires and 0xf00000.toInt()) != 0) 0x20 else 0)
-        return RedstoneTrackDefs.shape.get(faces)
+                (if ((wires and 0xf00000) != 0) 0x20 else 0)
+        return RedstoneTrackDefs.Shape.get(faces)
     }
 
     public override fun getCollisionShape(
@@ -150,7 +150,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         true
 
     fun canConnectRedstone(
-        _state: BlockState,
+        state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
         @Nullable side: Direction?,
@@ -160,16 +160,16 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 .map { te -> te.hasVanillaRedstoneConnection(side.opposite) }
                 .orElse(false)
 
-    public override fun isSignalSource(state: BlockState): Boolean = can_provide_power_
+    public override fun isSignalSource(state: BlockState): Boolean = canProvidePower
 
     public override fun getSignal(
         state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
-        redstone_side: Direction,
+        redstoneSide: Direction,
     ): Int =
-        if (can_provide_power_) {
-            tile(world, pos).map { te -> te.getRedstonePower(redstone_side, true) }.orElse(0)
+        if (canProvidePower) {
+            tile(world, pos).map { te -> te.getRedstonePower(redstoneSide, true) }.orElse(0)
         } else {
             0
         }
@@ -178,10 +178,10 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         state: BlockState,
         world: BlockGetter,
         pos: BlockPos,
-        redstone_side: Direction,
+        redstoneSide: Direction,
     ): Int =
-        if (can_provide_power_) {
-            tile(world, pos).map { te -> te.getRedstonePower(redstone_side, false) }.orElse(0)
+        if (canProvidePower) {
+            tile(world, pos).map { te -> te.getRedstonePower(redstoneSide, false) }.orElse(0)
         } else {
             0
         }
@@ -249,8 +249,8 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
             ItemStack.EMPTY,
             InteractionHand.MAIN_HAND,
             rtr,
-            true,
-            false,
+            noAdd = true,
+            noRemove = false,
         )
 
     override fun useItemOn(
@@ -302,22 +302,22 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
     ) {
         if (world.isClientSide()) return
         try {
-            val blocks_to_update =
+            val blocksToUpdate =
                 tile(world, pos)
                     .map { te -> te.handleNeighborChanged(fromPos) }
                     .orElse(Collections.emptyMap())
-            if (blocks_to_update.isEmpty()) return
-            for ((key, value) in blocks_to_update) {
+            if (blocksToUpdate.isEmpty()) return
+            for ((key, value) in blocksToUpdate) {
                 if (key == value) continue
                 world.neighborChanged(key, this, value)
             }
         } catch (ex: Throwable) {
             Auxiliaries.logError("Track neighborChanged recursion detected, dropping! ($ex)")
-            val num_redstone = tile(world, pos).map { it.getRedstoneDustCount() }.orElse(0)
-            if (num_redstone > 0) {
+            val numRedstone = tile(world, pos).map { it.getRedstoneDustCount() }.orElse(0)
+            if (numRedstone > 0) {
                 val p = Vec3.atCenterOf(pos)
                 world.addFreshEntity(
-                    ItemEntity(world, p.x, p.y, p.z, ItemStack(Items.REDSTONE, num_redstone))
+                    ItemEntity(world, p.x, p.y, p.z, ItemStack(Items.REDSTONE, numRedstone))
                 )
                 world.setBlock(
                     pos,
@@ -366,7 +366,7 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         val te = tileResult.get()
         if ((te.getStateFlags() and RedstoneTrackDefs.STATE_FLAG_PWR_MASK) == 0L) return
         val color = Vec3(0.6, 0.0, 0.0)
-        for (side in Direction.values()) {
+        for (side in Direction.entries) {
             val p = te.getSidePower(side)
             if (p == 0) continue
             spawnPoweredParticle(world, rand, pos, color, side, side.opposite, -0.5f, 0.5f)
@@ -381,44 +381,44 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         stack: ItemStack,
         hand: InteractionHand,
         rtr: BlockHitResult,
-        no_add: Boolean,
-        no_remove: Boolean,
+        noAdd: Boolean,
+        noRemove: Boolean,
     ): InteractionResult {
         if (!stack.isEmpty && stack.item != Items.REDSTONE && !RedstonePenItem.isPen(stack)) {
-            val behind_pos = pos.relative(rtr.direction)
-            val behind_state = world.getBlockState(behind_pos)
-            if (behind_state.isRedstoneConductor(world, behind_pos)) {
-                return behind_state.useWithoutItem(world, player, rtr)
+            val behindPos = pos.relative(rtr.direction)
+            val behindState = world.getBlockState(behindPos)
+            if (behindState.isRedstoneConductor(world, behindPos)) {
+                return behindState.useWithoutItem(world, player, rtr)
             }
             return InteractionResult.sidedSuccess(world.isClientSide())
         }
         if (world.isClientSide()) return InteractionResult.SUCCESS
-        var no_add_mut = no_add
-        if (!RedstonePenItem.hasEnoughRedstone(stack, 1, player)) no_add_mut = !no_remove
+        var noAddMut = noAdd
+        if (!RedstonePenItem.hasEnoughRedstone(stack, 1, player)) noAddMut = !noRemove
         val tileResult = tile(world, pos)
         if (!tileResult.isPresent) return InteractionResult.FAIL
         val te = tileResult.get()
-        val no_bulk = false
-        val redstone_use =
+        val noBulk = false
+        val redstoneUse =
             te.applyPenEdit(
                 pos,
                 player,
                 player.getItemInHand(hand),
                 rtr.direction,
                 rtr.location,
-                no_add_mut,
-                no_remove,
-                no_bulk,
+                noAddMut,
+                noRemove,
+                noBulk,
             )
-        if (redstone_use == 0) {
+        if (redstoneUse == 0) {
             return InteractionResult.CONSUME
-        } else if (redstone_use < 0) {
-            RedstonePenItem.pushRedstone(stack, -redstone_use, player)
+        } else if (redstoneUse < 0) {
+            RedstonePenItem.pushRedstone(stack, -redstoneUse, player)
             if (te.getWireFlags() == 0) {
                 world.setBlock(pos, state.fluidState.createLegacyBlock(), 1 or 2)
             } else {
-                val blocks_to_update = te.updateAllPowerValuesFromAdjacent()
-                for ((key, value) in blocks_to_update) {
+                val blocksToUpdate = te.updateAllPowerValuesFromAdjacent()
+                for ((key, value) in blocksToUpdate) {
                     world.neighborChanged(key, this, value)
                 }
             }
@@ -431,10 +431,10 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 2f,
             )
         } else {
-            RedstonePenItem.popRedstone(stack, redstone_use, player, hand)
+            RedstonePenItem.popRedstone(stack, redstoneUse, player, hand)
             world.playSound(null, pos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 0.4f, 2.4f)
-            val blocks_to_update = te.updateAllPowerValuesFromAdjacent()
-            for ((key, value) in blocks_to_update) {
+            val blocksToUpdate = te.updateAllPowerValuesFromAdjacent()
+            for ((key, value) in blocksToUpdate) {
                 world.neighborChanged(key, this, value)
             }
         }
@@ -443,10 +443,10 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
         return InteractionResult.CONSUME
     }
 
-    private var can_provide_power_: Boolean = true
+    private var canProvidePower: Boolean = true
 
     internal fun disablePower(disable: Boolean) {
-        can_provide_power_ = !disable
+        canProvidePower = !disable
     }
 
     private fun updateNeighbourShapes(state: BlockState, world: Level, pos: BlockPos) {
@@ -466,8 +466,8 @@ open class RedstoneTrackBlock(config: Long, builder: BlockBehaviour.Properties) 
                 if (dir0 == dir1.opposite) return
                 ppos = pos.relative(dir0).relative(dir1)
                 if (ppos == pos) continue
-                val diagonal_state = world.getBlockState(ppos)
-                if (diagonal_state.block != this) continue
+                val diagonalState = world.getBlockState(ppos)
+                if (diagonalState.block != this) continue
                 world.neighborChanged(ppos, this, pos)
             }
         }

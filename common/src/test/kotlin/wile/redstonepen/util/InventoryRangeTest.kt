@@ -5,14 +5,18 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
 import java.util.NoSuchElementException
 import java.util.Optional
 import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 class InventoryRangeTest :
     DescribeSpec({
+        val player = mockk<Player>(relaxed = true)
+
         fun container(size: Int) = SimpleContainer(size)
 
         fun filled(size: Int, redstone: Int) =
@@ -108,13 +112,13 @@ class InventoryRangeTest :
             }
 
             it("stillValid delegates to inventory") {
-                Inventories.InventoryRange(container(1)).stillValid(null) shouldBe true
+                Inventories.InventoryRange(container(1)).stillValid(player) shouldBe true
             }
 
             it("startOpen stopOpen setChanged are no-ops") {
                 val r = Inventories.InventoryRange(container(1))
-                r.startOpen(null)
-                r.stopOpen(null)
+                r.startOpen(player)
+                r.stopOpen(player)
                 r.setChanged()
             }
         }

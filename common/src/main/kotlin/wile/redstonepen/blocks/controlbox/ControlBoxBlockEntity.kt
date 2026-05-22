@@ -60,8 +60,8 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
                 CompoundTag()
             }
         logic.code(logicdata.getString("code"))
-        logic.input_data = logicdata.getInt("input")
-        logic.output_data = logicdata.getInt("output")
+        logic.inputData = logicdata.getInt("input")
+        logic.outputData = logicdata.getInt("output")
         val logicsymbols =
             if (logicdata.contains("symbols", Tag.TAG_COMPOUND.toInt())) {
                 logicdata.getCompound("symbols")
@@ -82,8 +82,8 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         customName?.let { nbt.putString("name", Auxiliaries.serializeTextComponent(it, hlp)) }
         val logicdata = CompoundTag()
         logicdata.putString("code", logic.code())
-        logicdata.putInt("input", logic.input_data)
-        logicdata.putInt("output", logic.output_data)
+        logicdata.putInt("input", logic.inputData)
+        logicdata.putInt("output", logic.outputData)
         val logicsymbols = CompoundTag()
         logic.symbols().forEach { (k, v) -> logicsymbols.putInt(k, v) }
         logicdata.put("symbols", logicsymbols)
@@ -103,7 +103,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         customName = name
     }
 
-    override fun getDisplayName(): Component = super<Nameable>.getDisplayName()
+    override fun getDisplayName(): Component = super.getDisplayName()
 
     override fun createMenu(id: Int, inventory: Inventory, player: Player): AbstractContainerMenu =
         ControlBoxUiContainer(
@@ -124,52 +124,52 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         tickTimer = if (tickInterval > 0) tickInterval else TICK_INTERVAL
         val tick = System.nanoTime()
         val world = getLevel() ?: return
-        val device_state = blockState
-        val device_pos = blockPos
-        val device_enabled =
-            (device_state.getValue(CircuitComponents.DirectedComponentBlock.STATE) > 0) ||
-                (device_state.getValue(CircuitComponents.DirectedComponentBlock.POWERED))
-        if (device_state.block !is ControlBoxBlock) return
-        val device_block = device_state.block as ControlBoxBlock
-        val last_output_data = logic.output_data
-        val last_input_data = logic.input_data
-        val rca_data =
-            if ((logic.rca_input_mask or logic.rca_output_mask) == 0L) {
+        val deviceState = blockState
+        val devicePos = blockPos
+        val deviceEnabled =
+            (deviceState.getValue(CircuitComponents.DirectedComponentBlock.STATE) > 0) ||
+                (deviceState.getValue(CircuitComponents.DirectedComponentBlock.POWERED))
+        if (deviceState.block !is ControlBoxBlock) return
+        val deviceBlock = deviceState.block as ControlBoxBlock
+        val lastOutputData = logic.outputData
+        val lastInputData = logic.inputData
+        val rcaData =
+            if ((logic.rcaInputMask or logic.rcaOutputMask) == 0L) {
                 RcaSync.CommonRca.EMPTY
             } else {
                 RcaSync.CommonRca.ofPlayer(activatingPlayer, false)
             }
         try {
             run {
-                logic.input_data = 0
-                for (d in Direction.values()) {
-                    val world_dir =
+                logic.inputData = 0
+                for (d in Direction.entries) {
+                    val worldDir =
                         CircuitComponents.DirectedComponentBlock.getForwardStateMappedFacing(
-                            device_state,
+                            deviceState,
                             d,
                         )
-                    if (device_enabled) {
-                        val port_name = PortNames.ALL[d.ordinal]
-                        if (logic.usesSymbol(port_name + ".co")) {
-                            val target_pos = device_pos.relative(world_dir)
-                            val target_state = world.getBlockState(target_pos)
+                    if (deviceEnabled) {
+                        val portName = PortNames.ALL[d.ordinal]
+                        if (logic.usesSymbol("${portName}.co")) {
+                            val targetPos = devicePos.relative(worldDir)
+                            val targetState = world.getBlockState(targetPos)
                             logic.symbol(
-                                port_name + ".co",
-                                if (target_state.hasAnalogOutputSignal()) {
-                                    target_state.getAnalogOutputSignal(world, target_pos)
+                                "${portName}.co",
+                                if (targetState.hasAnalogOutputSignal()) {
+                                    targetState.getAnalogOutputSignal(world, targetPos)
                                 } else {
                                     0
                                 },
                             )
                         }
                     }
-                    if ((logic.output_mask and (0xf shl (4 * d.ordinal))) == 0) {
-                        val p = world.getSignal(device_pos.relative(world_dir), world_dir)
-                        logic.input_data = logic.input_data or ((p and 0xf) shl (4 * d.ordinal))
+                    if ((logic.outputMask and (0xf shl (4 * d.ordinal))) == 0) {
+                        val p = world.getSignal(devicePos.relative(worldDir), worldDir)
+                        logic.inputData = logic.inputData or ((p and 0xf) shl (4 * d.ordinal))
                     }
                 }
-                if (logic.rca_input_mask != 0L && rca_data != RcaSync.CommonRca.EMPTY) {
-                    logic.rca_input_data = rca_data.client_inputs() and logic.rca_input_mask
+                if (logic.rcaInputMask != 0L && rcaData != RcaSync.CommonRca.EMPTY) {
+                    logic.rcaInputData = rcaData.client_inputs() and logic.rcaInputMask
                 }
             }
             run {
@@ -179,31 +179,31 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
                         (Mth.clamp(System.nanoTime() - tick, 0L, 0x7fffffffL) / 1000L).toInt(),
                     )
                 }
-                if (!device_enabled) {
-                    logic.output_data = 0
+                if (!deviceEnabled) {
+                    logic.outputData = 0
                 } else {
                     logic.symbol(".clock", (world.gameTime and 0x7fffffffL).toInt())
                     logic.symbol(".time", (world.dayTime % 24000L).toInt())
                     logic.tick()
-                    if (logic.rca_output_mask != 0L && rca_data != RcaSync.CommonRca.EMPTY) {
-                        rca_data.server_outputs(logic.rca_output_data)
+                    if (logic.rcaOutputMask != 0L && rcaData != RcaSync.CommonRca.EMPTY) {
+                        rcaData.server_outputs(logic.rcaOutputData)
                     }
                 }
             }
             run {
-                if (logic.output_data != last_output_data) {
-                    for (d in Direction.values()) {
-                        if ((logic.output_mask and (0xf shl (4 * d.ordinal))) == 0) continue
-                        val world_dir =
+                if (logic.outputData != lastOutputData) {
+                    for (d in Direction.entries) {
+                        if ((logic.outputMask and (0xf shl (4 * d.ordinal))) == 0) continue
+                        val worldDir =
                             CircuitComponents.DirectedComponentBlock.getForwardStateMappedFacing(
-                                device_state,
+                                deviceState,
                                 d,
                             )
-                        device_block.notifyOutput(device_state, world, device_pos, world_dir)
+                        deviceBlock.notifyOutput(deviceState, world, devicePos, worldDir)
                     }
                 }
-                if (logic.output_data != last_output_data || logic.input_data != last_input_data) {
-                    world.blockEntityChanged(device_pos)
+                if (logic.outputData != lastOutputData || logic.inputData != lastInputData) {
+                    world.blockEntityChanged(devicePos)
                 }
             }
         } catch (ex: Throwable) {
@@ -260,13 +260,13 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         )
         if (!en) {
             logic.clearSymbols()
-            val rca_data =
-                if (logic.rca_output_mask == 0L) {
+            val rcaData =
+                if (logic.rcaOutputMask == 0L) {
                     RcaSync.CommonRca.EMPTY
                 } else {
                     RcaSync.CommonRca.ofPlayer(activatingPlayer, false)
                 }
-            if (rca_data != RcaSync.CommonRca.EMPTY) rca_data.server_outputs(0L)
+            if (rcaData != RcaSync.CommonRca.EMPTY) rcaData.server_outputs(0L)
         }
     }
 
@@ -282,7 +282,7 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     fun getOutputSignal(internalSide: Direction): Int =
-        (logic.output_data shr (4 * internalSide.ordinal)) and 0xf
+        (logic.outputData shr (4 * internalSide.ordinal)) and 0xf
 
     internal fun scheduleImmediateTick() {
         tickTimer = 0
@@ -292,21 +292,21 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         val nbt = CompoundTag()
         nbt.putString("action", "serverdata")
         nbt.putBoolean("enabled", getEnabled())
-        nbt.putInt("inputs", logic.input_mask)
-        nbt.putInt("outputs", logic.output_mask)
+        nbt.putInt("inputs", logic.inputMask)
+        nbt.putInt("outputs", logic.outputMask)
         nbt.putInt(
             "ports",
-            (logic.input_data and logic.input_mask) or (logic.output_data and logic.output_mask),
+            (logic.inputData and logic.inputMask) or (logic.outputData and logic.outputMask),
         )
         if (logic.symbols().isNotEmpty()) {
-            val sym_nbt = CompoundTag()
-            logic.symbols().forEach { (k, v) -> sym_nbt.putInt(k, v) }
-            nbt.put("symbols", sym_nbt)
+            val symNbt = CompoundTag()
+            logic.symbols().forEach { (k, v) -> symNbt.putInt(k, v) }
+            nbt.put("symbols", symNbt)
         }
         if (!logic.valid()) {
-            val err_nbt = CompoundTag()
-            logic.errors().forEach { (e, l) -> err_nbt.putString(e.toString(), l) }
-            nbt.put("errors", err_nbt)
+            val errNbt = CompoundTag()
+            logic.errors().forEach { (e, l) -> errNbt.putString(e.toString(), l) }
+            nbt.put("errors", errNbt)
         } else {
             nbt.put("errors", CompoundTag())
         }
@@ -315,27 +315,26 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
         nbt.putBoolean("debug", trace_enabled())
         nbt.putString("code", getCode())
         activatingPlayer?.let { pid ->
-            val run_player = getLevel()?.getPlayerByUUID(pid)
-            nbt.putString("player", run_player?.scoreboardName ?: "")
+            val runPlayer = getLevel()?.getPlayerByUUID(pid)
+            nbt.putString("player", runPlayer?.scoreboardName ?: "")
         }
         return nbt
     }
 
-    fun signal_update(from_world_side: Direction, from_mapped_side: Direction) {
+    fun signal_update(fromWorldSide: Direction, fromMappedSide: Direction) {
         if (tickInterval > 0) return
-        val shift = 4 * from_mapped_side.ordinal
+        val shift = 4 * fromMappedSide.ordinal
         val mask = 0xf shl shift
-        if ((logic.input_mask and mask) == 0) return
+        if ((logic.inputMask and mask) == 0) return
         val world = getLevel() ?: return
-        val signal_intr =
-            mask and
-                (world.getSignal(blockPos.relative(from_world_side), from_world_side) shl shift)
-        val signal_data = mask and logic.input_data
-        if (signal_intr == signal_data) return
-        if (signal_intr != 0 && signal_data == 0) {
+        val signalIntr =
+            mask and (world.getSignal(blockPos.relative(fromWorldSide), fromWorldSide) shl shift)
+        val signalData = mask and logic.inputData
+        if (signalIntr == signalData) return
+        if (signalIntr != 0 && signalData == 0) {
             logic.risingEdgeInterrupts = logic.risingEdgeInterrupts or mask
             tickTimer = 0
-        } else if (signal_intr == 0) {
+        } else if (signalIntr == 0) {
             logic.fallingEdgeInterrupts = logic.fallingEdgeInterrupts or mask
             tickTimer = 0
         }
@@ -361,15 +360,15 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
 
         fun errors(): Map<Int, String> = HashMap(logic.errors())
 
-        fun inputMask(): Int = logic.input_mask
+        fun inputMask(): Int = logic.inputMask
 
-        fun outputMask(): Int = logic.output_mask
+        fun outputMask(): Int = logic.outputMask
 
         fun setInput(side: Direction, value: Int) {
             val shift = 4 * side.ordinal
             val mask = 0xf shl shift
-            logic.input_mask = logic.input_mask or mask
-            logic.input_data = (logic.input_data and mask.inv()) or ((value and 0xf) shl shift)
+            logic.inputMask = logic.inputMask or mask
+            logic.inputData = (logic.inputData and mask.inv()) or ((value and 0xf) shl shift)
         }
 
         fun setSymbol(key: String, value: Int) {
@@ -397,21 +396,20 @@ class ControlBoxBlockEntity(pos: BlockPos, state: BlockState) :
             tickErrorMessage = message
         }
 
-        fun output(side: Direction): Int = (logic.output_data shr (4 * side.ordinal)) and 0xf
+        fun output(side: Direction): Int = (logic.outputData shr (4 * side.ordinal)) and 0xf
 
-        fun outputData(): Int = logic.output_data
+        fun outputData(): Int = logic.outputData
 
         fun setRcaInput(channel: Int, value: Int) {
             val mask = 0xfL shl (channel * 4)
-            logic.rca_input_mask = logic.rca_input_mask or mask
-            logic.rca_input_data =
-                (logic.rca_input_data and mask.inv()) or
-                    ((value.toLong() and 0xfL) shl (channel * 4))
+            logic.rcaInputMask = logic.rcaInputMask or mask
+            logic.rcaInputData =
+                (logic.rcaInputData and mask.inv()) or ((value.toLong() and 0xfL) shl (channel * 4))
         }
 
         fun getRcaOutput(channel: Int): Int =
-            ((logic.rca_output_data shr (channel * 4)) and 0xfL).toInt()
+            ((logic.rcaOutputData shr (channel * 4)) and 0xfL).toInt()
 
-        fun rcaOutputData(): Long = logic.rca_output_data
+        fun rcaOutputData(): Long = logic.rcaOutputData
     }
 }

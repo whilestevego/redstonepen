@@ -65,9 +65,9 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         Auxiliaries.Tooltip.addInformation(stack, ctx, tooltip, flag, true)
         if (!Auxiliaries.Tooltip.extendedTipCondition()) return
         val nbt = Auxiliaries.getItemStackNbt(stack, "tedata")
-        val nbt_logic = nbt.getCompound("tedata").getCompound("logic")
-        if (nbt_logic.isEmpty) return
-        Arrays.stream(nbt_logic.getString("code").split("\\n".toRegex()).toTypedArray())
+        val nbtLogic = nbt.getCompound("tedata").getCompound("logic")
+        if (nbtLogic.isEmpty) return
+        Arrays.stream(nbtLogic.getString("code").split("\\n".toRegex()).toTypedArray())
             .map { s -> s.replace(Regex("#.*$"), "").trim() }
             .filter { s -> s.isNotEmpty() }
             .map { s -> Component.literal(s).withStyle(ChatFormatting.DARK_GREEN) }
@@ -98,12 +98,12 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
         redstoneSide: Direction,
     ): Int {
         val cb = world.getBlockEntity(pos) as? ControlBoxBlockEntity ?: return 0
-        val internal_side =
+        val internalSide =
             CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(
                 state,
                 redstoneSide.opposite,
             )
-        return cb.getOutputSignal(internal_side)
+        return cb.getOutputSignal(internalSide)
     }
 
     public override fun getDirectSignal(
@@ -155,13 +155,13 @@ class ControlBoxBlock(config: Long, builder: BlockBehaviour.Properties, aabb: Ar
             return state
         }
         val dp = fromPos.subtract(pos)
-        val world_side = Direction.fromDelta(dp.x, dp.y, dp.z)
-        if (world_side != null) {
+        val worldSide = Direction.fromDelta(dp.x, dp.y, dp.z)
+        if (worldSide != null) {
             cb.signal_update(
-                world_side,
+                worldSide,
                 CircuitComponents.DirectedComponentBlock.getReverseStateMappedFacing(
                     state,
-                    world_side,
+                    worldSide,
                 ),
             )
         }

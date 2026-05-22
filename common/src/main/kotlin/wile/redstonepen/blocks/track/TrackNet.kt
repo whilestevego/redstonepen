@@ -4,21 +4,20 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 
 class TrackNet(
-    val neighbour_positions: List<BlockPos>,
-    val neighbour_sides: List<Direction>,
-    val internal_sides: List<Direction>,
-    val power_sides: List<Direction>,
-    power: Int = 0,
+    val neighbourPositions: List<BlockPos>,
+    val neighbourSides: List<Direction>,
+    val internalSides: List<Direction>,
+    val powerSides: List<Direction>,
+    internal var power: Int = 0,
 ) {
-    internal var power: Int = power
 
     override fun toString(): String {
         var s = "NET{"
         s += "p:$power"
-        s += ", intsides:" + internal_sides.joinToString("") { TrackBlockEntity.dirstr(it) }
-        s += ", pwrsides:" + power_sides.joinToString("") { TrackBlockEntity.dirstr(it) }
-        s += ", nbsides:" + neighbour_sides.joinToString("") { TrackBlockEntity.dirstr(it) }
-        s += ", nbpos:" + neighbour_positions.joinToString(",") { TrackBlockEntity.posstr(it) }
+        s += ", intsides:" + internalSides.joinToString("") { TrackBlockEntity.dirstr(it) }
+        s += ", pwrsides:" + powerSides.joinToString("") { TrackBlockEntity.dirstr(it) }
+        s += ", nbsides:" + neighbourSides.joinToString("") { TrackBlockEntity.dirstr(it) }
+        s += ", nbpos:" + neighbourPositions.joinToString(",") { TrackBlockEntity.posstr(it) }
         return "$s}"
     }
 }

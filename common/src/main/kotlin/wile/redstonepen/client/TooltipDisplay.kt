@@ -2,6 +2,7 @@ package wile.redstonepen.client
 
 import java.util.Optional
 import java.util.function.Supplier
+import kotlin.math.abs
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
@@ -76,12 +77,12 @@ class TooltipDisplay {
         y: Int,
     ): Boolean {
         if (hadRenderException) return false
-        if (Math.abs(x - xLast) > maxDeviation || Math.abs(y - yLast) > maxDeviation) {
+        if (abs(x - xLast) > maxDeviation || abs(y - yLast) > maxDeviation) {
             xLast = x
             yLast = y
             resetTimer()
             return false
-        } else if (Math.abs(System.currentTimeMillis() - t) < delay) {
+        } else if (abs(System.currentTimeMillis() - t) < delay) {
             return false
         } else if (
             ranges.stream().noneMatch { tip ->

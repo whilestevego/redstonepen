@@ -1,5 +1,6 @@
 package wile.redstonepen.util
 
+import kotlin.math.floor
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.Container
@@ -13,9 +14,9 @@ object RsSignals {
     @JvmStatic
     fun hasSignalConnector(
         state: BlockState,
-        _world: BlockGetter,
-        _pos: BlockPos,
-        _realSide: Direction?,
+        world: BlockGetter,
+        pos: BlockPos,
+        realSide: Direction?,
     ): Boolean = state.isSignalSource
 
     @JvmStatic
@@ -32,7 +33,7 @@ object RsSignals {
             nonempty = true
         }
         fillLevel /= container.containerSize
-        return (Math.floor(fillLevel * 14) + if (nonempty) 1 else 0)
+        return (floor(fillLevel * 14) + if (nonempty) 1 else 0)
             .toInt() // vanilla compliant calculation.
     }
 
@@ -41,6 +42,6 @@ object RsSignals {
         state: BlockState,
         world: Level,
         pos: BlockPos,
-        _redstoneSide: Direction,
+        redstoneSide: Direction,
     ): Boolean = state.isRedstoneConductor(world, pos)
 }

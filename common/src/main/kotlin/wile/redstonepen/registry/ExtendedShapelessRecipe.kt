@@ -51,8 +51,7 @@ class ExtendedShapelessRecipe(
 
     override fun isSpecial(): Boolean = isRepair() || aspects.getBoolean("dynamic")
 
-    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
-    override fun getResultItem(ra: HolderLookup.Provider?): ItemStack =
+    override fun getResultItem(ra: HolderLookup.Provider): ItemStack =
         if (isSpecial()) ItemStack.EMPTY else result
 
     override fun getIngredients(): NonNullList<Ingredient> = ingredients
@@ -83,7 +82,7 @@ class ExtendedShapelessRecipe(
                         remaining[i] = stack
                     } else {
                         val rstack = stack.copy()
-                        rstack.damageValue = rstack.damageValue + toolDamage
+                        rstack.damageValue += toolDamage
                         if (rstack.damageValue < rstack.maxDamage) remaining[i] = rstack
                     }
                 } else if (stack.item.hasCraftingRemainingItem()) {
@@ -95,8 +94,7 @@ class ExtendedShapelessRecipe(
         }
     }
 
-    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
-    override fun matches(input: CraftingInput, world: Level?): Boolean {
+    override fun matches(input: CraftingInput, world: Level): Boolean {
         val stacked = StackedContents()
         var i = 0
         for (j in 0 until input.size()) {
@@ -108,8 +106,7 @@ class ExtendedShapelessRecipe(
         return (i == ingredients.size) && stacked.canCraft(this, null)
     }
 
-    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
-    override fun assemble(inv: CraftingInput, ra: HolderLookup.Provider?): ItemStack {
+    override fun assemble(inv: CraftingInput, ra: HolderLookup.Provider): ItemStack {
         if (isRepair()) return getRepaired(inv).a
         val rstack = result.copy()
         if (rstack.isEmpty) return ItemStack.EMPTY

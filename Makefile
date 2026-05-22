@@ -167,7 +167,7 @@ KRIT_JAVA := $(shell \
   printf '%s' "java")
 KRIT := "$(KRIT_JAVA)" --enable-native-access=ALL-UNNAMED \
   --add-opens java.base/jdk.internal.misc=ALL-UNNAMED \
-  -jar $(KRIT_JAR) --common-checks --format text
+  -jar $(KRIT_JAR) --common-checks --config config/krit/krit.yml --format text --fail-on-severity WARNING
 
 $(KRIT_JAR): | $(TOOLS_DIR)
 	@echo "Downloading krit $(KRIT_VERSION)..."

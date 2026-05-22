@@ -1,0 +1,5 @@
+suppress:
+  # ktfmt 0.62 does not support the Kotlin 2.2.20 [...] destructuring syntax.
+  # Re-enable once ktfmt is updated to a version that handles it.
+  - CustomComponentDestructuringMigration
+  - DestructingShortFormNameMismatch

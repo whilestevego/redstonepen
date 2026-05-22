@@ -2,7 +2,6 @@ package wile.redstonepen.client
 
 import com.mojang.blaze3d.platform.Window
 import com.mojang.blaze3d.systems.RenderSystem
-import java.util.Arrays
 import java.util.function.Consumer
 import java.util.function.Function
 import net.fabricmc.api.EnvType
@@ -31,15 +30,15 @@ object Guis {
         menu: T,
         playerInv: Inventory,
         title: Component,
-        backgroundImage: String,
+        bgImage: String,
         width: Int,
         height: Int,
     ) : AbstractContainerScreen<T>(menu, playerInv, title) {
 
-        protected val background_image_: ResourceLocation =
-            ResourceLocation.fromNamespaceAndPath(Auxiliaries.modid(), backgroundImage)
-        protected val player_: Player = playerInv.player
-        protected val tooltip_: TooltipDisplay = TooltipDisplay()
+        protected val bgImage: ResourceLocation =
+            ResourceLocation.fromNamespaceAndPath(Auxiliaries.modid(), bgImage)
+        protected val player: Player = playerInv.player
+        protected val tooltip: TooltipDisplay = TooltipDisplay()
 
         init {
             imageWidth = width
@@ -50,8 +49,8 @@ object Guis {
             menu: T,
             playerInv: Inventory,
             title: Component,
-            backgroundImage: String,
-        ) : this(menu, playerInv, title, backgroundImage, 0, 0)
+            bgImage: String,
+        ) : this(menu, playerInv, title, bgImage, 0, 0)
 
         override fun init() {
             super.init()
@@ -60,7 +59,7 @@ object Guis {
         override fun render(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             renderBackground(gg, mouseX, mouseY, partialTicks)
             super.render(gg, mouseX, mouseY, partialTicks)
-            if (!tooltip_.render(gg, this, mouseX, mouseY)) renderTooltip(gg, mouseX, mouseY)
+            if (!tooltip.render(gg, this, mouseX, mouseY)) renderTooltip(gg, mouseX, mouseY)
         }
 
         override fun renderLabels(gg: GuiGraphics, x: Int, y: Int) {}
@@ -71,13 +70,13 @@ object Guis {
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            RenderSystem.setShaderTexture(0, background_image_)
-            gg.blit(background_image_, leftPos, topPos, 0, 0, imageWidth, imageHeight)
+            RenderSystem.setShaderTexture(0, bgImage)
+            gg.blit(bgImage, leftPos, topPos, 0, 0, imageWidth, imageHeight)
             renderBgWidgets(gg, partialTicks, mouseX, mouseY)
             RenderSystem.disableBlend()
         }
 
-        fun getBackgroundImage(): ResourceLocation = background_image_
+        fun getBackgroundImage(): ResourceLocation = bgImage
 
         fun getGuiLeft(): Int = leftPos
 
@@ -101,8 +100,8 @@ object Guis {
             gg.renderItem(stack, x0 + x, y0 + y)
             RenderSystem.colorMask(true, true, true, true)
             RenderSystem.setShaderColor(0.7f, 0.7f, 0.7f, 0.4f)
-            RenderSystem.setShaderTexture(0, background_image_)
-            gg.blit(background_image_, x0 + x, y0 + y, x, y, 16, 16)
+            RenderSystem.setShaderTexture(0, bgImage)
+            gg.blit(bgImage, x0 + x, y0 + y, x, y, 16, 16)
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
             RenderSystem.disableBlend()
         }
@@ -123,31 +122,31 @@ object Guis {
     open class UiWidget(x: Int, y: Int, width: Int, height: Int, title: Component) :
         net.minecraft.client.gui.components.AbstractWidget(x, y, width, height, title) {
 
-        private val mc_: Minecraft = Minecraft.getInstance()
-        private var tooltip_: Function<UiWidget, Component> = NO_TOOLTIP
-        private var parent_: Screen? = null
+        private val mc: Minecraft = Minecraft.getInstance()
+        private var tooltipProvider: Function<UiWidget, Component> = NO_TOOLTIP
+        private var parent: Screen? = null
 
         open fun init(parent: Screen): UiWidget {
-            parent_ = parent
-            setX(getX() + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0)
-            setY(getY() + if (parent is ContainerGui<*>) parent.getGuiTop() else 0)
+            this.parent = parent
+            x += if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
+            y += if (parent is ContainerGui<*>) parent.getGuiTop() else 0
             return this
         }
 
         open fun init(parent: Screen, position: Coord2d): UiWidget {
-            parent_ = parent
-            setX(position.x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0)
-            setY(position.y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0)
+            this.parent = parent
+            x = position.x + if (parent is ContainerGui<*>) parent.getGuiLeft() else 0
+            y = position.y + if (parent is ContainerGui<*>) parent.getGuiTop() else 0
             return this
         }
 
         fun tooltip(tip: Function<UiWidget, Component>): UiWidget {
-            tooltip_ = tip
+            tooltipProvider = tip
             return this
         }
 
         fun tooltip(tip: Component): UiWidget {
-            tooltip_ = Function { tip }
+            tooltipProvider = Function { tip }
             return this
         }
 
@@ -156,17 +155,15 @@ object Guis {
         override fun getHeight(): Int = height
 
         fun getMousePosition(): Coord2d {
-            val win: Window = mc_.window
+            val win: Window = mc.window
             return Coord2d.of(
                 Mth.clamp(
-                    (mc_.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() -
-                        getX(),
+                    (mc.mouseHandler.xpos() * win.guiScaledWidth / win.screenWidth).toInt() - x,
                     -1,
                     width + 1,
                 ),
                 Mth.clamp(
-                    (mc_.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() -
-                        getY(),
+                    (mc.mouseHandler.ypos() * win.guiScaledHeight / win.screenHeight).toInt() - y,
                     -1,
                     height + 1,
                 ),
@@ -175,9 +172,9 @@ object Guis {
 
         protected fun screenCoordinates(xy: Coord2d, reverse: Boolean): Coord2d =
             if (reverse) {
-                Coord2d.of(xy.x + getX(), xy.y + getY())
+                Coord2d.of(xy.x + x, xy.y + y)
             } else {
-                Coord2d.of(xy.x - getX(), xy.y - getY())
+                Coord2d.of(xy.x - x, xy.y - y)
             }
 
         fun show(): UiWidget {
@@ -194,15 +191,15 @@ object Guis {
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
-            setTooltip(null)
+            tooltip = null
         }
 
         @Suppress("all")
         fun renderToolTip(gg: GuiGraphics, mouseX: Int, mouseY: Int) {
-            if (!visible || !active || tooltip_ === NO_TOOLTIP) return
-            val tip = tooltip_.apply(this)
+            if (!visible || !active || tooltipProvider === NO_TOOLTIP) return
+            val tip = tooltipProvider.apply(this)
             if (tip.string.trim().isEmpty()) return
-            gg.renderTooltip(mc_.font, Arrays.asList(tip.visualOrderText), mouseX, mouseY)
+            gg.renderTooltip(mc.font, listOf(tip.visualOrderText), mouseX, mouseY)
         }
 
         companion object {
@@ -213,99 +210,100 @@ object Guis {
 
     @Environment(EnvType.CLIENT)
     class CheckBox(
-        atlas: ResourceLocation,
+        private val atlas: ResourceLocation,
         width: Int,
         height: Int,
         atlasTexturePositionOff: Coord2d,
         atlasTexturePositionOn: Coord2d,
     ) : UiWidget(0, 0, width, height, EMPTY_TEXT) {
 
-        private val texture_position_off_: Coord2d = atlasTexturePositionOff
-        private val texture_position_on_: Coord2d = atlasTexturePositionOn
-        private val atlas_: ResourceLocation = atlas
-        private var checked_: Boolean = false
-        private var on_click_: Consumer<CheckBox> = Consumer {}
+        private val texturePositionOff: Coord2d = atlasTexturePositionOff
+        private val texturePositionOn: Coord2d = atlasTexturePositionOn
+        private var isChecked: Boolean = false
+        private var onClickAction: Consumer<CheckBox> = Consumer {}
 
-        fun checked(): Boolean = checked_
+        fun checked(): Boolean = isChecked
 
         fun checked(on: Boolean): CheckBox {
-            checked_ = on
+            isChecked = on
             return this
         }
 
         fun onclick(action: Consumer<CheckBox>): CheckBox {
-            on_click_ = action
+            onClickAction = action
             return this
         }
 
         override fun onClick(mouseX: Double, mouseY: Double) {
-            checked_ = !checked_
-            on_click_.accept(this)
+            isChecked = !isChecked
+            onClickAction.accept(this)
         }
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
-            RenderSystem.setShaderTexture(0, atlas_)
+            RenderSystem.setShaderTexture(0, atlas)
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            val pos = if (checked_) texture_position_on_ else texture_position_off_
-            gg.blit(atlas_, getX(), getY(), pos.x, pos.y, width, height)
+            val pos = if (isChecked) texturePositionOn else texturePositionOff
+            gg.blit(atlas, x, y, pos.x, pos.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
 
     @Environment(EnvType.CLIENT)
     class ImageButton(
-        atlas: ResourceLocation,
+        private val atlas: ResourceLocation,
         width: Int,
         height: Int,
         atlasTexturePosition: Coord2d,
     ) : UiWidget(0, 0, width, height, Component.empty()) {
 
-        private val texture_position_: Coord2d = atlasTexturePosition
-        private val atlas_: ResourceLocation = atlas
-        private var on_click_: Consumer<ImageButton> = Consumer {}
+        private val texturePosition: Coord2d = atlasTexturePosition
+        private var onClickAction: Consumer<ImageButton> = Consumer {}
 
         fun onclick(action: Consumer<ImageButton>): ImageButton {
-            on_click_ = action
+            onClickAction = action
             return this
         }
 
         override fun onClick(mouseX: Double, mouseY: Double) {
-            on_click_.accept(this)
+            onClickAction.accept(this)
         }
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
-            RenderSystem.setShaderTexture(0, atlas_)
+            RenderSystem.setShaderTexture(0, atlas)
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            gg.blit(atlas_, getX(), getY(), texture_position_.x, texture_position_.y, width, height)
+            gg.blit(atlas, x, y, texturePosition.x, texturePosition.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Image(atlas: ResourceLocation, width: Int, height: Int, atlasTexturePosition: Coord2d) :
-        UiWidget(0, 0, width, height, Component.empty()) {
+    class Image(
+        private val atlas: ResourceLocation,
+        width: Int,
+        height: Int,
+        atlasTexturePosition: Coord2d,
+    ) : UiWidget(0, 0, width, height, Component.empty()) {
 
-        private val texture_position_: Coord2d = atlasTexturePosition
-        private val atlas_: ResourceLocation = atlas
+        private val texturePosition: Coord2d = atlasTexturePosition
 
         override fun onClick(mouseX: Double, mouseY: Double) {}
 
         override fun renderWidget(gg: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
-            RenderSystem.setShaderTexture(0, atlas_)
+            RenderSystem.setShaderTexture(0, atlas)
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
-            gg.blit(atlas_, getX(), getY(), texture_position_.x, texture_position_.y, width, height)
+            gg.blit(atlas, x, y, texturePosition.x, texturePosition.y, width, height)
             if (isHovered) renderToolTip(gg, mouseX, mouseY)
         }
     }
@@ -315,7 +313,7 @@ object Guis {
         net.minecraft.client.gui.components.EditBox(font, x, y, width, height, title) {
 
         init {
-            setBordered(false)
+            isBordered = false
         }
 
         fun withMaxLength(len: Int): TextBox {

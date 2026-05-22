@@ -24,7 +24,7 @@ import wile.redstonepen.util.Auxiliaries
 object ModRenderers {
 
     @Environment(EnvType.CLIENT)
-    class TrackTer(_ctx: BlockEntityRendererProvider.Context?) :
+    class TrackTer(ctx: BlockEntityRendererProvider.Context?) :
         BlockEntityRenderer<TrackBlockEntity> {
 
         companion object {
@@ -38,8 +38,8 @@ object ModRenderers {
 
             @JvmStatic
             fun registerModels(): List<ResourceLocation> {
-                val resources_to_register = ArrayList<ResourceLocation>()
-                RedstoneTrackDefs.models.STATE_WIRE_MAPPING.forEach { (key, value) ->
+                val resourcesToRegister = ArrayList<ResourceLocation>()
+                RedstoneTrackDefs.Models.STATE_WIRE_MAPPING.forEach { (key, value) ->
                     val mrl =
                         requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
                             .withPrefix("item/")
@@ -49,9 +49,9 @@ object ModRenderers {
                             break
                         }
                     }
-                    resources_to_register.add(mrl)
+                    resourcesToRegister.add(mrl)
                 }
-                RedstoneTrackDefs.models.STATE_CONNECT_MAPPING.forEach { (key, value) ->
+                RedstoneTrackDefs.Models.STATE_CONNECT_MAPPING.forEach { (key, value) ->
                     val mrl =
                         requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
                             .withPrefix("item/")
@@ -61,9 +61,9 @@ object ModRenderers {
                             break
                         }
                     }
-                    resources_to_register.add(mrl)
+                    resourcesToRegister.add(mrl)
                 }
-                RedstoneTrackDefs.models.STATE_CNTWIRE_MAPPING.forEach { (key, value) ->
+                RedstoneTrackDefs.Models.STATE_CNTWIRE_MAPPING.forEach { (key, value) ->
                     val mrl =
                         requireNotNull(ResourceLocation.tryBuild(ModConstants.MODID, value))
                             .withPrefix("item/")
@@ -73,7 +73,7 @@ object ModRenderers {
                             break
                         }
                     }
-                    resources_to_register.add(mrl)
+                    resourcesToRegister.add(mrl)
                 }
                 power_rgb.clear()
                 for (i in 0..15) {
@@ -86,13 +86,13 @@ object ModRenderers {
                         )
                     )
                 }
-                return resources_to_register
+                return resourcesToRegister
             }
 
             private fun getPowerRGB(p: Int): Vec3 = power_rgb[p and 0xf]
         }
 
-        private val broken_entities_ = WeakHashMap<TrackBlockEntity, Long>()
+        private val brokenEntities = WeakHashMap<TrackBlockEntity, Long>()
 
         @Suppress("DEPRECATION")
         override fun render(
@@ -103,13 +103,13 @@ object ModRenderers {
             combinedLightIn: Int,
             combinedOverlayIn: Int,
         ) {
-            val current_flags = te.getStateFlags()
-            if (broken_entities_.getOrDefault(te, current_flags.inv()) == current_flags) return
+            val currentFlags = te.getStateFlags()
+            if (brokenEntities.getOrDefault(te, currentFlags.inv()) == currentFlags) return
             mxs.pushPose()
             try {
-                val block_state: BlockState = te.blockState
+                val blockState: BlockState = te.blockState
                 val vxb: VertexConsumer =
-                    buf.getBuffer(ItemBlockRenderTypes.getRenderType(block_state, false))
+                    buf.getBuffer(ItemBlockRenderTypes.getRenderType(blockState, false))
                 val overlay = OverlayTexture.pack(0, 0)
                 run {
                     val wirfl = te.getWireFlags()
@@ -120,7 +120,7 @@ object ModRenderers {
                             val rgb =
                                 getPowerRGB(
                                     te.getSidePower(
-                                        RedstoneTrackDefs.connections.CONNECTION_BIT_ORDER[i / 4]
+                                        RedstoneTrackDefs.Connections.CONNECTION_BIT_ORDER[i / 4]
                                     )
                                 )
                             val model =
@@ -158,7 +158,7 @@ object ModRenderers {
                             val rgb =
                                 getPowerRGB(
                                     te.getSidePower(
-                                        RedstoneTrackDefs.connections.CONNECTION_BIT_ORDER[i]
+                                        RedstoneTrackDefs.Connections.CONNECTION_BIT_ORDER[i]
                                     )
                                 )
                             val model =
@@ -195,13 +195,13 @@ object ModRenderers {
                     }
                 }
             } catch (e: Throwable) {
-                if (!broken_entities_.containsKey(te)) {
+                if (!brokenEntities.containsKey(te)) {
                     Auxiliaries.logError(
                         "TER render error for track at ${te.blockPos}, exception: ${e.message}"
                     )
                     Auxiliaries.logError(e.stackTrace.joinToString("\n") { it.toString() })
                 }
-                broken_entities_[te] = current_flags
+                brokenEntities[te] = currentFlags
             } finally {
                 mxs.popPose()
             }

@@ -84,7 +84,7 @@ object InventoriesTests {
         val container = SimpleContainer(2)
         container.setItem(0, ItemStack(Items.REDSTONE, 20))
         val ir = Inventories.InventoryRange(container)
-        val extracted = ir.extract(10, false, true)
+        val extracted = ir.extract(10, random = false, simulate = true)
         if (extracted.count != 10) {
             helper.fail("simulate extract must return the requested amount, got ${extracted.count}")
         }
@@ -102,7 +102,14 @@ object InventoriesTests {
         container.setItem(0, ItemStack(Items.STICK, 1))
         container.setItem(1, ItemStack(Items.STICK, 1))
         val ir = Inventories.InventoryRange(container)
-        val remaining = ir.insert(ItemStack(Items.REDSTONE, 5), true, 0, false, false)
+        val remaining =
+            ir.insert(
+                ItemStack(Items.REDSTONE, 5),
+                onlyFillup = true,
+                limit = 0,
+                reverse = false,
+                forceGroupStacks = false,
+            )
         if (remaining.isEmpty) {
             helper.fail("only_fillup with no matching slot must return the input, got empty")
         }

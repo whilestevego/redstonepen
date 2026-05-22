@@ -27,7 +27,7 @@ class ControlBoxUiContainer(
     Networking.INetworkSynchronisableContainer {
 
     companion object {
-        protected const val NUM_OF_SLOTS = 1
+        private const val NUM_OF_SLOTS = 1
     }
 
     constructor(
@@ -41,35 +41,35 @@ class ControlBoxUiContainer(
         SimpleContainerData(1),
     )
 
-    private val player_: Player = playerInventory.player
-    private val inventory_: Container = blockInventory
-    private val wpc_: ContainerLevelAccess = wpc
-    private val fields_: ContainerData = fields
+    private val player: Player = playerInventory.player
+    private val inventory: Container = blockInventory
+    private val wpc: ContainerLevelAccess = wpc
+    private val fields: ContainerData = fields
 
-    @Volatile private var received_server_data_: CompoundTag = CompoundTag()
+    @Volatile private var receivedServerData: CompoundTag = CompoundTag()
 
     init {
-        wpc_.execute { _, _ -> inventory_.startOpen(player_) }
-        addDataSlots(fields_)
+        this.wpc.execute { _, _ -> this.inventory.startOpen(this.player) }
+        addDataSlots(this.fields)
         for (x in 0 until 9) addSlot(Slot(playerInventory, x, 28 + x * 18, 183))
     }
 
-    fun field(index: Int): Int = fields_.get(index)
+    fun field(index: Int): Int = fields.get(index)
 
-    fun player(): Player = player_
+    fun player(): Player = player
 
-    fun inventory(): Container = inventory_
+    fun inventory(): Container = inventory
 
-    fun world(): Level = player_.level()
+    fun world(): Level = player.level()
 
     fun te(): ControlBoxBlockEntity? =
-        wpc_.evaluate { w, p -> w.getBlockEntity(p) as? ControlBoxBlockEntity }.orElse(null)
+        wpc.evaluate { w, p -> w.getBlockEntity(p) as? ControlBoxBlockEntity }.orElse(null)
 
-    override fun stillValid(player: Player): Boolean = inventory_.stillValid(player)
+    override fun stillValid(player: Player): Boolean = inventory.stillValid(player)
 
     override fun removed(player: Player) {
         super.removed(player)
-        inventory_.stopOpen(player)
+        inventory.stopOpen(player)
     }
 
     override fun sendAllDataToRemote() {
@@ -89,15 +89,15 @@ class ControlBoxUiContainer(
         te.collectSyncData(full)
 
     fun fetchReceivedServerData(): CompoundTag {
-        val received = received_server_data_
-        received_server_data_ = CompoundTag()
+        val received = receivedServerData
+        receivedServerData = CompoundTag()
         return received
     }
 
     override fun onServerPacketReceived(windowId: Int, nbt: CompoundTag) {
         when (nbt.getString("action")) {
             "serverdata" -> {
-                received_server_data_ = nbt
+                receivedServerData = nbt
             }
         }
     }

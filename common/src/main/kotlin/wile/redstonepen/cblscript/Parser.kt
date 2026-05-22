@@ -245,13 +245,14 @@ private class LineParser(
     private fun parseRel(): Expression {
         var x = parseAdd()
         while (true) {
-            if (adv("!=")) x = NeqExpression(x, parseAdd(), tv, fv)
-            else if (adv("<>")) x = NeqExpression(x, parseAdd(), tv, fv)
-            else if (adv("==")) x = EqExpression(x, parseAdd(), tv, fv)
-            else if (adv(">=")) x = GeExpression(x, parseAdd(), tv, fv)
-            else if (adv("<=")) x = LeExpression(x, parseAdd(), tv, fv)
-            else if (adv('>')) x = GtExpression(x, parseAdd(), tv, fv)
-            else if (adv('<')) x = LtExpression(x, parseAdd(), tv, fv) else return x
+            x =
+                if (adv("!=")) NeqExpression(x, parseAdd(), tv, fv)
+                else if (adv("<>")) NeqExpression(x, parseAdd(), tv, fv)
+                else if (adv("==")) EqExpression(x, parseAdd(), tv, fv)
+                else if (adv(">=")) GeExpression(x, parseAdd(), tv, fv)
+                else if (adv("<=")) LeExpression(x, parseAdd(), tv, fv)
+                else if (adv('>')) GtExpression(x, parseAdd(), tv, fv)
+                else if (adv('<')) LtExpression(x, parseAdd(), tv, fv) else return x
         }
     }
 
@@ -314,7 +315,7 @@ private class LineParser(
     private fun isIdentChar(): Boolean = c in 'a'..'z' || c in '0'..'9' || c == '.' || c == '_'
 
     private fun readIdentifier(): String {
-        if (c < 'a' || c > 'z') return ""
+        if (c !in 'a'..'z') return ""
         val p0 = pos
         while (isIdentChar()) adv()
         return line.substring(p0, pos).lowercase()

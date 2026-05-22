@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Function
 import java.util.stream.Collectors
+import kotlin.math.floor
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
@@ -224,7 +225,7 @@ object Auxiliaries {
             advancedTooltipTranslationKey: String?,
             helpTranslationKey: String?,
             tooltip: MutableList<Component>,
-            _flag: TooltipFlag,
+            flag: TooltipFlag,
             addAdvancedTooltipHints: Boolean,
         ): Boolean {
             val helpAvailable =
@@ -266,16 +267,16 @@ object Auxiliaries {
         @Environment(EnvType.CLIENT)
         fun addInformation(
             stack: ItemStack,
-            _ctx: Item.TooltipContext,
+            ctx: Item.TooltipContext,
             tooltip: MutableList<Component>,
-            _flag: TooltipFlag,
+            flag: TooltipFlag,
             addAdvancedTooltipHints: Boolean,
         ): Boolean =
             addInformation(
                 stack.descriptionId,
                 stack.descriptionId,
                 tooltip,
-                _flag,
+                flag,
                 addAdvancedTooltipHints,
             )
     }
@@ -462,32 +463,23 @@ object Auxiliaries {
         Array(bbs.size) { i -> mapper.apply(bbs[i]) }
 
     class BlockPosRange(x0: Int, y0: Int, z0: Int, x1: Int, y1: Int, z1: Int) : Iterable<BlockPos> {
-        internal val x0: Int
-        internal val x1: Int
-        internal val y0: Int
-        internal val y1: Int
-        internal val z0: Int
-        internal val z1: Int
-
-        init {
-            this.x0 = minOf(x0, x1)
-            this.x1 = maxOf(x0, x1)
-            this.y0 = minOf(y0, y1)
-            this.y1 = maxOf(y0, y1)
-            this.z0 = minOf(z0, z1)
-            this.z1 = maxOf(z0, z1)
-        }
+        internal val x0: Int = minOf(x0, x1)
+        internal val x1: Int = maxOf(x0, x1)
+        internal val y0: Int = minOf(y0, y1)
+        internal val y1: Int = maxOf(y0, y1)
+        internal val z0: Int = minOf(z0, z1)
+        internal val z1: Int = maxOf(z0, z1)
 
         companion object {
             @JvmStatic
             fun of(range: AABB): BlockPosRange =
                 BlockPosRange(
-                    Math.floor(range.minX).toInt(),
-                    Math.floor(range.minY).toInt(),
-                    Math.floor(range.minZ).toInt(),
-                    Math.floor(range.maxX - 0.0625).toInt(),
-                    Math.floor(range.maxY - 0.0625).toInt(),
-                    Math.floor(range.maxZ - 0.0625).toInt(),
+                    floor(range.minX).toInt(),
+                    floor(range.minY).toInt(),
+                    floor(range.minZ).toInt(),
+                    floor(range.maxX - 0.0625).toInt(),
+                    floor(range.maxY - 0.0625).toInt(),
+                    floor(range.maxZ - 0.0625).toInt(),
                 )
         }
 

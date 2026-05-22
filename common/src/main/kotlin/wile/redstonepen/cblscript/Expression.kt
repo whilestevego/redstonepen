@@ -35,7 +35,7 @@ internal class VarRefExpression(private val name: String) : Expression {
  */
 internal class FuncExpression(
     private val name: String,
-    private val arity: Int,
+    arity: Int,
     private val func: (Array<Expression>, MutableMap<String, Int>) -> Int,
     private val args: List<Expression>,
 ) : Expression {

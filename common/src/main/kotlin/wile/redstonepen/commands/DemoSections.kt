@@ -19,7 +19,7 @@ import wile.redstonepen.registry.Registries
 
 object DemoSections {
 
-    private val FLAGS = DemoBuilder.FLAGS
+    private const val FLAGS = DemoBuilder.FLAGS
     private const val CELL_SIZE = 9
     private const val GRID_COLUMNS = 4
     private const val GRID_SPACING = CELL_SIZE + 1
@@ -556,7 +556,7 @@ object DemoSections {
     }
 
     private fun wireBit(face: Direction, wireDirection: Direction): Long =
-        RedstoneTrackDefs.connections.getWireBit(face, wireDirection)
+        RedstoneTrackDefs.Connections.getWireBit(face, wireDirection)
 
     private fun placePenTrack(level: Level, pos: BlockPos, wireFlags: Long) {
         level.setBlock(pos, Registries.requireBlock("track").defaultBlockState(), FLAGS)

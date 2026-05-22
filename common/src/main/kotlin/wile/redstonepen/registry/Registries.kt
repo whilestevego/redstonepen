@@ -216,7 +216,7 @@ object Registries {
                                     }
                             }
                             .toTypedArray()
-                    @Suppress("SpreadOperator", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                    @Suppress("SpreadOperator", "TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
                     BlockEntityType.Builder.of(ctor::create, *blocks).build(null)
                 },
             )
@@ -254,12 +254,10 @@ object Registries {
         blockSupplier: Supplier<TB>,
         itemBuilder: BiFunction<Block, Item.Properties, Item>,
     ) {
-        @Suppress("UNCHECKED_CAST")
         addBlock(
             registryName,
             blockSupplier,
-            Supplier { itemBuilder.apply(registeredBlocks[registryName]!!, Item.Properties()) }
-                as Supplier<Item>,
+            Supplier { itemBuilder.apply(registeredBlocks[registryName]!!, Item.Properties()) },
         )
     }
 

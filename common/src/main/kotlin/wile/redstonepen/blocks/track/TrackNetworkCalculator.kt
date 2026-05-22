@@ -6,7 +6,7 @@ import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
-import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.Connections
 import wile.redstonepen.util.Auxiliaries
 
 /**
@@ -83,7 +83,7 @@ internal class TrackNetworkCalculator(
 
         newNets
             .filter { it.power > 0 }
-            .forEach { net -> allNeighbours.addAll(net.neighbour_positions) }
+            .forEach { net -> allNeighbours.addAll(net.neighbourPositions) }
 
         return Result(newNets, newStateFlags, trackConnectionUpdates, allNeighbours)
     }
@@ -104,8 +104,8 @@ internal class TrackNetworkCalculator(
         currentSidePowers: IntArray,
     ) {
         previousNets.forEach { net ->
-            net.internal_sides.forEach { ps -> currentSidePowers[ps.ordinal] = net.power }
-            allNeighbours.addAll(net.neighbour_positions)
+            net.internalSides.forEach { ps -> currentSidePowers[ps.ordinal] = net.power }
+            allNeighbours.addAll(net.neighbourPositions)
         }
         if (trace) {
             Auxiliaries.logWarn(
@@ -148,7 +148,7 @@ internal class TrackNetworkCalculator(
         var externalConnectionFlags =
             stateFlags.raw and
                 (RedstoneTrackDefs.STATE_FLAG_WIR_MASK or RedstoneTrackDefs.STATE_FLAG_CON_MASK)
-        for ((wireBitPair, _) in connections.INTERNAL_EDGE_CONNECTION_MAPPING) {
+        for ((wireBitPair, _) in Connections.INTERNAL_EDGE_CONNECTION_MAPPING) {
             if ((stateFlags.raw and wireBitPair) != wireBitPair) continue
             externalConnectionFlags = externalConnectionFlags and wireBitPair.inv()
             for (i in 0 until 6) {
@@ -267,7 +267,7 @@ internal class TrackNetworkCalculator(
             for (j in 0 until 6) {
                 val mask = 0xfL shl (4 * j)
                 val bulk = 0x1L shl (RedstoneTrackDefs.STATE_FLAG_CON_POS + j)
-                val side = connections.CONNECTION_BIT_ORDER[j]
+                val side = Connections.CONNECTION_BIT_ORDER[j]
                 if ((internalConnectedSides[i] and mask) != 0L) intSides.add(side)
                 if ((externalConnectedRoutes[i] and mask) != 0L) {
                     discoverWireNeighbours(
@@ -293,7 +293,7 @@ internal class TrackNetworkCalculator(
             }
             if (positions.isNotEmpty()) {
                 val net = TrackNet(positions, extSides, ArrayList(intSides), ArrayList(pwrSides))
-                net.power = net.internal_sides.maxOfOrNull { currentSidePowers[it.ordinal] } ?: 0
+                net.power = net.internalSides.maxOfOrNull { currentSidePowers[it.ordinal] } ?: 0
                 newNets.add(net)
                 usedSides.addAll(intSides)
             }
@@ -317,7 +317,7 @@ internal class TrackNetworkCalculator(
      * The `diagonalCheck` flag is set when the straight target exists but the reciprocal wire bit
      * is absent, signalling the connection is not mutual and the diagonal path should be tried.
      *
-     * @param j Direction slot index (0–5) into [connections.CONNECTION_BIT_ORDER].
+     * @param j Direction slot index (0–5) into [Connections.CONNECTION_BIT_ORDER].
      * @param side The [Direction] corresponding to slot [j].
      * @param routeFlags The external route flags for the current net group.
      * @param intSides Accumulator for internal sides belonging to this net.
@@ -339,14 +339,14 @@ internal class TrackNetworkCalculator(
         for (k in 0 until 4) {
             val wireBit = 0x1L shl (4 * j + k)
             if ((routeFlags and wireBit) == 0L) continue
-            val tsd = connections.getWireBitSideAndDirection(wireBit)
+            val tsd = Connections.getWireBitSideAndDirection(wireBit)
             val tsid = tsd.getA()
             val tdir = tsd.getB()
             val wirePos = pos.relative(tdir)
             val wireState = level.getBlockState(wirePos)
             var diagonalCheck = false
             if (wireState.`is`(block)) {
-                val adjacentMask = connections.getWireBit(tsid, tdir.opposite)
+                val adjacentMask = Connections.getWireBit(tsid, tdir.opposite)
                 val adjTe = RedstoneTrackBlock.tile(level, wirePos).orElse(null)
                 if (adjTe == null || (adjTe.getStateFlags() and adjacentMask) != adjacentMask) {
                     diagonalCheck = true
@@ -381,7 +381,7 @@ internal class TrackNetworkCalculator(
                 val trackPos = wirePos.relative(tsid)
                 val trackState = level.getBlockState(trackPos)
                 if (!trackState.`is`(block)) return@run
-                val adjacentMask = connections.getWireBit(tdir.opposite, tsid.opposite)
+                val adjacentMask = Connections.getWireBit(tdir.opposite, tsid.opposite)
                 val adjTe = RedstoneTrackBlock.tile(level, trackPos).orElse(null)
                 if (adjTe == null || (adjTe.getStateFlags() and adjacentMask) != adjacentMask) {
                     return@run
@@ -404,7 +404,7 @@ internal class TrackNetworkCalculator(
     // Power bits for sides that are no longer part of any net must be explicitly cleared;
     // they are not overwritten by net construction and would otherwise carry stale values.
     private fun zeroUnusedSidePowers(usedSides: Set<Direction>): TrackStateFlags =
-        Direction.values()
+        Direction.entries
             .filter { !usedSides.contains(it) }
             .fold(stateFlags) { flags, side -> flags.withSidePower(side, 0) }
 
@@ -430,16 +430,16 @@ internal class TrackNetworkCalculator(
         val disconnectedNeighbours = HashSet<BlockPos>(allNeighbours)
         val connectedNeighbours = HashSet<BlockPos>()
         newNets.forEach { net ->
-            net.neighbour_positions.forEach { disconnectedNeighbours.remove(it) }
+            net.neighbourPositions.forEach { disconnectedNeighbours.remove(it) }
         }
-        newNets.forEach { net -> connectedNeighbours.addAll(net.neighbour_positions) }
+        newNets.forEach { net -> connectedNeighbours.addAll(net.neighbourPositions) }
         allNeighbours.forEach { connectedNeighbours.remove(it) }
         if (trace) {
             val poss = TrackBlockEntity.posstr(pos)
             for (net in newNets) {
                 val adjacentDesc =
-                    (0 until net.neighbour_positions.size).map { i ->
-                        "${TrackBlockEntity.posstr(net.neighbour_positions[i])}:${net.neighbour_sides[i]}"
+                    net.neighbourPositions.indices.map { i ->
+                        "${TrackBlockEntity.posstr(net.neighbourPositions[i])}:${net.neighbourSides[i]}"
                     }
                 Auxiliaries.logWarn(
                     String.format(
@@ -447,8 +447,8 @@ internal class TrackNetworkCalculator(
                         "UCON: %s adj:%s | ints:%s | pwrs:%s",
                         poss,
                         adjacentDesc.joinToString(", "),
-                        net.internal_sides.joinToString(",") { it.toString() },
-                        net.power_sides.joinToString(",") { it.toString() },
+                        net.internalSides.joinToString(",") { it.toString() },
+                        net.powerSides.joinToString(",") { it.toString() },
                     )
                 )
             }

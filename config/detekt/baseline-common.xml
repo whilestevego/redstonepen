@@ -11,7 +11,7 @@
     <ID>CyclomaticComplexMethod:Inventories.kt$Inventories.InventoryRange$fun extract(amount: Int, random: Boolean, simulate: Boolean): ItemStack</ID>
     <ID>CyclomaticComplexMethod:Inventories.kt$Inventories.InventoryRange$fun insert( inputStack: ItemStack, onlyFillup: Boolean, limit: Int, reverse: Boolean, forceGroupStacks: Boolean, ): ItemStack</ID>
     <ID>CyclomaticComplexMethod:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
-    <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
+    <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable changeNotifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
     <ID>CyclomaticComplexMethod:TrackBlockEntity.kt$TrackBlockEntity$private fun propagateEdit(face: Direction, originalPos: BlockPos, initialSidePower: Int)</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
     <ID>CyclomaticComplexMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun discoverWireNeighbours( j: Int, side: Direction, routeFlags: Long, intSides: MutableSet&lt;Direction&gt;, pwrSides: MutableList&lt;Direction&gt;, positions: MutableList&lt;BlockPos&gt;, extSides: MutableList&lt;Direction&gt;, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, )</ID>
@@ -30,11 +30,11 @@
     <ID>LongMethod:ModRenderers.kt$ModRenderers.TrackTer$@Suppress("DEPRECATION") override fun render( te: TrackBlockEntity, unused1: Float, mxs: PoseStack, buf: MultiBufferSource, combinedLightIn: Int, combinedOverlayIn: Int, )</ID>
     <ID>LongMethod:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
     <ID>LongMethod:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
-    <ID>LongMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
+    <ID>LongMethod:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable changeNotifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
     <ID>LongMethod:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
-    <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, )</ID>
+    <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, noAdd: Boolean, noRemove: Boolean, )</ID>
     <ID>LongParameterList:RedstoneTrackBlock.kt$RedstoneTrackBlock$( world: Level, rand: RandomSource, pos: BlockPos, color: Vec3, from: Direction, to: Direction, minChance: Float, maxChance: Float, )</ID>
-    <ID>LongParameterList:TrackBlockEntity.kt$TrackBlockEntity$( pos: BlockPos, player: Player, used_stack: ItemStack, clicked_face: Direction, hitvec: Vec3, no_add: Boolean, no_remove: Boolean, no_bulk: Boolean, )</ID>
+    <ID>LongParameterList:TrackBlockEntity.kt$TrackBlockEntity$( pos: BlockPos, player: Player, usedStack: ItemStack, clickedFace: Direction, hitvec: Vec3, noAdd: Boolean, noRemove: Boolean, noBulk: Boolean, )</ID>
     <ID>LongParameterList:TrackNetworkCalculator.kt$TrackNetworkCalculator$( j: Int, side: Direction, routeFlags: Long, intSides: MutableSet&lt;Direction&gt;, pwrSides: MutableList&lt;Direction&gt;, positions: MutableList&lt;BlockPos&gt;, extSides: MutableList&lt;Direction&gt;, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, )</ID>
     <ID>LoopWithTooManyJumpStatements:Inventories.kt$Inventories.InventoryRange$for</ID>
     <ID>LoopWithTooManyJumpStatements:TrackBlockEntity.kt$TrackBlockEntity$for</ID>
@@ -238,23 +238,24 @@
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x04</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x08</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x0f0000</ID>
+    <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0xf00000</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x10</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$0x20</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$16</ID>
     <ID>MagicNumber:RedstoneTrackBlock.kt$RedstoneTrackBlock$2.4f</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000004L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x00000008L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x01222200L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x02111100L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x04440011L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x08880022L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x10004444L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$0x20008888L</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.connections$4</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x04</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x08</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x10</ID>
-    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.shape$0x20</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x00000004L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x00000008L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x01222200L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x02111100L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x04440011L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x08880022L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x10004444L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$0x20008888L</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Connections$4</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Shape$0x04</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Shape$0x08</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Shape$0x10</ID>
+    <ID>MagicNumber:RedstoneTrackDefs.kt$RedstoneTrackDefs.Shape$0x20</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$0.25f</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.3f</ID>
     <ID>MagicNumber:RemoteItem.kt$RemoteItem$1.5f</ID>
@@ -292,7 +293,7 @@
     <ID>NestedBlockDepth:Parser.kt$LineParser$private fun parseFactor(): Expression</ID>
     <ID>NestedBlockDepth:RedstonePenItem.kt$RedstonePenItem$override fun inventoryTick( stack: ItemStack, world: Level, entity: Entity, itemSlot: Int, isSelected: Boolean, )</ID>
     <ID>NestedBlockDepth:RelayTests.kt$RelayTests$@JvmStatic fun forwardThenReverseStateMappedFacingIsIdentity(helper: GameTestHelper)</ID>
-    <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable change_notifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
+    <ID>NestedBlockDepth:TrackBlockEntity.kt$TrackBlockEntity$fun handleNetNeighborChanged( net: TrackNet, fromPos: BlockPos, @Nullable fromNet: TrackNet?, @Nullable changeNotifications: MutableMap&lt;BlockPos, BlockPos&gt;?, )</ID>
     <ID>NestedBlockDepth:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun buildNets( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, currentSidePowers: IntArray, trackConnectionUpdates: MutableSet&lt;TrackBlockEntity&gt;, ): Pair&lt;List&lt;TrackNet&gt;, Set&lt;Direction&gt;&gt;</ID>
     <ID>NestedBlockDepth:TrackNetworkCalculator.kt$TrackNetworkCalculator$private fun computeConnectionRouting( internalConnectedSides: LongArray, externalConnectedRoutes: LongArray, )</ID>
     <ID>ReturnCount:BuiltinFunctions.kt$private fun timerOff( sym: String, x: Array&lt;Expression&gt;, m: MutableMap&lt;String, Int&gt;, policy: SignalPolicy, ): Int</ID>
@@ -306,7 +307,7 @@
     <ID>ReturnCount:Parser.kt$LineParser$private fun parseFactor(): Expression</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$override fun useOn(context: UseOnContext): InteractionResult</ID>
     <ID>ReturnCount:RedstonePenItem.kt$RedstonePenItem$private fun attack(stack: ItemStack, pos: BlockPos, player: Player): Boolean</ID>
-    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun applyPenEdit( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, no_add: Boolean, no_remove: Boolean, ): InteractionResult</ID>
+    <ID>ReturnCount:RedstoneTrackBlock.kt$RedstoneTrackBlock$fun applyPenEdit( state: BlockState, world: Level, pos: BlockPos, player: Player, stack: ItemStack, hand: InteractionHand, rtr: BlockHitResult, noAdd: Boolean, noRemove: Boolean, ): InteractionResult</ID>
     <ID>ReturnCount:RemoteItem.kt$RemoteItem$private fun onTriggerRemoteLink(world: ServerLevel, player: ServerPlayer, stack: ItemStack)</ID>
     <ID>ReturnCount:TooltipDisplay.kt$TooltipDisplay$@Suppress("UnusedParameter", "TooGenericExceptionCaught") fun &lt;T : AbstractContainerMenu&gt; render( gg: GuiGraphics, gui: AbstractContainerScreen&lt;T&gt;, x: Int, y: Int, ): Boolean</ID>
     <ID>TooManyFunctions:Auxiliaries.kt$Auxiliaries</ID>
@@ -318,5 +319,25 @@
     <ID>TooManyFunctions:RelayTests.kt$RelayTests</ID>
     <ID>TooManyFunctions:TrackBlockEntity.kt$TrackBlockEntity : StandardBlockEntityIPacketTileNotifyReceiver</ID>
     <ID>TooManyFunctions:TrackTests.kt$TrackTests</ID>
+    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$ctx: Item.TooltipContext</ID>
+    <ID>UnusedParameter:Auxiliaries.kt$Auxiliaries.Tooltip$flag: TooltipFlag</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$pos: BlockPos</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$side: Direction?</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$state: BlockState</ID>
+    <ID>UnusedParameter:BasicGauge.kt$BasicGauge.BasicGaugeBlock$world: BlockGetter</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$level: SignalGetter</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$pos: BlockPos</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$side: Direction</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$state: BlockState</ID>
+    <ID>UnusedParameter:CircuitComponents.kt$CircuitComponents.DirectedComponentBlock$world: BlockGetter</ID>
+    <ID>UnusedParameter:Inventories.kt$Inventories.InventoryRange$random: Boolean</ID>
+    <ID>UnusedParameter:RedstoneTrackBlock.kt$RedstoneTrackBlock$state: BlockState</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$pos: BlockPos</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$realSide: Direction?</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$redstoneSide: Direction</ID>
+    <ID>UnusedParameter:RsSignals.kt$RsSignals$world: BlockGetter</ID>
+    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$pos: BlockPos</ID>
+    <ID>UnusedParameter:TrackBlockEntity.kt$TrackBlockEntity$weak: Boolean</ID>
+    <ID>UnusedPrivateProperty:ModRenderers.kt$ModRenderers.TrackTer$ctx: BlockEntityRendererProvider.Context?</ID>
   </CurrentIssues>
 </SmellBaseline>

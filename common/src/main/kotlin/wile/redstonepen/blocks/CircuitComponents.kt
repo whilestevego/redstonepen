@@ -85,7 +85,7 @@ object CircuitComponents {
 
             private fun makeFacingMappings(): List<Direction> {
                 val maps = ArrayList<Direction>()
-                Direction.values().forEach { face ->
+                Direction.entries.forEach { face ->
                     when (face) {
                         Direction.DOWN,
                         Direction.UP -> {
@@ -130,7 +130,7 @@ object CircuitComponents {
                     return
                 }
                 for (state in states) {
-                    for (worldSide in Direction.values()) {
+                    for (worldSide in Direction.entries) {
                         val sm =
                             when (worldSide) {
                                 Direction.DOWN -> getDownFacing(state)
@@ -384,7 +384,7 @@ object CircuitComponents {
                 PLACEMENT_ROTATION[face.ordinal][dir.ordinal]
         }
 
-        protected val shapes_: HashMap<BlockState, VoxelShape> = HashMap()
+        protected val shapes: HashMap<BlockState, VoxelShape> = HashMap()
 
         constructor(
             config: Long,
@@ -399,7 +399,7 @@ object CircuitComponents {
                     .setValue(STATE, 0)
             )
             stateDefinition.possibleStates.forEach { state ->
-                shapes_[state] = mappedShape(state, aabbs)
+                shapes[state] = mappedShape(state, aabbs)
             }
             fillStateFacingLookups(stateDefinition.possibleStates)
         }
@@ -434,7 +434,7 @@ object CircuitComponents {
             source: BlockGetter,
             pos: BlockPos,
             selectionContext: CollisionContext,
-        ): VoxelShape = shapes_.getOrDefault(state, Shapes.block())
+        ): VoxelShape = shapes.getOrDefault(state, Shapes.block())
 
         override fun getCollisionShape(
             state: BlockState,
@@ -447,7 +447,7 @@ object CircuitComponents {
             state: BlockState,
             world: BlockGetter,
             pos: BlockPos,
-        ): VoxelShape = shapes_.getOrDefault(state, Shapes.block())
+        ): VoxelShape = shapes.getOrDefault(state, Shapes.block())
 
         override fun propagatesSkylightDown(
             state: BlockState,
@@ -457,8 +457,8 @@ object CircuitComponents {
 
         fun canConnectRedstone(
             state: BlockState,
-            _world: BlockGetter,
-            _pos: BlockPos,
+            world: BlockGetter,
+            pos: BlockPos,
             side: Direction?,
         ): Boolean = side == null || side != state.getValue(FACING)
 
@@ -559,10 +559,10 @@ object CircuitComponents {
 
         @Suppress("FunctionOnlyReturningConstant")
         fun shouldCheckWeakPower(
-            _state: BlockState,
-            _level: SignalGetter,
-            _pos: BlockPos,
-            _side: Direction,
+            state: BlockState,
+            level: SignalGetter,
+            pos: BlockPos,
+            side: Direction,
         ): Boolean = false
 
         override fun neighborChanged(
@@ -694,7 +694,7 @@ object CircuitComponents {
         protected open fun isPowered(state: BlockState, world: Level, pos: BlockPos): Boolean {
             val outputSide = getOutputFacing(state)
             val mountSide = state.getValue(FACING)
-            for (side in Direction.values()) {
+            for (side in Direction.entries) {
                 if (side == outputSide) continue
                 if (side == mountSide.opposite) continue
                 if (world.getSignal(pos.relative(side), side) > 0) return true
@@ -956,7 +956,7 @@ object CircuitComponents {
                                     !state.isSignalSource &&
                                     RsSignals.canEmitWeakPower(state, world, pos, redstoneSide)
                             ) {
-                                for (d in Direction.values()) {
+                                for (d in Direction.entries) {
                                     if (d == redstoneSide.opposite) continue
                                     sp =
                                         maxOf(

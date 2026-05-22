@@ -4,20 +4,20 @@ import wile.redstonepen.cblscript.CBLScript
 import wile.redstonepen.cblscript.Program
 import wile.redstonepen.cblscript.SignalPolicy
 
-private val RCA_SYMBOL_REGEX = Regex("^d[io][1]?[\\d][\\d]?\$")
+private val RCA_SYMBOL_REGEX = Regex("""^d[io][1]?[\d][\d]?$""")
 
 internal class ControlBoxLogic {
 
-    var input_mask = 0x00000000
-    var input_data = 0x00000000
-    var output_mask = 0x00000000
-    var output_data = 0x00000000
+    var inputMask = 0x00000000
+    var inputData = 0x00000000
+    var outputMask = 0x00000000
+    var outputData = 0x00000000
     var risingEdgeInterrupts = 0x00000000
     var fallingEdgeInterrupts = 0x00000000
-    var rca_input_mask = 0L
-    var rca_input_data = 0L
-    var rca_output_mask = 0L
-    var rca_output_data = 0L
+    var rcaInputMask = 0L
+    var rcaInputData = 0L
+    var rcaOutputMask = 0L
+    var rcaOutputData = 0L
 
     private val state: MutableMap<String, Int> = HashMap()
     private var program: Program = Program.EMPTY
@@ -43,34 +43,34 @@ internal class ControlBoxLogic {
 
     fun code(): String = codeText
 
-    fun code(new_code: String): Boolean {
-        if (codeText == new_code && program !== Program.EMPTY) {
+    fun code(newCode: String): Boolean {
+        if (codeText == newCode && program !== Program.EMPTY) {
             return program.isValid
         }
-        codeText = new_code
+        codeText = newCode
         program =
             CBLScript.compile(
-                code = new_code,
+                code = newCode,
                 policy = SignalPolicy.REDSTONE,
                 outputClamp = { sym, v ->
                     if (PortNames.ALL.contains(sym)) v.coerceIn(0, 15) else v
                 },
             )
-        input_mask = 0
-        output_mask = 0
-        rca_input_mask = 0
-        rca_output_mask = 0
+        inputMask = 0
+        outputMask = 0
+        rcaInputMask = 0
+        rcaOutputMask = 0
         state.clear()
         for (i in PortNames.ALL.indices) {
             val port = PortNames.ALL[i]
-            val bit = 0xf shl (4 * i)
-            if (program.referencedSymbols.any { it == port + ".co.re" || it == port + ".co.fe" })
-                state[port + ".co"] = 0
+            val portMask = 0xf shl (4 * i)
+            if (program.referencedSymbols.any { it == "${port}.co.re" || it == "${port}.co.fe" })
+                state["${port}.co"] = 0
             when {
-                program.assignedSymbols.contains(port) -> output_mask = output_mask or bit
+                program.assignedSymbols.contains(port) -> outputMask = outputMask or portMask
                 CBLScript.STANDARD_SYMBOL_SUFFIXES.any {
                     program.referencedSymbols.contains(port + it)
-                } -> input_mask = input_mask or bit
+                } -> inputMask = inputMask or portMask
             }
         }
         computeRcaMasks()
@@ -84,30 +84,30 @@ internal class ControlBoxLogic {
             val ch = sym.substring(2).toInt()
             if (ch > 15) continue
             val isInput = sym[1] == 'i'
-            if (isInput) rca_input_mask = rca_input_mask or (0xfL shl (ch * 4))
-            else rca_output_mask = rca_output_mask or (0xfL shl (ch * 4))
+            if (isInput) rcaInputMask = rcaInputMask or (0xfL shl (ch * 4))
+            else rcaOutputMask = rcaOutputMask or (0xfL shl (ch * 4))
         }
     }
 
     // Ports/channels no longer referenced by the new program lose their mask bits; AND the
     // cached data with the updated masks so stale values from old code don't persist.
     private fun clearStaleIoData() {
-        rca_input_data = rca_input_data and rca_input_mask
-        rca_output_data = rca_output_data and rca_output_mask
-        output_data = output_data and output_mask
-        input_data = input_data and input_mask
+        rcaInputData = rcaInputData and rcaInputMask
+        rcaOutputData = rcaOutputData and rcaOutputMask
+        outputData = outputData and outputMask
+        inputData = inputData and inputMask
     }
 
     fun tick() {
         for (i in 0 until PortNames.ALL.size) {
-            if ((input_mask and (0xf shl (4 * i))) != 0) {
-                symbol(PortNames.ALL[i], (input_data shr (4 * i)) and 0xf)
+            if ((inputMask and (0xf shl (4 * i))) != 0) {
+                symbol(PortNames.ALL[i], (inputData shr (4 * i)) and 0xf)
             }
         }
-        if (rca_input_mask != 0L) {
+        if (rcaInputMask != 0L) {
             for (i in 0 until 16) {
-                if ((rca_input_mask and (0xfL shl (4 * i))) != 0L) {
-                    symbol("di$i", ((rca_input_data shr (4 * i)) and 0xfL).toInt())
+                if ((rcaInputMask and (0xfL shl (4 * i))) != 0L) {
+                    symbol("di$i", ((rcaInputData shr (4 * i)) and 0xfL).toInt())
                 }
             }
         }
@@ -129,9 +129,9 @@ internal class ControlBoxLogic {
             }
         }
         for (i in 0 until PortNames.ALL.size) {
-            val port_mask = 0xf shl (4 * i)
-            if ((risingEdgeInterrupts and port_mask) != 0) symbol(PortNames.ALL[i] + ".re", 15)
-            if ((fallingEdgeInterrupts and port_mask) != 0) symbol(PortNames.ALL[i] + ".fe", 15)
+            val portMask = 0xf shl (4 * i)
+            if ((risingEdgeInterrupts and portMask) != 0) symbol(PortNames.ALL[i] + ".re", 15)
+            if ((fallingEdgeInterrupts and portMask) != 0) symbol(PortNames.ALL[i] + ".fe", 15)
         }
         risingEdgeInterrupts = 0
         fallingEdgeInterrupts = 0
@@ -140,21 +140,20 @@ internal class ControlBoxLogic {
         // only need to reduce it — never increase it.
         symbol(".deadline", 40)
         program.evaluate(state)
-        output_data = 0
+        outputData = 0
         for (i in 0 until PortNames.ALL.size) {
-            output_data = output_data or ((symbol(PortNames.ALL[i]) and 0xf) shl (4 * i))
+            outputData = outputData or ((symbol(PortNames.ALL[i]) and 0xf) shl (4 * i))
         }
-        output_data = output_data and output_mask
-        if (rca_output_mask != 0L) {
-            rca_output_data = 0L
+        outputData = outputData and outputMask
+        if (rcaOutputMask != 0L) {
+            rcaOutputData = 0L
             for (i in 0 until 16) {
-                if ((rca_output_mask and (0xfL shl (4 * i))) != 0L) {
-                    rca_output_data =
-                        rca_output_data or
-                            (Math.min(15, Math.max(0, symbol("do$i"))).toLong() shl (4 * i))
+                if ((rcaOutputMask and (0xfL shl (4 * i))) != 0L) {
+                    rcaOutputData =
+                        rcaOutputData or (minOf(15, maxOf(0, symbol("do$i"))).toLong() shl (4 * i))
                 }
             }
         }
-        rca_output_data = rca_output_data and rca_output_mask
+        rcaOutputData = rcaOutputData and rcaOutputMask
     }
 }

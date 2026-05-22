@@ -4,6 +4,8 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
@@ -11,9 +13,13 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.crafting.CraftingInput
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.Level
 
 class ExtendedShapelessRecipeTest :
     DescribeSpec({
+        val ra = mockk<HolderLookup.Provider>(relaxed = true)
+        val world = mockk<Level>(relaxed = true)
+
         fun recipe(ingredientCount: Int, aspects: CompoundTag): ExtendedShapelessRecipe {
             val ingredients = NonNullList.withSize(ingredientCount, Ingredient.EMPTY)
             return ExtendedShapelessRecipe(
@@ -120,13 +126,13 @@ class ExtendedShapelessRecipeTest :
 
         describe("result item") {
             it("getResultItem returns configured output for non-special recipe") {
-                recipe(1, CompoundTag()).getResultItem(null).item shouldBe Items.REDSTONE
+                recipe(1, CompoundTag()).getResultItem(ra).item shouldBe Items.REDSTONE
             }
 
             it("getResultItem empty for special dynamic recipe") {
                 val aspects = CompoundTag()
                 aspects.putBoolean("dynamic", true)
-                recipe(1, aspects).getResultItem(null).isEmpty shouldBe true
+                recipe(1, aspects).getResultItem(ra).isEmpty shouldBe true
             }
 
             it("assemble returns result stack for basic recipe") {
@@ -138,7 +144,7 @@ class ExtendedShapelessRecipeTest :
                         NonNullList.withSize(1, Ingredient.EMPTY),
                         CompoundTag(),
                     )
-                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
+                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), ra)
                 assertSoftly(out) {
                     item shouldBe Items.IRON_PICKAXE
                     damageValue shouldBe 0
@@ -156,7 +162,7 @@ class ExtendedShapelessRecipeTest :
                         NonNullList.withSize(1, Ingredient.EMPTY),
                         aspects,
                     )
-                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
+                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), ra)
                 (out.damageValue > 0) shouldBe true
             }
 
@@ -171,7 +177,7 @@ class ExtendedShapelessRecipeTest :
                         NonNullList.withSize(1, Ingredient.EMPTY),
                         aspects,
                     )
-                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
+                val out = r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), ra)
                 out.damageValue shouldBe 5
             }
 
@@ -184,7 +190,7 @@ class ExtendedShapelessRecipeTest :
                         NonNullList.withSize(1, Ingredient.EMPTY),
                         CompoundTag(),
                     )
-                r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), null)
+                r.assemble(CraftingInput.of(1, 1, listOf(ItemStack(Items.STICK))), ra)
                     .isEmpty shouldBe true
             }
         }
@@ -233,14 +239,14 @@ class ExtendedShapelessRecipeTest :
                 aspects.putInt("tool_repair", 100)
                 val r = recipe(1, aspects)
                 r.isSpecial() shouldBe true
-                r.getResultItem(null).isEmpty shouldBe true
+                r.getResultItem(ra).isEmpty shouldBe true
             }
 
             it("assemble returns healed tool stack") {
                 val r = repairRecipe(50)
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(120)
-                val out = r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null)
+                val out = r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), ra)
                 assertSoftly(out) {
                     item shouldBe Items.IRON_PICKAXE
                     (damageValue < 120) shouldBe true
@@ -259,7 +265,7 @@ class ExtendedShapelessRecipeTest :
                 val r = repairRecipe(50)
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(0)
-                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null).isEmpty shouldBe
+                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), ra).isEmpty shouldBe
                     true
             }
 
@@ -271,7 +277,7 @@ class ExtendedShapelessRecipeTest :
                 val r = recipe(2, aspects)
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(0)
-                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null) shouldNotBe null
+                r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), ra) shouldNotBe null
             }
 
             it("relative_repair_damage path triggers") {
@@ -282,7 +288,7 @@ class ExtendedShapelessRecipeTest :
                 val r = recipe(2, aspects)
                 val pickaxe = ItemStack(Items.IRON_PICKAXE)
                 pickaxe.setDamageValue(pickaxe.maxDamage - 10)
-                val out = r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), null)
+                val out = r.assemble(repairInput(pickaxe, ItemStack(Items.IRON_INGOT)), ra)
                 out.item shouldBe Items.IRON_PICKAXE
                 (out.damageValue < pickaxe.maxDamage - 10) shouldBe true
             }
@@ -295,7 +301,7 @@ class ExtendedShapelessRecipeTest :
                         1,
                         listOf(ItemStack(Items.IRON_INGOT), ItemStack(Items.IRON_INGOT)),
                     )
-                r.assemble(inv, null).isEmpty shouldBe true
+                r.assemble(inv, ra).isEmpty shouldBe true
             }
 
             it("non-damageable tool returns empty") {
@@ -309,14 +315,14 @@ class ExtendedShapelessRecipeTest :
                         1,
                         listOf(ItemStack(Items.STICK), ItemStack(Items.IRON_INGOT)),
                     )
-                r.assemble(inv, null).isEmpty shouldBe true
+                r.assemble(inv, ra).isEmpty shouldBe true
             }
         }
 
         describe("matches") {
             it("false for empty input with ingredients") {
                 val inv = CraftingInput.of(1, 1, listOf(ItemStack.EMPTY))
-                recipe(1, CompoundTag()).matches(inv, null) shouldBe false
+                recipe(1, CompoundTag()).matches(inv, world) shouldBe false
             }
         }
     })
