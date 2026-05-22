@@ -183,8 +183,8 @@ krit: $(KRIT_JAR)
 	@$(KRIT) --input common/src/main/kotlin --input common/src/main/java \
 	  --classpath $$(cat common/build/compile-classpath.txt)
 	@echo "Analyzing neoforge..."
-	@$(KRIT) --input neoforge/src/main/kotlin --input neoforge/src/main/java \
+	@$(KRIT) --input neoforge/src/main/kotlin \
 	  --classpath $$(cat neoforge/build/compile-classpath.txt)
 	@echo "Analyzing fabric..."
-	@$(KRIT) --input fabric/src/main/kotlin --input fabric/src/main/java \
+	@$(KRIT) --input fabric/src/main/kotlin \
 	  --classpath $$(cat fabric/build/compile-classpath.txt)
