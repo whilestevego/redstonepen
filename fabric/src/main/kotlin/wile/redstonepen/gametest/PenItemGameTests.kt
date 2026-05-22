@@ -577,5 +577,17 @@ class PenItemGameTests {
             helper.setBlock(POS.south().east(), Blocks.REDSTONE_BLOCK)
             helper.runAfterDelay(5, helper::succeed)
         }
+
+        @JvmStatic
+        @GameTest(template = EMPTY, timeoutTicks = 5)
+        fun pushRedstoneIntoFullRedstoneStackDropsExtra(helper: GameTestHelper) {
+            val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
+            // count=62, amount=3 → 62 > 64-3=61 → else branch → Inventories.give; stack count
+            // unchanged
+            val rs = ItemStack(Items.REDSTONE, 62)
+            RedstonePenItem.pushRedstone(rs, 3, player)
+            if (rs.count != 62) helper.fail("expected stack count 62 (unchanged), got ${rs.count}")
+            helper.succeed()
+        }
     }
 }

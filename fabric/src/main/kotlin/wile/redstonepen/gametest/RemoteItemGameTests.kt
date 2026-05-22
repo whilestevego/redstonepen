@@ -3,14 +3,17 @@ package wile.redstonepen.gametest
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.GameTest
 import net.minecraft.gametest.framework.GameTestHelper
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import wile.redstonepen.items.StandardItems
 import wile.redstonepen.registry.Registries
+import wile.redstonepen.util.Auxiliaries
 
 class RemoteItemGameTests {
     companion object {
@@ -77,6 +80,29 @@ class RemoteItemGameTests {
             val result =
                 (remote.item as StandardItems.BaseItem).onBlockStartBreak(remote, leverAbs, player)
             if (result) helper.fail("onBlockStartBreak must return false")
+            helper.succeed()
+        }
+
+        @JvmStatic
+        @GameTest(template = EMPTY, timeoutTicks = 10)
+        fun remoteDoesNotDoublePressAlreadyPoweredButton(helper: GameTestHelper) {
+            helper.setBlock(POS.below(), Blocks.STONE)
+            helper.setBlock(
+                POS,
+                Blocks.STONE_BUTTON.defaultBlockState().setValue(BlockStateProperties.POWERED, true),
+            )
+            val player: Player = helper.makeMockPlayer(GameType.SURVIVAL)
+            val remote = ItemStack(Registries.requireItem("remote"))
+            player.setItemInHand(InteractionHand.MAIN_HAND, remote)
+            val buttonAbs = helper.absolutePos(POS)
+            val nbt = CompoundTag()
+            nbt.putLong("pos", buttonAbs.asLong())
+            nbt.putString("name", Blocks.STONE_BUTTON.descriptionId)
+            Auxiliaries.setItemStackNbt(remote, "remote", nbt)
+            remote.item.use(helper.level, player, InteractionHand.MAIN_HAND)
+            if (!helper.level.getBlockState(buttonAbs).getValue(BlockStateProperties.POWERED)) {
+                helper.fail("button must remain powered after remote skips already-powered button")
+            }
             helper.succeed()
         }
 

@@ -302,5 +302,20 @@ class TrackGameTests {
         @GameTest(template = TEMPLATE, timeoutTicks = 5)
         fun calculatorPreviouslyConnectedTrackQueuedWhenWireRemoved(helper: GameTestHelper) =
             TrackTests.calculatorPreviouslyConnectedTrackQueuedWhenWireRemoved(helper)
+
+        @JvmStatic
+        @GameTest(template = TEMPLATE, timeoutTicks = 5)
+        fun penEditFailsWhenPlayerHasNoRedstone(helper: GameTestHelper) =
+            TrackTests.penEditFailsWhenPlayerHasNoRedstone(helper)
+
+        @JvmStatic
+        @GameTest(template = TEMPLATE, timeoutTicks = 5)
+        fun trackNeighborChangedWithSamePowerDoesNotPropagate(helper: GameTestHelper) =
+            TrackTests.trackNeighborChangedWithSamePowerDoesNotPropagate(helper)
+
+        @JvmStatic
+        @GameTest(template = TEMPLATE, timeoutTicks = 5)
+        fun trackReceivesPowerThroughConductorBlock(helper: GameTestHelper) =
+            TrackTests.trackReceivesPowerThroughConductorBlock(helper)
     }
 }
