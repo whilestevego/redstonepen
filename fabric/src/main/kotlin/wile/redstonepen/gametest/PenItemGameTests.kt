@@ -430,7 +430,7 @@ class PenItemGameTests {
             val undamaged = pen.item.getBarWidth(pen)
             pen.damageValue = pen.maxDamage / 2
             val half = pen.item.getBarWidth(pen)
-            if (!(half < undamaged)) helper.fail("expected bar width to decrease with damage")
+            if (half >= undamaged) helper.fail("expected bar width to decrease with damage")
             helper.succeed()
         }
 

@@ -162,13 +162,13 @@ object ModContent {
             Registries.getBlock("basic_gauge") as BasicGauge.BasicGaugeBlock
     }
 
-    fun getMenuTypeOfBlock(block_name: String): MenuType<*>? =
-        Registries.getMenuTypeOfBlock(block_name)
+    fun getMenuTypeOfBlock(blockName: String): MenuType<*>? =
+        Registries.getMenuTypeOfBlock(blockName)
 
     fun getMenuTypeOfBlock(block: Block): MenuType<*>? = Registries.getMenuTypeOfBlock(block)
 
-    fun getBlockEntityTypeOfBlock(block_name: String): BlockEntityType<*>? =
-        Registries.getBlockEntityTypeOfBlock(block_name)
+    fun getBlockEntityTypeOfBlock(blockName: String): BlockEntityType<*>? =
+        Registries.getBlockEntityTypeOfBlock(blockName)
 
     fun getBlockEntityTypeOfBlock(block: Block): BlockEntityType<*>? =
         Registries.getBlockEntityTypeOfBlock(block)

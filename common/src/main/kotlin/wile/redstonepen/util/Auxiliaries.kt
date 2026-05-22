@@ -225,7 +225,7 @@ object Auxiliaries {
             advancedTooltipTranslationKey: String?,
             helpTranslationKey: String?,
             tooltip: MutableList<Component>,
-            _flag: TooltipFlag,
+            flag: TooltipFlag,
             addAdvancedTooltipHints: Boolean,
         ): Boolean {
             val helpAvailable =
@@ -267,16 +267,16 @@ object Auxiliaries {
         @Environment(EnvType.CLIENT)
         fun addInformation(
             stack: ItemStack,
-            _ctx: Item.TooltipContext,
+            ctx: Item.TooltipContext,
             tooltip: MutableList<Component>,
-            _flag: TooltipFlag,
+            flag: TooltipFlag,
             addAdvancedTooltipHints: Boolean,
         ): Boolean =
             addInformation(
                 stack.descriptionId,
                 stack.descriptionId,
                 tooltip,
-                _flag,
+                flag,
                 addAdvancedTooltipHints,
             )
     }

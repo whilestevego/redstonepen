@@ -21,7 +21,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import wile.redstonepen.blocks.track.RedstoneTrackBlock
 import wile.redstonepen.blocks.track.RedstoneTrackDefs
-import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.Connections
 import wile.redstonepen.blocks.track.TrackBlockEntity
 import wile.redstonepen.blocks.track.TrackNet
 import wile.redstonepen.blocks.track.TrackNetworkCalculator
@@ -502,8 +502,8 @@ object TrackTests {
             pen,
             InteractionHand.MAIN_HAND,
             rtrAdd,
-            no_add = false,
-            no_remove = true,
+            noAdd = false,
+            noRemove = true,
         )
 
         val rtrRemove = BlockHitResult(hitAdd, Direction.NORTH, absPos, false)
@@ -517,8 +517,8 @@ object TrackTests {
             pen2,
             InteractionHand.MAIN_HAND,
             rtrRemove,
-            no_add = true,
-            no_remove = false,
+            noAdd = true,
+            noRemove = false,
         )
         helper.succeed()
     }
@@ -542,8 +542,8 @@ object TrackTests {
             pen,
             InteractionHand.MAIN_HAND,
             rtr,
-            no_add = false,
-            no_remove = true,
+            noAdd = false,
+            noRemove = true,
         )
         val te = getTrack(helper)
         if (te == null) {
@@ -563,8 +563,8 @@ object TrackTests {
             ItemStack.EMPTY,
             InteractionHand.MAIN_HAND,
             BlockHitResult(hitVec, Direction.NORTH, absPos, false),
-            no_add = true,
-            no_remove = false,
+            noAdd = true,
+            noRemove = false,
         )
         helper.succeed()
     }
@@ -873,8 +873,8 @@ object TrackTests {
             pen,
             InteractionHand.MAIN_HAND,
             rtr,
-            no_add = false,
-            no_remove = true,
+            noAdd = false,
+            noRemove = true,
         )
 
         val teAfterAdd =
@@ -954,8 +954,8 @@ object TrackTests {
         // flags=16 (UPDATE_SUPPRESS_DROPS) also suppresses updateNeighbourShapes, preventing
         // the cascade that would remove a wire-less track when a neighbour block changes.
         helper.level.setBlock(helper.absolutePos(TRACK_POS.east()), block.defaultBlockState(), 16)
-        val wireBitA = connections.getWireBit(Direction.DOWN, Direction.EAST)
-        val wireBitB = connections.getWireBit(Direction.DOWN, Direction.WEST)
+        val wireBitA = Connections.getWireBit(Direction.DOWN, Direction.EAST)
+        val wireBitB = Connections.getWireBit(Direction.DOWN, Direction.WEST)
         val teBResult = RedstoneTrackBlock.tile(helper.level, helper.absolutePos(TRACK_POS.east()))
         if (!teBResult.isPresent) {
             helper.fail("expected TrackBlockEntity at TRACK_POS.east()")
@@ -985,7 +985,7 @@ object TrackTests {
         placeTrack(helper)
         helper.setBlock(TRACK_POS.east(), Blocks.REDSTONE_BLOCK)
         val block = Registries.requireBlock("track") as RedstoneTrackBlock
-        val wireBit = connections.getWireBit(Direction.DOWN, Direction.EAST)
+        val wireBit = Connections.getWireBit(Direction.DOWN, Direction.EAST)
         val result =
             TrackNetworkCalculator(
                     helper.level,
@@ -1000,8 +1000,8 @@ object TrackTests {
             return
         }
         val absEast = helper.absolutePos(TRACK_POS.east())
-        if (result.nets.none { it.neighbour_positions.contains(absEast) }) {
-            helper.fail("redstone block at east must appear in net neighbour_positions")
+        if (result.nets.none { it.neighbourPositions.contains(absEast) }) {
+            helper.fail("redstone block at east must appear in net neighbourPositions")
         }
         helper.succeed()
     }

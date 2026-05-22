@@ -11,6 +11,8 @@
     <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$3.0</ID>
     <ID>MagicNumber:PenItemGameTests.kt$PenItemGameTests$90f</ID>
     <ID>TooManyFunctions:ControlBoxGameTests.kt$ControlBoxGameTests</ID>
+    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.ClientEvents.Companion$event: FMLClientSetupEvent</ID>
+    <ID>UnusedParameter:ModRedstonePen.kt$ModRedstonePen.LiveCycleEvents.Companion$event: FMLConstructModEvent</ID>
     <ID>TooManyFunctions:DemoGameTests.kt$DemoGameTests</ID>
     <ID>TooManyFunctions:PenItemGameTests.kt$PenItemGameTests</ID>
     <ID>TooManyFunctions:RelayGameTests.kt$RelayGameTests</ID>

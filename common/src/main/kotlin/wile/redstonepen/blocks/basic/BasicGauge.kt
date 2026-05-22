@@ -86,10 +86,10 @@ object BasicGauge {
 
         @Suppress("FunctionOnlyReturningConstant")
         fun canConnectRedstone(
-            _state: BlockState,
-            _world: BlockGetter,
-            _pos: BlockPos,
-            _side: Direction?,
+            state: BlockState,
+            world: BlockGetter,
+            pos: BlockPos,
+            side: Direction?,
         ): Boolean = true
 
         override fun shouldCheckWeakPower(

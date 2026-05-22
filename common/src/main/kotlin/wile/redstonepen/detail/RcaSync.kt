@@ -13,46 +13,46 @@ object RcaSync {
     private const val MESSAGE_HANDLER_ID = "rcadata"
 
     class RcaData(val puid: UUID) {
-        var client_inputs_: Long = 0
-        var client_outputs_: Long = 0
-        var server_outputs_: Long = 0
+        var clientInputs: Long = 0
+        var clientOutputs: Long = 0
+        var serverOutputs: Long = 0
 
         fun isValid(): Boolean = puid.leastSignificantBits != 0L || puid.mostSignificantBits != 0L
 
-        @Synchronized fun client_inputs(): Long = client_inputs_
+        @Synchronized fun client_inputs(): Long = clientInputs
 
         @Synchronized
         fun client_inputs(value: Long) {
-            client_inputs_ = value
+            clientInputs = value
         }
 
-        @Synchronized fun server_outputs(): Long = server_outputs_
+        @Synchronized fun server_outputs(): Long = serverOutputs
 
         @Synchronized
         fun server_outputs(value: Long) {
-            server_outputs_ = value
+            serverOutputs = value
         }
 
         override fun toString(): String =
             "{player:\"$puid\", " +
-                "ci:${String.format(Locale.ROOT, "%016x", client_inputs_)}, " +
-                "co:${String.format(Locale.ROOT, "%016x", client_outputs_)}, " +
-                "so:${String.format(Locale.ROOT, "%016x", server_outputs_)}}"
+                "ci:${String.format(Locale.ROOT, "%016x", clientInputs)}, " +
+                "co:${String.format(Locale.ROOT, "%016x", clientOutputs)}, " +
+                "so:${String.format(Locale.ROOT, "%016x", serverOutputs)}}"
     }
 
     object CommonRca {
         @JvmField val EMPTY: RcaData = RcaData(UUID(0, 0)) // intentionally not immutable
 
-        private val data_cache: MutableMap<UUID, RcaData> = HashMap()
-        private var num_exceptions: Long = 0
+        private val dataCache: MutableMap<UUID, RcaData> = HashMap()
+        private var numExceptions: Long = 0
         private const val ERROR_CUTOFF_COUNT: Long = 32
 
         @JvmStatic
         @Synchronized
-        fun ofPlayer(puid: UUID?, allow_create: Boolean): RcaData {
+        fun ofPlayer(puid: UUID?, allowCreate: Boolean): RcaData {
             if (puid == null) return EMPTY
-            if (allow_create && !data_cache.containsKey(puid)) data_cache[puid] = RcaData(puid)
-            return data_cache.getOrDefault(puid, EMPTY)
+            if (allowCreate && !dataCache.containsKey(puid)) dataCache[puid] = RcaData(puid)
+            return dataCache.getOrDefault(puid, EMPTY)
         }
 
         @JvmStatic
@@ -67,7 +67,7 @@ object RcaSync {
 
         @JvmStatic
         fun applyRcaUpdate(uid: UUID, nbt: CompoundTag): Boolean {
-            if (!nbt.contains("i") || num_exceptions >= ERROR_CUTOFF_COUNT) return false
+            if (!nbt.contains("i") || numExceptions >= ERROR_CUTOFF_COUNT) return false
             return try {
                 val rca = ofPlayer(uid, true)
                 rca.client_inputs(nbt.getLong("i"))
@@ -75,7 +75,7 @@ object RcaSync {
                 nbt.putLong("o", rca.server_outputs())
                 true
             } catch (ignored: Throwable) {
-                ++num_exceptions
+                ++numExceptions
                 false
             }
         }

@@ -35,119 +35,119 @@ object GuiTextEditing {
     class MultiLineTextBox(x: Int, y: Int, width: Int, height: Int, title: Component) :
         Guis.UiWidget(x, y, width, height, title), GuiEventListener {
 
-        private var frame_tick_: Int = 0
-        private var last_clicked_: Long = 0
-        private var last_index_: Int = -1
-        private val edit_: TextFieldHelper
-        private var text_: String = ""
-        private lateinit var font_: Font
-        private var line_height_: Int = NORM_LINE_HEIGHT
-        private var font_scale_: Float = 1f
-        private var max_text_size_: Int = 1024
-        private var font_color_: Int = 0xff000000.toInt()
-        private var cursor_color_: Int = 0xff000000.toInt()
-        private var on_changed_: Consumer<MultiLineTextBox> = Consumer {}
-        private var on_mouse_move_: BiConsumer<MultiLineTextBox, Guis.Coord2d> =
+        private var frameTick: Int = 0
+        private var lastClicked: Long = 0
+        private var lastIndex: Int = -1
+        private val edit: TextFieldHelper
+        private var text: String = ""
+        private lateinit var font: Font
+        private var lineHeight: Int = NORM_LINE_HEIGHT
+        private var fontScale: Float = 1f
+        private var maxTextSize: Int = 1024
+        private var fontColor: Int = 0xff000000.toInt()
+        private var cursorColor: Int = 0xff000000.toInt()
+        private var onChanged: Consumer<MultiLineTextBox> = Consumer {}
+        private var onMouseMoveAction: BiConsumer<MultiLineTextBox, Guis.Coord2d> =
             BiConsumer { _, _ ->
             }
 
         init {
-            edit_ =
+            edit =
                 TextFieldHelper(
                     this::getText,
                     this::setText,
                     this::getClipboard,
                     this::setClipboard,
                 ) { s ->
-                    s.length < max_text_size_ &&
-                        font_.wordWrapHeight(s, width * NORM_LINE_HEIGHT / line_height_) <=
-                            (height * NORM_LINE_HEIGHT / line_height_)
+                    s.length < maxTextSize &&
+                        font.wordWrapHeight(s, width * NORM_LINE_HEIGHT / lineHeight) <=
+                            (height * NORM_LINE_HEIGHT / lineHeight)
                 }
         }
 
-        fun getValue(): String = eotTrimmed(text_)
+        fun getValue(): String = eotTrimmed(text)
 
         fun setValue(text: String): MultiLineTextBox {
             var t = text
             if (t.length > getMaxLength()) t = t.substring(0, getMaxLength())
-            if (text_ != t) {
-                val toEnd = text_.isEmpty()
-                val cur = edit_.cursorPos
-                val sel = edit_.selectionPos
-                edit_.selectAll()
-                edit_.insertText(eotTrimmed(t))
-                val newSel = if (toEnd) text_.length else sel
-                val newCur = if (toEnd) text_.length else cur
-                edit_.setSelectionPos(newSel)
-                edit_.setCursorPos(newCur, false)
+            if (this.text != t) {
+                val toEnd = this.text.isEmpty()
+                val cur = edit.cursorPos
+                val sel = edit.selectionPos
+                edit.selectAll()
+                edit.insertText(eotTrimmed(t))
+                val newSel = if (toEnd) this.text.length else sel
+                val newCur = if (toEnd) this.text.length else cur
+                edit.setSelectionPos(newSel)
+                edit.setCursorPos(newCur, false)
                 clearDisplayCache()
             }
             return this
         }
 
-        fun getMaxLength(): Int = max_text_size_
+        fun getMaxLength(): Int = maxTextSize
 
         fun setMaxLength(size: Int): MultiLineTextBox {
-            max_text_size_ = Mth.clamp(size, 2, 1024)
-            if (text_.length > max_text_size_) {
-                text_ = eotTrimmed(text_.substring(0, max_text_size_))
-                on_changed_.accept(this)
+            maxTextSize = Mth.clamp(size, 2, 1024)
+            if (text.length > maxTextSize) {
+                text = eotTrimmed(text.substring(0, maxTextSize))
+                onChanged.accept(this)
             }
             return this
         }
 
-        fun getFont(): Font? = if (::font_.isInitialized) font_ else null
+        fun getFont(): Font? = if (::font.isInitialized) font else null
 
         fun setFont(fnt: Font): MultiLineTextBox {
-            font_ = fnt
+            font = fnt
             return this
         }
 
-        fun getFontColor(): Int = font_color_
+        fun getFontColor(): Int = fontColor
 
         fun setFontColor(color: Int): MultiLineTextBox {
-            font_color_ = color or 0xff000000.toInt()
+            fontColor = color or 0xff000000.toInt()
             return this
         }
 
-        fun getCursorColor(): Int = cursor_color_
+        fun getCursorColor(): Int = cursorColor
 
         fun setCursorColor(color: Int): MultiLineTextBox {
-            cursor_color_ = color or 0xff000000.toInt()
+            cursorColor = color or 0xff000000.toInt()
             return this
         }
 
-        fun getLineHeight(): Int = line_height_
+        fun getLineHeight(): Int = lineHeight
 
         fun setLineHeight(h: Int): MultiLineTextBox {
-            line_height_ = Mth.clamp(h, 6, NORM_LINE_HEIGHT)
-            font_scale_ = line_height_.toFloat() / 9f
+            lineHeight = Mth.clamp(h, 6, NORM_LINE_HEIGHT)
+            fontScale = lineHeight.toFloat() / 9f
             return this
         }
 
         fun onValueChanged(cb: Consumer<MultiLineTextBox>): MultiLineTextBox {
-            on_changed_ = cb
+            onChanged = cb
             return this
         }
 
         fun onMouseMove(cb: BiConsumer<MultiLineTextBox, Guis.Coord2d>): MultiLineTextBox {
-            on_mouse_move_ = cb
+            onMouseMoveAction = cb
             return this
         }
 
         fun getIndexUnderMouse(mouseX: Double, mouseY: Double): Int =
-            if (!::font_.isInitialized) {
+            if (!::font.isInitialized) {
                 0
             } else {
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_,
+                        font,
                         screenCoordinates(Guis.Coord2d.of(mouseX.toInt(), mouseY.toInt()), false),
                     )
             }
 
         fun getCoordinatesAtIndex(textIndex: Int): Guis.Coord2d {
-            if (!::font_.isInitialized) return Guis.Coord2d.ORIGIN
+            if (!::font.isInitialized) return Guis.Coord2d.ORIGIN
             var idx = Mth.clamp(textIndex, 0, getDisplayCache().fullText.length)
             val lindex = findLineFromPos(getDisplayCache().lineStarts, idx)
             if (lindex < 0 || lindex >= getDisplayCache().lineStarts.size) {
@@ -155,11 +155,11 @@ object GuiTextEditing {
             }
             val li = getDisplayCache().lines[lindex]
             idx = Mth.clamp(idx - getDisplayCache().lineStarts[lindex], 0, li.contents.length)
-            val ox = font_.splitter.stringWidth(li.contents.substring(0, idx)).toInt()
+            val ox = font.splitter.stringWidth(li.contents.substring(0, idx)).toInt()
             val oy = getDisplayCache().lines[0].y
             return Guis.Coord2d.of(
-                li.x + (ox * line_height_ / NORM_LINE_HEIGHT),
-                oy + ((li.y - oy) * line_height_ / NORM_LINE_HEIGHT),
+                li.x + (ox * lineHeight / NORM_LINE_HEIGHT),
+                oy + ((li.y - oy) * lineHeight / NORM_LINE_HEIGHT),
             )
         }
 
@@ -167,9 +167,9 @@ object GuiTextEditing {
 
         override fun init(parent: Screen, position: Guis.Coord2d): MultiLineTextBox {
             super.init(parent, position)
-            font_ = Minecraft.getInstance().font
-            font_color_ = 0xff000000.toInt()
-            cursor_color_ = 0xff000000.toInt()
+            font = Minecraft.getInstance().font
+            fontColor = 0xff000000.toInt()
+            cursorColor = 0xff000000.toInt()
             clearDisplayCache()
             return this
         }
@@ -185,29 +185,29 @@ object GuiTextEditing {
             val index =
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_,
+                        font,
                         Guis.Coord2d.of(
-                            sc.x * NORM_LINE_HEIGHT / line_height_,
-                            sc.y * NORM_LINE_HEIGHT / line_height_,
+                            sc.x * NORM_LINE_HEIGHT / lineHeight,
+                            sc.y * NORM_LINE_HEIGHT / lineHeight,
                         ),
                     )
             if (index >= 0) {
-                if (index == last_index_ && (Util.getMillis() - last_clicked_) < 250) {
-                    if (edit_.isSelecting) {
-                        edit_.selectAll()
+                if (index == lastIndex && (Util.getMillis() - lastClicked) < 250) {
+                    if (edit.isSelecting) {
+                        edit.selectAll()
                     } else {
-                        edit_.setSelectionRange(
+                        edit.setSelectionRange(
                             StringSplitter.getWordPosition(getText(), -1, index, false),
                             StringSplitter.getWordPosition(getText(), 1, index, false),
                         )
                     }
                 } else {
-                    edit_.setCursorPos(index, Screen.hasShiftDown())
+                    edit.setCursorPos(index, Screen.hasShiftDown())
                 }
                 clearDisplayCache()
             }
-            last_index_ = index
-            last_clicked_ = index.toLong()
+            lastIndex = index
+            lastClicked = index.toLong()
             if (isFocused) isFocused = true
             return true
         }
@@ -222,13 +222,13 @@ object GuiTextEditing {
             if (super<Guis.UiWidget>.mouseDragged(x, y, button, dx, dy) || button != 0) return true
             if (!active || !visible) return false
             val sc = screenCoordinates(Guis.Coord2d.of(x.toInt(), y.toInt()), false)
-            edit_.setCursorPos(
+            edit.setCursorPos(
                 getDisplayCache()
                     .getIndexAtPosition(
-                        font_,
+                        font,
                         Guis.Coord2d.of(
-                            sc.x * NORM_LINE_HEIGHT / line_height_,
-                            sc.y * NORM_LINE_HEIGHT / line_height_,
+                            sc.x * NORM_LINE_HEIGHT / lineHeight,
+                            sc.y * NORM_LINE_HEIGHT / lineHeight,
                         ),
                     ),
                 true,
@@ -241,26 +241,26 @@ object GuiTextEditing {
             if (super<Guis.UiWidget>.charTyped(key, code)) return true
             if (!active || !visible) return false
             if (!StringUtil.isAllowedChatCharacter(key)) return false
-            edit_.insertText(key.toString())
+            edit.insertText(key.toString())
             clearDisplayCache()
-            on_changed_.accept(this)
+            onChanged.accept(this)
             return true
         }
 
         override fun keyPressed(key: Int, x: Int, y: Int): Boolean {
             if (super<Guis.UiWidget>.keyPressed(key, x, y)) return true
             if (!active || !visible) return false
-            val textBefore = text_
+            val textBefore = text
             if (!specialKeyMatched(key)) return isFocused
             clearDisplayCache()
-            if (key == 257 && !edit_.isSelecting && edit_.cursorPos < text_.length - 2) {
-                val cp = edit_.cursorPos
-                edit_.selectAll()
-                edit_.insertText(eotTrimmed(text_))
-                edit_.setSelectionPos(cp)
-                edit_.setCursorPos(cp, false)
+            if (key == 257 && !edit.isSelecting && edit.cursorPos < text.length - 2) {
+                val cp = edit.cursorPos
+                edit.selectAll()
+                edit.insertText(eotTrimmed(text))
+                edit.setSelectionPos(cp)
+                edit.setCursorPos(cp, false)
             }
-            if (textBefore != text_) on_changed_.accept(this)
+            if (textBefore != text) onChanged.accept(this)
             return true
         }
 
@@ -268,28 +268,28 @@ object GuiTextEditing {
             if (!visible) return
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-            val ox = (x * (1.0 - font_scale_)).toInt()
-            val oy = (y * (1.0 - font_scale_)).toInt()
+            val ox = (x * (1.0 - fontScale)).toInt()
+            val oy = (y * (1.0 - fontScale)).toInt()
             val mxs: PoseStack = gg.pose()
             mxs.pushPose()
             mxs.translate(ox.toDouble(), oy.toDouble(), 0.0)
-            mxs.scale(font_scale_, font_scale_, font_scale_)
+            mxs.scale(fontScale, fontScale, fontScale)
             val cache = getDisplayCache()
-            for (li in cache.lines) gg.drawString(font_, li.asComponent, li.x, li.y, font_color_)
+            for (li in cache.lines) gg.drawString(font, li.asComponent, li.x, li.y, fontColor)
             renderCursor(gg, cache.cursor, cache.cursorAtEnd)
             renderHighlight(gg, cache.selection)
             val xy = getMousePosition()
             val isInBounds = xy.x >= 0 && xy.y >= 0 && xy.x < width && xy.y < height
             if (isInBounds) {
-                on_mouse_move_.accept(this, getMousePosition())
+                onMouseMoveAction.accept(this, getMousePosition())
             }
             mxs.popPose()
         }
 
-        private fun getText(): String = text_
+        private fun getText(): String = text
 
-        private fun setText(text: String) {
-            text_ = text
+        private fun setText(t: String) {
+            text = t
             clearDisplayCache()
         }
 
@@ -308,41 +308,41 @@ object GuiTextEditing {
 
         private fun specialKeyMatched(key: Int): Boolean {
             if (Screen.isSelectAll(key)) {
-                edit_.selectAll()
+                edit.selectAll()
                 return true
             }
             if (Screen.isCopy(key)) {
-                edit_.copy()
+                edit.copy()
                 return true
             }
             if (Screen.isPaste(key)) {
-                edit_.paste()
+                edit.paste()
                 return true
             }
             if (Screen.isCut(key)) {
-                edit_.cut()
+                edit.cut()
                 return true
             }
             return when (key) {
                 257,
                 335 -> {
-                    edit_.insertText("\n")
+                    edit.insertText("\n")
                     true
                 }
                 259 -> {
-                    edit_.removeCharsFromCursor(-1)
+                    edit.removeCharsFromCursor(-1)
                     true
                 }
                 261 -> {
-                    edit_.removeCharsFromCursor(1)
+                    edit.removeCharsFromCursor(1)
                     true
                 }
                 262 -> {
-                    edit_.moveByChars(1, Screen.hasShiftDown())
+                    edit.moveByChars(1, Screen.hasShiftDown())
                     true
                 }
                 263 -> {
-                    edit_.moveByChars(-1, Screen.hasShiftDown())
+                    edit.moveByChars(-1, Screen.hasShiftDown())
                     true
                 }
                 264 -> {
@@ -354,23 +354,23 @@ object GuiTextEditing {
                     true
                 }
                 266 -> {
-                    edit_.setCursorPos(0, Screen.hasShiftDown())
+                    edit.setCursorPos(0, Screen.hasShiftDown())
                     true
                 }
                 267 -> {
-                    edit_.setCursorPos(text_.length, Screen.hasShiftDown())
+                    edit.setCursorPos(text.length, Screen.hasShiftDown())
                     true
                 }
                 268 -> {
-                    edit_.setCursorPos(
-                        getDisplayCache().findLineStart(edit_.cursorPos),
+                    edit.setCursorPos(
+                        getDisplayCache().findLineStart(edit.cursorPos),
                         Screen.hasShiftDown(),
                     )
                     true
                 }
                 269 -> {
-                    edit_.setCursorPos(
-                        getDisplayCache().findLineEnd(edit_.cursorPos),
+                    edit.setCursorPos(
+                        getDisplayCache().findLineEnd(edit.cursorPos),
                         Screen.hasShiftDown(),
                     )
                     true
@@ -380,20 +380,20 @@ object GuiTextEditing {
         }
 
         private fun changeLine(incr: Int) {
-            edit_.setCursorPos(
-                getDisplayCache().changeLine(edit_.cursorPos, incr),
+            edit.setCursorPos(
+                getDisplayCache().changeLine(edit.cursorPos, incr),
                 Screen.hasShiftDown(),
             )
         }
 
         private fun renderCursor(gg: GuiGraphics, pos: Guis.Coord2d, atEnd: Boolean) {
-            if (!active || !visible) frame_tick_ = 0
-            if ((++frame_tick_ and 0x3f) < 0x20) return
+            if (!active || !visible) frameTick = 0
+            if ((++frameTick and 0x3f) < 0x20) return
             val p = screenCoordinates(pos, true)
             if (!atEnd) {
-                gg.fill(p.x, p.y - 1, p.x + 1, p.y + NORM_LINE_HEIGHT, cursor_color_)
+                gg.fill(p.x, p.y - 1, p.x + 1, p.y + NORM_LINE_HEIGHT, cursorColor)
             } else {
-                gg.drawString(font_, "_", p.x, p.y, cursor_color_)
+                gg.drawString(font, "_", p.x, p.y, cursorColor)
             }
         }
 
@@ -416,26 +416,26 @@ object GuiTextEditing {
             }
         }
 
-        private var display_cache_: DisplayCache? = DisplayCache.EMPTY
+        private var displayCache: DisplayCache? = DisplayCache.EMPTY
 
         private fun getDisplayCache(): DisplayCache =
-            display_cache_ ?: rebuildDisplayCache().also { display_cache_ = it }
+            displayCache ?: rebuildDisplayCache().also { displayCache = it }
 
         private fun clearDisplayCache() {
-            display_cache_ = null
+            displayCache = null
         }
 
         private fun rebuildDisplayCache(): DisplayCache {
             val fullText = getText()
             if (fullText.isEmpty()) return DisplayCache.EMPTY
-            val curPos = edit_.cursorPos
-            val selPos = edit_.selectionPos
+            val curPos = edit.cursorPos
+            val selPos = edit.selectionPos
             val lsp: IntList = IntArrayList()
             val lineInfos: MutableList<LineInfo> = Lists.newArrayList()
             val lineNo = MutableInt()
             val lineTerminated = MutableBoolean()
-            val ssp = font_.splitter
-            ssp.splitLines(fullText, width * NORM_LINE_HEIGHT / line_height_, Style.EMPTY, true) {
+            val ssp = font.splitter
+            ssp.splitLines(fullText, width * NORM_LINE_HEIGHT / lineHeight, Style.EMPTY, true) {
                 text,
                 spos,
                 epos ->
@@ -454,7 +454,7 @@ object GuiTextEditing {
                 ppos = Guis.Coord2d(0, lineInfos.size * NORM_LINE_HEIGHT)
             } else {
                 val lno = findLineFromPos(lineStarts, curPos)
-                val lpx = font_.width(fullText.substring(lineStarts[lno], curPos))
+                val lpx = font.width(fullText.substring(lineStarts[lno], curPos))
                 ppos = Guis.Coord2d(lpx, lno * NORM_LINE_HEIGHT)
             }
             val selectionBlocks: MutableList<Rect2i> = Lists.newArrayList()

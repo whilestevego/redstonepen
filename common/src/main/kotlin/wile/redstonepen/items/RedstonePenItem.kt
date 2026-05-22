@@ -135,8 +135,8 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                 stack,
                 hand,
                 rtr,
-                no_add = false,
-                no_remove = true,
+                noAdd = false,
+                noRemove = true,
             )
         }
         // Check if a new track can be placed.
@@ -164,8 +164,8 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                 stack,
                 hand,
                 rtr,
-                no_add = false,
-                no_remove = true,
+                noAdd = false,
+                noRemove = true,
             )
         } else {
             val rtr =
@@ -199,8 +199,8 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                         stack,
                         hand,
                         rtr,
-                        no_add = false,
-                        no_remove = true,
+                        noAdd = false,
+                        noRemove = true,
                     ) == InteractionResult.FAIL
                 ) {
                     InteractionResult.FAIL
@@ -387,8 +387,8 @@ class RedstonePenItem(properties: Item.Properties) : StandardItems.BaseItem(prop
                 stack,
                 hand,
                 rt as BlockHitResult,
-                no_add = true,
-                no_remove = false,
+                noAdd = true,
+                noRemove = false,
             )
             return true
         } else if (state.`is`(Blocks.REDSTONE_WIRE)) {

@@ -36,30 +36,30 @@ class ControlBoxGui(
         206,
     ) {
 
-    private val VALUE_UPDATE_INTERVAL = 2
-    private val tooltip_prefix: String = ModContent.References.CONTROLBOX_BLOCK.descriptionId
+    private val valueUpdateInterval = 2
+    private val tooltipPrefix: String = ModContent.References.CONTROLBOX_BLOCK.descriptionId
     private val textbox: GuiTextEditing.MultiLineTextBox
-    private val start_stop: Guis.CheckBox
-    private val cb_copy_all: Guis.ImageButton
-    private val cb_paste_all: Guis.ImageButton
-    private val cb_error_indicator: Guis.Image
-    private val rca_enabled_indicator: Guis.Image
-    private val port_stati: MutableList<Guis.TextBox> = ArrayList()
-    private val port_stati_i_indicators: MutableList<Guis.Image> = ArrayList()
-    private val port_stati_o_indicators: MutableList<Guis.Image> = ArrayList()
-    private val symbols_: MutableMap<String, Int> = HashMap()
-    private val errors_: MutableList<Tuple<Int, String>> = ArrayList()
-    private var runtimeError_: String = ""
-    private var update_counter_: Int = 0
-    private var focus_editor_: Boolean = false
-    private var debug_enabled_: Boolean = false
+    private val startStop: Guis.CheckBox
+    private val cbCopyAll: Guis.ImageButton
+    private val cbPasteAll: Guis.ImageButton
+    private val cbErrorIndicator: Guis.Image
+    private val rcaEnabledIndicator: Guis.Image
+    private val portStati: MutableList<Guis.TextBox> = ArrayList()
+    private val portStatiIIndicators: MutableList<Guis.Image> = ArrayList()
+    private val portStatiOIndicators: MutableList<Guis.Image> = ArrayList()
+    private val symbols: MutableMap<String, Int> = HashMap()
+    private val errors: MutableList<Tuple<Int, String>> = ArrayList()
+    private var runtimeError: String = ""
+    private var updateCounter: Int = 0
+    private var focusEditor: Boolean = false
+    private var debugEnabled: Boolean = false
     private var codeRequested: Boolean = false
     private var activatingPlayer: Component = Component.empty()
 
     init {
         titleLabelX = 17
         titleLabelY = -10
-        start_stop =
+        startStop =
             Guis.CheckBox(
                 getBackgroundImage(),
                 12,
@@ -67,10 +67,10 @@ class ControlBoxGui(
                 Guis.Coord2d.of(15, 213),
                 Guis.Coord2d.of(28, 213),
             )
-        cb_copy_all = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(41, 213))
-        cb_paste_all = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(54, 213))
-        cb_error_indicator = Guis.Image(getBackgroundImage(), 5, 2, Guis.Coord2d.of(68, 213))
-        rca_enabled_indicator = Guis.Image(getBackgroundImage(), 7, 7, Guis.Coord2d.of(90, 215))
+        cbCopyAll = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(41, 213))
+        cbPasteAll = Guis.ImageButton(getBackgroundImage(), 12, 12, Guis.Coord2d.of(54, 213))
+        cbErrorIndicator = Guis.Image(getBackgroundImage(), 5, 2, Guis.Coord2d.of(68, 213))
+        rcaEnabledIndicator = Guis.Image(getBackgroundImage(), 7, 7, Guis.Coord2d.of(90, 215))
         textbox = GuiTextEditing.MultiLineTextBox(29, 12, 156, 170, Component.literal("Code"))
     }
 
@@ -90,63 +90,61 @@ class ControlBoxGui(
             .setLineHeight(7)
             .onValueChanged { push_code(textbox.getValue()) }
         addRenderableWidget(textbox)
-        start_stop
+        startStop
             .init(this, Guis.Coord2d.of(196, 14))
-            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.runstop"))
-        start_stop.onclick { _ ->
+            .tooltip(Auxiliaries.localizable("$tooltipPrefix.tooltips.runstop"))
+        startStop.onclick { _ ->
             val nbt = CompoundTag()
             val rca = wile.api.rca.FmmRedstoneClientAdapter.Adapter.instance()
             if (rca != null && rca.isOpen()) nbt.putBoolean("withrca", true)
             onGuiAction("enabled", nbt)
-            focus_editor_ = true
+            focusEditor = true
         }
-        addRenderableWidget(start_stop)
-        cb_copy_all
+        addRenderableWidget(startStop)
+        cbCopyAll
             .init(this, Guis.Coord2d.of(212, 14))
-            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.copyall"))
-        cb_copy_all.onclick { _ ->
+            .tooltip(Auxiliaries.localizable("$tooltipPrefix.tooltips.copyall"))
+        cbCopyAll.onclick { _ ->
             Auxiliaries.setClipboard(textbox.getValue())
-            focus_editor_ = true
+            focusEditor = true
         }
-        cb_copy_all.visible = false
-        addRenderableWidget(cb_copy_all)
-        cb_paste_all
+        cbCopyAll.visible = false
+        addRenderableWidget(cbCopyAll)
+        cbPasteAll
             .init(this, Guis.Coord2d.of(212, 14))
-            .tooltip(Auxiliaries.localizable("$tooltip_prefix.tooltips.pasteall"))
-        cb_paste_all.onclick { _ ->
+            .tooltip(Auxiliaries.localizable("$tooltipPrefix.tooltips.pasteall"))
+        cbPasteAll.onclick { _ ->
             textbox.setValue(Auxiliaries.getClipboard().orElse(""))
             push_code(textbox.getValue())
-            focus_editor_ = true
+            focusEditor = true
         }
-        cb_paste_all.visible = false
-        addRenderableWidget(cb_paste_all)
-        cb_error_indicator.init(this, Guis.Coord2d.of(230, 14))
-        cb_error_indicator.visible = false
-        addRenderableWidget(cb_error_indicator)
-        rca_enabled_indicator.init(this, Guis.Coord2d.of(194, 40))
-        rca_enabled_indicator.visible = false
-        rca_enabled_indicator.tooltip { _ ->
-            Auxiliaries.localizable("$tooltip_prefix.tooltips.rcaplayer", activatingPlayer)
+        cbPasteAll.visible = false
+        addRenderableWidget(cbPasteAll)
+        cbErrorIndicator.init(this, Guis.Coord2d.of(230, 14))
+        cbErrorIndicator.visible = false
+        addRenderableWidget(cbErrorIndicator)
+        rcaEnabledIndicator.init(this, Guis.Coord2d.of(194, 40))
+        rcaEnabledIndicator.visible = false
+        rcaEnabledIndicator.tooltip { _ ->
+            Auxiliaries.localizable("$tooltipPrefix.tooltips.rcaplayer", activatingPlayer)
         }
-        addRenderableWidget(rca_enabled_indicator)
+        addRenderableWidget(rcaEnabledIndicator)
 
         val ygap = 12
         val x0 = getGuiLeft() + 205
         val y0 = getGuiTop() + 56
         val lineyMap = intArrayOf(5 * ygap, 4 * ygap, 0, 2 * ygap, 3 * ygap, ygap)
-        port_stati.clear()
-        port_stati_i_indicators.clear()
-        port_stati_o_indicators.clear()
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[0], 30, 10, Component.literal("down"), font))
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[1], 30, 10, Component.literal("up"), font))
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[2], 30, 10, Component.literal("red"), font))
-        port_stati.add(
-            Guis.TextBox(x0, y0 + lineyMap[3], 30, 10, Component.literal("yellow"), font)
-        )
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[4], 30, 10, Component.literal("green"), font))
-        port_stati.add(Guis.TextBox(x0, y0 + lineyMap[5], 30, 10, Component.literal("blue"), font))
-        for (i in port_stati.indices) {
-            val tb = port_stati[i]
+        portStati.clear()
+        portStatiIIndicators.clear()
+        portStatiOIndicators.clear()
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[0], 30, 10, Component.literal("down"), font))
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[1], 30, 10, Component.literal("up"), font))
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[2], 30, 10, Component.literal("red"), font))
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[3], 30, 10, Component.literal("yellow"), font))
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[4], 30, 10, Component.literal("green"), font))
+        portStati.add(Guis.TextBox(x0, y0 + lineyMap[5], 30, 10, Component.literal("blue"), font))
+        for (i in portStati.indices) {
+            val tb = portStati[i]
             tb.setEditable(false)
             tb.setBordered(false)
             tb.setTextColor(COLOR_TEXT_ARGB)
@@ -157,11 +155,11 @@ class ControlBoxGui(
             addRenderableWidget(tb)
             val imgI = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(78, 215))
             imgI.init(this, Guis.Coord2d.of(191, 56 + lineyMap[i]))
-            port_stati_i_indicators.add(imgI)
+            portStatiIIndicators.add(imgI)
             addRenderableWidget(imgI)
             val imgO = Guis.Image(getBackgroundImage(), 3, 6, Guis.Coord2d.of(84, 215))
             imgO.init(this, Guis.Coord2d.of(189, 56 + lineyMap[i]))
-            port_stati_o_indicators.add(imgO)
+            portStatiOIndicators.add(imgO)
             addRenderableWidget(imgO)
         }
 
@@ -169,7 +167,7 @@ class ControlBoxGui(
         tooltips.add(
             TooltipDisplay.TipRange(getGuiLeft() + 200, getGuiTop() + 36, 36, 16) {
                 val c = Component.literal("")
-                symbols_.entries
+                symbols.entries
                     .sortedBy { it.key }
                     .forEach { (k, v) ->
                         val isInternalSymbol =
@@ -177,7 +175,7 @@ class ControlBoxGui(
                                 PortNames.ALL.contains(k) ||
                                 k.endsWith(".re") ||
                                 k.endsWith(".fe")
-                        if (!debug_enabled_ && isInternalSymbol) return@forEach
+                        if (!debugEnabled && isInternalSymbol) return@forEach
                         val lf = if (c.siblings.isEmpty()) "" else "\n"
                         c.siblings.add(
                             Component.literal(
@@ -196,10 +194,10 @@ class ControlBoxGui(
         )
         tooltips.add(
             TooltipDisplay.TipRange(getGuiLeft() + 196, getGuiTop() + 14, 16, 16) {
-                if (errors_.isEmpty()) {
+                if (errors.isEmpty()) {
                     Component.empty()
                 } else {
-                    Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}")
+                    Auxiliaries.localizable("$tooltipPrefix.error.${errors[0].b}")
                 }
             }
         )
@@ -209,7 +207,7 @@ class ControlBoxGui(
                 getGuiTop() + 12,
                 5,
                 8,
-                Auxiliaries.localizable("$tooltip_prefix.help.1"),
+                Auxiliaries.localizable("$tooltipPrefix.help.1"),
             )
         )
         tooltips.add(
@@ -218,7 +216,7 @@ class ControlBoxGui(
                 getGuiTop() + 22,
                 5,
                 3,
-                Auxiliaries.localizable("$tooltip_prefix.help.2"),
+                Auxiliaries.localizable("$tooltipPrefix.help.2"),
             )
         )
         tooltips.add(
@@ -227,7 +225,7 @@ class ControlBoxGui(
                 getGuiTop() + 27,
                 5,
                 5,
-                Auxiliaries.localizable("$tooltip_prefix.help.3"),
+                Auxiliaries.localizable("$tooltipPrefix.help.3"),
             )
         )
         tooltips.add(
@@ -236,7 +234,7 @@ class ControlBoxGui(
                 getGuiTop() + 34,
                 5,
                 5,
-                Auxiliaries.localizable("$tooltip_prefix.help.4"),
+                Auxiliaries.localizable("$tooltipPrefix.help.4"),
             )
         )
         tooltips.add(
@@ -245,7 +243,7 @@ class ControlBoxGui(
                 getGuiTop() + 41,
                 5,
                 6,
-                Auxiliaries.localizable("$tooltip_prefix.help.5"),
+                Auxiliaries.localizable("$tooltipPrefix.help.5"),
             )
         )
         tooltips.add(
@@ -254,7 +252,7 @@ class ControlBoxGui(
                 getGuiTop() + 49,
                 5,
                 4,
-                Auxiliaries.localizable("$tooltip_prefix.help.6"),
+                Auxiliaries.localizable("$tooltipPrefix.help.6"),
             )
         )
         tooltips.add(
@@ -263,7 +261,7 @@ class ControlBoxGui(
                 getGuiTop() + 55,
                 5,
                 5,
-                Auxiliaries.localizable("$tooltip_prefix.help.7"),
+                Auxiliaries.localizable("$tooltipPrefix.help.7"),
             )
         )
         tooltips.add(
@@ -272,7 +270,7 @@ class ControlBoxGui(
                 getGuiTop() + 62,
                 5,
                 3,
-                Auxiliaries.localizable("$tooltip_prefix.help.8"),
+                Auxiliaries.localizable("$tooltipPrefix.help.8"),
             )
         )
         tooltips.add(
@@ -281,7 +279,7 @@ class ControlBoxGui(
                 getGuiTop() + 67,
                 5,
                 7,
-                Auxiliaries.localizable("$tooltip_prefix.help.9"),
+                Auxiliaries.localizable("$tooltipPrefix.help.9"),
             )
         )
         tooltips.add(
@@ -290,10 +288,10 @@ class ControlBoxGui(
                 getGuiTop() + 76,
                 5,
                 3,
-                Auxiliaries.localizable("$tooltip_prefix.help.10"),
+                Auxiliaries.localizable("$tooltipPrefix.help.10"),
             )
         )
-        tooltip_.init(tooltips).delay(50)
+        tooltip.init(tooltips).delay(50)
 
         setInitialFocus(textbox)
         focused = textbox
@@ -309,7 +307,7 @@ class ControlBoxGui(
                 val io = nbt.getInt("ports")
                 for (i in PortNames.ALL.indices) {
                     if ((mask and (0xf shl (4 * i))) == 0) continue
-                    port_stati[i].setValue(
+                    portStati[i].setValue(
                         String.format(
                             Locale.ROOT,
                             "%1s=%02d",
@@ -321,79 +319,79 @@ class ControlBoxGui(
             }
             if (nbt.contains("code")) {
                 textbox.setValue(nbt.getString("code"))
-                focus_editor_ = true
+                focusEditor = true
             }
             if (nbt.contains("enabled")) {
-                start_stop.checked(nbt.getBoolean("enabled"))
-                focus_editor_ = true
+                startStop.checked(nbt.getBoolean("enabled"))
+                focusEditor = true
             }
             if (nbt.contains("debug")) {
-                debug_enabled_ = nbt.getBoolean("debug")
+                debugEnabled = nbt.getBoolean("debug")
             }
             if (nbt.contains("inputs")) {
                 var mask = nbt.getInt("inputs")
                 for (i in PortNames.ALL.indices) {
-                    port_stati_i_indicators[i].visible = (mask and 0xf) != 0
+                    portStatiIIndicators[i].visible = (mask and 0xf) != 0
                     mask = mask shr 4
                 }
             }
             if (nbt.contains("outputs")) {
                 var mask = nbt.getInt("outputs")
                 for (i in PortNames.ALL.indices) {
-                    port_stati_o_indicators[i].visible = (mask and 0xf) != 0
+                    portStatiOIndicators[i].visible = (mask and 0xf) != 0
                     mask = mask shr 4
                 }
             }
             if (nbt.contains("symbols", Tag.TAG_COMPOUND.toInt())) {
                 val symNbt = nbt.getCompound("symbols")
-                symbols_.clear()
-                symNbt.allKeys.forEach { k -> symbols_[k] = symNbt.getInt(k) }
+                symbols.clear()
+                symNbt.allKeys.forEach { k -> symbols[k] = symNbt.getInt(k) }
             }
             if (nbt.contains("errors", Tag.TAG_COMPOUND.toInt())) {
                 val errNbt = nbt.getCompound("errors")
-                errors_.clear()
+                errors.clear()
                 errNbt.allKeys.forEach { k ->
                     try {
-                        errors_.add(Tuple(k.toInt(), errNbt.getString(k)))
+                        errors.add(Tuple(k.toInt(), errNbt.getString(k)))
                     } catch (_: Throwable) {}
                 }
-                if (errors_.isEmpty()) {
-                    cb_error_indicator.visible = false
-                    cb_error_indicator.setX(0)
-                    cb_error_indicator.setY(0)
-                    cb_error_indicator.tooltip(Component.empty())
+                if (errors.isEmpty()) {
+                    cbErrorIndicator.visible = false
+                    cbErrorIndicator.setX(0)
+                    cbErrorIndicator.setY(0)
+                    cbErrorIndicator.tooltip(Component.empty())
                 } else {
-                    val exy = textbox.getCoordinatesAtIndex(errors_[0].a)
-                    cb_error_indicator.tooltip(
-                        Auxiliaries.localizable("$tooltip_prefix.error.${errors_[0].b}")
+                    val exy = textbox.getCoordinatesAtIndex(errors[0].a)
+                    cbErrorIndicator.tooltip(
+                        Auxiliaries.localizable("$tooltipPrefix.error.${errors[0].b}")
                     )
-                    cb_error_indicator.visible = true
-                    cb_error_indicator.setX(exy.x)
-                    cb_error_indicator.setY(exy.y + textbox.getLineHeight())
+                    cbErrorIndicator.visible = true
+                    cbErrorIndicator.setX(exy.x)
+                    cbErrorIndicator.setY(exy.y + textbox.getLineHeight())
                 }
             }
-            runtimeError_ = nbt.getString("runtimeError")
-            if (runtimeError_.isNotEmpty() && errors_.isEmpty()) {
+            runtimeError = nbt.getString("runtimeError")
+            if (runtimeError.isNotEmpty() && errors.isEmpty()) {
                 val exy = textbox.getCoordinatesAtIndex(0)
-                cb_error_indicator.tooltip(Component.literal(runtimeError_))
-                cb_error_indicator.visible = true
-                cb_error_indicator.setX(exy.x)
-                cb_error_indicator.setY(exy.y + textbox.getLineHeight())
+                cbErrorIndicator.tooltip(Component.literal(runtimeError))
+                cbErrorIndicator.visible = true
+                cbErrorIndicator.setX(exy.x)
+                cbErrorIndicator.setY(exy.y + textbox.getLineHeight())
             }
             if (nbt.contains("player", Tag.TAG_STRING.toInt())) {
                 val playerName = nbt.getString("player")
                 if (playerName.isEmpty()) {
                     activatingPlayer = Component.empty()
-                    rca_enabled_indicator.visible = false
-                    rca_enabled_indicator.active = false
+                    rcaEnabledIndicator.visible = false
+                    rcaEnabledIndicator.active = false
                 } else {
                     activatingPlayer = Component.literal(playerName)
-                    rca_enabled_indicator.visible = true
-                    rca_enabled_indicator.active = true
+                    rcaEnabledIndicator.visible = true
+                    rcaEnabledIndicator.active = true
                 }
             }
-        } else if (--update_counter_ <= 0) {
-            update_counter_ = VALUE_UPDATE_INTERVAL
+        } else if (--updateCounter <= 0) {
+            updateCounter = valueUpdateInterval
             if (!codeRequested) {
                 codeRequested = true
                 onGuiAction("serverdata")
@@ -402,14 +400,14 @@ class ControlBoxGui(
             }
         }
 
-        start_stop.active = errors_.isEmpty() && runtimeError_.isEmpty()
-        if (!start_stop.active) start_stop.checked(false) else cb_error_indicator.visible = false
-        textbox.active = !start_stop.checked()
+        startStop.active = errors.isEmpty() && runtimeError.isEmpty()
+        if (!startStop.active) startStop.checked(false) else cbErrorIndicator.visible = false
+        textbox.active = !startStop.checked()
         textbox.setFontColor(if (textbox.active) COLOR_TEXT_ACTIVE else COLOR_TEXT_INACTIVE)
-        cb_paste_all.visible = textbox.active && textbox.getValue().trim().isEmpty()
-        cb_copy_all.visible = !cb_paste_all.visible
-        if (focus_editor_) {
-            focus_editor_ = false
+        cbPasteAll.visible = textbox.active && textbox.getValue().trim().isEmpty()
+        cbCopyAll.visible = !cbPasteAll.visible
+        if (focusEditor) {
+            focusEditor = false
             if (!isDragging && !textbox.isFocused) {
                 children().forEach { child ->
                     if (child != textbox && child is AbstractWidget) child.setFocused(false)

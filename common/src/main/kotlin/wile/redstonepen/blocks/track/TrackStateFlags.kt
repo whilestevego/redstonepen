@@ -1,11 +1,11 @@
 package wile.redstonepen.blocks.track
 
 import net.minecraft.core.Direction
+import wile.redstonepen.blocks.track.RedstoneTrackDefs.Connections
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_CON_MASK
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_CON_POS
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_PWR_POS
 import wile.redstonepen.blocks.track.RedstoneTrackDefs.STATE_FLAG_WIR_MASK
-import wile.redstonepen.blocks.track.RedstoneTrackDefs.connections
 
 /**
  * Typed wrapper around the `Long` bit field that encodes wire presence, bulk connectors, and
@@ -37,7 +37,7 @@ value class TrackStateFlags(val raw: Long) {
     fun sidePower(side: Direction): Int {
         val shift =
             STATE_FLAG_PWR_POS +
-                POWER_BITS_PER_SIDE * connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0)
+                POWER_BITS_PER_SIDE * Connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0)
         return ((raw shr shift) and 0xfL).toInt()
     }
 
@@ -48,7 +48,7 @@ value class TrackStateFlags(val raw: Long) {
     fun withSidePower(side: Direction, p: Int): TrackStateFlags {
         val shift =
             STATE_FLAG_PWR_POS +
-                POWER_BITS_PER_SIDE * connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0)
+                POWER_BITS_PER_SIDE * Connections.CONNECTION_BIT_ORDER_REV.getOrDefault(side, 0)
         return TrackStateFlags(
             (raw and (0xfL shl shift).inv()) or ((p.toLong() and 0xfL) shl shift)
         )

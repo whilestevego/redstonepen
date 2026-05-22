@@ -18,10 +18,10 @@ class TrackNetTest :
                 val pwrSides = listOf(Direction.NORTH)
                 val net = TrackNet(positions, nbSides, intSides, pwrSides, 7)
                 assertSoftly {
-                    net.neighbour_positions shouldBe positions
-                    net.neighbour_sides shouldBe nbSides
-                    net.internal_sides shouldBe intSides
-                    net.power_sides shouldBe pwrSides
+                    net.neighbourPositions shouldBe positions
+                    net.neighbourSides shouldBe nbSides
+                    net.internalSides shouldBe intSides
+                    net.powerSides shouldBe pwrSides
                     net.power shouldBe 7
                 }
             }
